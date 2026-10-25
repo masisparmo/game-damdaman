@@ -1,0 +1,6 @@
+{
+  "name": "Maen Dam-Daman - Permainan Papan Tradisional",
+  "description": "Game strategi papan tradisional nusantara Maen Dam-Daman (Damdas / Catur Jawa) yang responsif, dilengkapi aturan autentik graf etnomatematika, papan yang bisa diubah ukuran, dan AI cerdas.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
