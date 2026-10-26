@@ -49,6 +49,7 @@ export class OnlineMatchService {
   private myRole: PlayerId | null = null;
   private myName: string = 'Pemain';
   private opponentName: string = 'Lawan';
+  private clientId: string = 'cli_' + Math.random().toString(36).substring(2, 9) + '_' + Date.now().toString(36);
 
   // Event callbacks
   public onOpponentJoined: ((opponentName: string) => void) | null = null;
@@ -76,6 +77,10 @@ export class OnlineMatchService {
     return this.opponentName;
   }
 
+  public getClientId(): string {
+    return this.clientId;
+  }
+
   /**
    * Generate a clean 6-digit room code: e.g. DAM-7842
    */
@@ -88,26 +93,30 @@ export class OnlineMatchService {
    * Host a Private Room for a friend
    */
   public async createPrivateRoom(roomCode: string, playerName: string): Promise<string> {
-    this.cleanup();
+    console.log(`[OnlineMatch] createPrivateRoom called with roomCode: ${roomCode}, name: ${playerName}`);
+    await this.cleanup();
     this.currentRoomId = roomCode;
     this.myRole = 'P1';
     this.myName = playerName || 'Pemain 1';
 
     const channelName = `damdaman:room:${roomCode}`;
-    this.activeChannel = supabase.channel(channelName, {
+    const channel = supabase.channel(channelName, {
       config: {
         broadcast: { ack: false, self: false },
-        presence: { key: `host-${Date.now()}` },
+        presence: { key: this.clientId },
       },
     });
+    this.activeChannel = channel;
 
-    this.setupRoomListeners(this.activeChannel);
+    this.setupRoomListeners(channel);
 
-    await this.activeChannel.subscribe(async (status) => {
+    await channel.subscribe(async (status) => {
+      console.log(`[OnlineMatch] Host subscribed to ${channelName}: ${status}`);
       if (status === 'SUBSCRIBED') {
-        await this.activeChannel?.track({
+        await channel.track({
           role: 'P1',
           name: this.myName,
+          clientId: this.clientId,
           joinedAt: Date.now(),
         });
       }
@@ -120,35 +129,41 @@ export class OnlineMatchService {
    * Join an existing Private Room using code
    */
   public async joinPrivateRoom(roomCode: string, playerName: string): Promise<void> {
-    this.cleanup();
+    console.log(`[OnlineMatch] joinPrivateRoom called with roomCode: ${roomCode}, name: ${playerName}`);
+    await this.cleanup();
     this.currentRoomId = roomCode;
     this.myRole = 'P2';
     this.myName = playerName || 'Pemain 2';
 
     const channelName = `damdaman:room:${roomCode}`;
-    this.activeChannel = supabase.channel(channelName, {
+    const channel = supabase.channel(channelName, {
       config: {
         broadcast: { ack: false, self: false },
-        presence: { key: `guest-${Date.now()}` },
+        presence: { key: this.clientId },
       },
     });
+    this.activeChannel = channel;
 
-    this.setupRoomListeners(this.activeChannel);
+    this.setupRoomListeners(channel);
 
-    await this.activeChannel.subscribe(async (status) => {
+    await channel.subscribe(async (status) => {
+      console.log(`[OnlineMatch] Guest subscribed to ${channelName}: ${status}`);
       if (status === 'SUBSCRIBED') {
-        await this.activeChannel?.track({
+        await channel.track({
           role: 'P2',
           name: this.myName,
+          clientId: this.clientId,
           joinedAt: Date.now(),
         });
 
-        // Notify host that guest has entered
-        this.activeChannel?.send({
-          type: 'broadcast',
-          event: 'player_joined',
-          payload: { name: this.myName, role: 'P2' },
-        });
+        // Notify host immediately that guest has entered
+        setTimeout(() => {
+          channel.send({
+            type: 'broadcast',
+            event: 'player_joined',
+            payload: { name: this.myName, role: 'P2', clientId: this.clientId },
+          });
+        }, 100);
       }
     });
   }
@@ -157,19 +172,26 @@ export class OnlineMatchService {
    * Quick Matchmaking Queue
    */
   public async startMatchmaking(playerName: string): Promise<void> {
-    this.cleanup();
+    console.log(`[OnlineMatch] startMatchmaking called for ${playerName} (clientId: ${this.clientId})`);
+    await this.cleanup();
     this.myName = playerName || 'Pemain';
+
+    const myJoinedAt = Date.now();
+    const myClientId = this.clientId;
+    let isMatched = false;
 
     const lobbyChannel = supabase.channel('damdaman:matchmaking_queue', {
       config: {
-        presence: { key: `queue-${Date.now()}-${Math.random().toString(36).substring(2, 6)}` },
+        presence: { key: myClientId },
       },
     });
     this.matchmakingChannel = lobbyChannel;
 
     lobbyChannel.on('presence', { event: 'sync' }, () => {
+      if (isMatched) return;
       const state = lobbyChannel.presenceState();
-      const users: any[] = [];
+      const users: Array<{ name: string; clientId: string; joinedAt: number }> = [];
+
       for (const key of Object.keys(state)) {
         const presences = state[key] as any[];
         if (presences && presences.length > 0) {
@@ -177,24 +199,34 @@ export class OnlineMatchService {
         }
       }
 
-      // If at least 2 users are waiting in the queue
+      console.log(`[OnlineMatch] Queue presence sync: ${users.length} player(s) waiting:`, users.map(u => `${u.name} (${u.clientId})`));
+
+      // If at least 2 distinct clients are waiting in queue
       if (users.length >= 2) {
-        // Sort deterministically by joinedAt timestamp
-        users.sort((a, b) => (a.joinedAt || 0) - (b.joinedAt || 0));
+        // Sort deterministically by joinedAt, then clientId
+        users.sort((a, b) => {
+          if ((a.joinedAt || 0) !== (b.joinedAt || 0)) {
+            return (a.joinedAt || 0) - (b.joinedAt || 0);
+          }
+          return (a.clientId || '').localeCompare(b.clientId || '');
+        });
+
         const playerA = users[0];
         const playerB = users[1];
 
-        const isMeA = playerA.name === this.myName && playerA.joinedAt === myJoinedAt;
-        const isMeB = playerB.name === this.myName && playerB.joinedAt === myJoinedAt;
+        // Ensure playerA and playerB are actually different clients
+        if (playerA.clientId === playerB.clientId) return;
 
-        if (isMeA || isMeB) {
-          const generatedRoom = `DAM-QM${playerA.joinedAt.toString().slice(-4)}`;
+        // If I am either Player A or Player B, coordinate room pairing
+        if (playerA.clientId === myClientId || playerB.clientId === myClientId) {
+          const generatedRoom = `DAM-QM${Math.abs(playerA.joinedAt % 10000).toString().padStart(4, '0')}`;
+          console.log(`[OnlineMatch] Pair found! Sending match_paired for room ${generatedRoom}`);
           lobbyChannel.send({
             type: 'broadcast',
             event: 'match_paired',
             payload: {
-              targetA: playerA.joinedAt,
-              targetB: playerB.joinedAt,
+              targetAId: playerA.clientId,
+              targetBId: playerB.clientId,
               roomId: generatedRoom,
               hostName: playerA.name,
               guestName: playerB.name,
@@ -204,13 +236,14 @@ export class OnlineMatchService {
       }
     });
 
-    const myJoinedAt = Date.now();
-
     lobbyChannel.on('broadcast', { event: 'match_paired' }, async ({ payload }) => {
-      if (payload.targetA === myJoinedAt) {
+      if (isMatched) return;
+
+      if (payload.targetAId === myClientId) {
         // I am Host (P1)
-        lobbyChannel.unsubscribe();
-        this.matchmakingChannel = null;
+        console.log(`[OnlineMatch] I am HOST (P1) for room ${payload.roomId}`);
+        isMatched = true;
+        this.cancelMatchmaking();
         this.opponentName = payload.guestName;
         await this.createPrivateRoom(payload.roomId, this.myName);
         this.onMatchFound?.({
@@ -219,11 +252,14 @@ export class OnlineMatchService {
           myName: this.myName,
           opponentName: payload.guestName,
         });
-      } else if (payload.targetB === myJoinedAt) {
+      } else if (payload.targetBId === myClientId) {
         // I am Guest (P2)
-        lobbyChannel.unsubscribe();
-        this.matchmakingChannel = null;
+        console.log(`[OnlineMatch] I am GUEST (P2) for room ${payload.roomId}`);
+        isMatched = true;
+        this.cancelMatchmaking();
         this.opponentName = payload.hostName;
+        // Wait slightly so host creates room first
+        await new Promise((r) => setTimeout(r, 200));
         await this.joinPrivateRoom(payload.roomId, this.myName);
         this.onMatchFound?.({
           roomId: payload.roomId,
@@ -235,9 +271,11 @@ export class OnlineMatchService {
     });
 
     await lobbyChannel.subscribe(async (status) => {
+      console.log(`[OnlineMatch] Matchmaking queue subscribed: ${status}`);
       if (status === 'SUBSCRIBED') {
         await lobbyChannel.track({
           name: this.myName,
+          clientId: myClientId,
           joinedAt: myJoinedAt,
         });
       }
@@ -249,7 +287,8 @@ export class OnlineMatchService {
    */
   public cancelMatchmaking() {
     if (this.matchmakingChannel) {
-      this.matchmakingChannel.unsubscribe();
+      console.log('[OnlineMatch] Cancelling matchmaking queue channel');
+      supabase.removeChannel(this.matchmakingChannel);
       this.matchmakingChannel = null;
     }
   }
@@ -260,17 +299,20 @@ export class OnlineMatchService {
   private setupRoomListeners(channel: RealtimeChannel) {
     // Player joined event
     channel.on('broadcast', { event: 'player_joined' }, ({ payload }) => {
-      if (payload && payload.name) {
-        this.opponentName = payload.name;
-        this.onOpponentJoined?.(payload.name);
+      console.log('[OnlineMatch] Received player_joined event:', payload);
+      if (payload && payload.clientId !== this.clientId) {
+        if (payload.name) {
+          this.opponentName = payload.name;
+        }
+        this.onOpponentJoined?.(this.opponentName);
         this.onOpponentStatusChange?.(true);
 
-        // If I am host, reply with my name
+        // If I am host, reply with host_ack so guest knows I am here
         if (this.myRole === 'P1') {
           channel.send({
             type: 'broadcast',
             event: 'host_ack',
-            payload: { name: this.myName },
+            payload: { name: this.myName, role: 'P1', clientId: this.clientId },
           });
         }
       }
@@ -278,15 +320,19 @@ export class OnlineMatchService {
 
     // Host acknowledgement
     channel.on('broadcast', { event: 'host_ack' }, ({ payload }) => {
-      if (payload && payload.name) {
-        this.opponentName = payload.name;
-        this.onOpponentJoined?.(payload.name);
+      console.log('[OnlineMatch] Received host_ack event:', payload);
+      if (payload && payload.clientId !== this.clientId) {
+        if (payload.name) {
+          this.opponentName = payload.name;
+        }
+        this.onOpponentJoined?.(this.opponentName);
         this.onOpponentStatusChange?.(true);
       }
     });
 
     // Move execution event
     channel.on('broadcast', { event: 'game_move' }, ({ payload }) => {
+      console.log('[OnlineMatch] Received game_move from remote opponent:', payload);
       if (payload && payload.move && payload.nextState) {
         this.onRemoteMoveReceived?.(payload);
       }
@@ -294,33 +340,56 @@ export class OnlineMatchService {
 
     // Claim DAM penalty event
     channel.on('broadcast', { event: 'claim_dam' }, () => {
+      console.log('[OnlineMatch] Received claim_dam event');
       this.onRemoteClaimDam?.();
     });
 
     // Pass multi-jump event
     channel.on('broadcast', { event: 'pass_jump' }, () => {
+      console.log('[OnlineMatch] Received pass_jump event');
       this.onRemotePassJump?.();
     });
 
     // Game restart event
     channel.on('broadcast', { event: 'restart_game' }, () => {
+      console.log('[OnlineMatch] Received restart_game event');
       this.onRemoteRestart?.();
     });
 
     // Reaction event (emoji / quick message)
     channel.on('broadcast', { event: 'reaction' }, ({ payload }) => {
+      console.log('[OnlineMatch] Received reaction:', payload);
       if (payload && payload.emoji) {
         this.onReactionReceived?.(payload);
       }
     });
 
-    // Track presence to detect opponent disconnect
+    // Track presence state for robust connection detection
     channel.on('presence', { event: 'sync' }, () => {
       const state = channel.presenceState();
-      const count = Object.keys(state).length;
-      if (count >= 2) {
-        this.onOpponentStatusChange?.(true);
-      } else if (count === 1 && this.myRole) {
+      console.log('[OnlineMatch] Room presence sync:', state);
+      let foundOpponent = false;
+
+      for (const key of Object.keys(state)) {
+        const presences = state[key] as any[];
+        for (const p of presences) {
+          if (p.clientId && p.clientId !== this.clientId) {
+            foundOpponent = true;
+            if (p.name) {
+              this.opponentName = p.name;
+              this.onOpponentJoined?.(p.name);
+            }
+          }
+        }
+      }
+
+      this.onOpponentStatusChange?.(foundOpponent);
+    });
+
+    channel.on('presence', { event: 'leave' }, ({ leftPresences }) => {
+      console.log('[OnlineMatch] Presence leave:', leftPresences);
+      const isOpponentLeaving = leftPresences?.some((p: any) => p.clientId !== this.clientId);
+      if (isOpponentLeaving) {
         this.onOpponentStatusChange?.(false);
       }
     });
@@ -330,7 +399,11 @@ export class OnlineMatchService {
    * Broadcast a move made by the local player
    */
   public broadcastMove(move: Move, nextState: GameState) {
-    if (!this.activeChannel) return;
+    if (!this.activeChannel) {
+      console.warn('[OnlineMatch] broadcastMove ignored: activeChannel is null!');
+      return;
+    }
+    console.log('[OnlineMatch] Broadcasting move:', move);
     this.activeChannel.send({
       type: 'broadcast',
       event: 'game_move',
@@ -339,7 +412,7 @@ export class OnlineMatchService {
   }
 
   /**
-   * Broadcast DAM penalty claim
+   * Broadcast claim DAM penalty
    */
   public broadcastClaimDam() {
     if (!this.activeChannel) return;
@@ -351,7 +424,7 @@ export class OnlineMatchService {
   }
 
   /**
-   * Broadcast passing consecutive multi-jump
+   * Broadcast passing consecutive jump
    */
   public broadcastPassJump() {
     if (!this.activeChannel) return;
@@ -393,13 +466,14 @@ export class OnlineMatchService {
   /**
    * Clean up channels
    */
-  public cleanup() {
+  public async cleanup() {
+    console.log('[OnlineMatch] Cleaning up active channels');
     if (this.activeChannel) {
-      this.activeChannel.unsubscribe();
+      await supabase.removeChannel(this.activeChannel);
       this.activeChannel = null;
     }
     if (this.matchmakingChannel) {
-      this.matchmakingChannel.unsubscribe();
+      await supabase.removeChannel(this.matchmakingChannel);
       this.matchmakingChannel = null;
     }
     this.currentRoomId = null;

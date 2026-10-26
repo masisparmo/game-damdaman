@@ -174,7 +174,7 @@ export default function App() {
     };
 
     onlineMatch.onRemoteRestart = () => {
-      handleRestart();
+      handleRestart(rulesConfig, true);
     };
 
     onlineMatch.onReactionReceived = ({ emoji, senderName }) => {
@@ -1062,6 +1062,11 @@ export default function App() {
           setOnlineConfig(cfg);
           setGameMode('online');
           setIsOpponentConnected(true);
+          if (cfg.myRole === 'P2') {
+            setIsFlipped(true);
+          } else {
+            setIsFlipped(false);
+          }
           handleRestart(rulesConfig, true);
         }}
       />

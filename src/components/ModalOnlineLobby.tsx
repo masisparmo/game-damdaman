@@ -11,7 +11,7 @@
  * - Full Dual Language (ID & EN)
  */
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import {
   X,
   Globe,
@@ -55,21 +55,27 @@ export const ModalOnlineLobby: React.FC<ModalOnlineLobbyProps> = ({
   const [generatedRoom, setGeneratedRoom] = useState<string>('');
   const [joinCodeInput, setJoinCodeInput] = useState<string>('');
   const [copiedLink, setCopiedLink] = useState(false);
-  const [isWaitingFriend, setIsWaitingFriend] = useState(false);
   const [friendJoinedName, setFriendJoinedName] = useState<string | null>(null);
   const [joinError, setJoinError] = useState<string | null>(null);
+  const [isJoining, setIsJoining] = useState(false);
+
+  // Flag to know if game was started so cleanup is NOT invoked on modal unmount
+  const isStartingGameRef = useRef(false);
 
   const handleCancelAll = () => {
-    onlineMatch.cleanup();
+    if (!isStartingGameRef.current) {
+      onlineMatch.cleanup();
+    }
     setIsSearching(false);
-    setIsWaitingFriend(false);
     setFriendJoinedName(null);
     setJoinError(null);
+    setIsJoining(false);
   };
 
-  // Generate room code on open
+  // Automatically setup room code and listeners
   useEffect(() => {
     if (isOpen) {
+      isStartingGameRef.current = false;
       if (initialRoomCode) {
         setActiveTab('friend');
         setFriendSubTab('join');
@@ -79,9 +85,24 @@ export const ModalOnlineLobby: React.FC<ModalOnlineLobbyProps> = ({
         setGeneratedRoom(code);
       }
     } else {
-      handleCancelAll();
+      if (!isStartingGameRef.current) {
+        onlineMatch.cleanup();
+      }
+      setIsSearching(false);
     }
   }, [isOpen, initialRoomCode]);
+
+  // When switching to friend "create", activate the room immediately
+  useEffect(() => {
+    if (isOpen && activeTab === 'friend' && friendSubTab === 'create' && generatedRoom) {
+      console.log(`[Lobby] Auto-hosting room: ${generatedRoom}`);
+      onlineMatch.onOpponentJoined = (opponent) => {
+        console.log(`[Lobby] Host detected friend joined: ${opponent}`);
+        setFriendJoinedName(opponent);
+      };
+      onlineMatch.createPrivateRoom(generatedRoom, playerName);
+    }
+  }, [isOpen, activeTab, friendSubTab, generatedRoom, playerName]);
 
   // Matchmaking timer
   useEffect(() => {
@@ -105,7 +126,9 @@ export const ModalOnlineLobby: React.FC<ModalOnlineLobbyProps> = ({
   const handleStartQuickMatch = async () => {
     setIsSearching(true);
     onlineMatch.onMatchFound = (config) => {
+      console.log('[Lobby] Quick match found:', config);
       setIsSearching(false);
+      isStartingGameRef.current = true;
       onStartOnlineGame(config);
       onClose();
     };
@@ -117,20 +140,9 @@ export const ModalOnlineLobby: React.FC<ModalOnlineLobbyProps> = ({
     setIsSearching(false);
   };
 
-  // Handle Create Private Room
-  const handleCreateRoom = async () => {
-    setIsWaitingFriend(true);
-    setFriendJoinedName(null);
-
-    onlineMatch.onOpponentJoined = (opponent) => {
-      setFriendJoinedName(opponent);
-    };
-
-    await onlineMatch.createPrivateRoom(generatedRoom, playerName);
-  };
-
   // Start match after friend entered
   const handleStartWithJoinedFriend = () => {
+    isStartingGameRef.current = true;
     onStartOnlineGame({
       roomId: generatedRoom,
       myRole: 'P1',
@@ -149,21 +161,26 @@ export const ModalOnlineLobby: React.FC<ModalOnlineLobbyProps> = ({
     }
 
     setJoinError(null);
+    setIsJoining(true);
+
     try {
-      onlineMatch.onOpponentJoined = (opponent) => {
+      onlineMatch.onOpponentJoined = (hostName) => {
+        console.log('[Lobby] Guest detected host ack:', hostName);
+        isStartingGameRef.current = true;
         onStartOnlineGame({
           roomId: code,
           myRole: 'P2',
           myName: playerName,
-          opponentName: opponent,
+          opponentName: hostName || (lang === 'en' ? 'Host Player' : 'Tuan Rumah'),
         });
         onClose();
       };
 
       await onlineMatch.joinPrivateRoom(code, playerName);
 
-      // Auto start as P2 after a brief handshake
+      // Transition to game board as P2
       setTimeout(() => {
+        isStartingGameRef.current = true;
         onStartOnlineGame({
           roomId: code,
           myRole: 'P2',
@@ -171,16 +188,19 @@ export const ModalOnlineLobby: React.FC<ModalOnlineLobbyProps> = ({
           opponentName: onlineMatch.getOpponentName() || (lang === 'en' ? 'Host Player' : 'Tuan Rumah'),
         });
         onClose();
-      }, 1200);
+      }, 1000);
     } catch (err) {
+      setIsJoining(false);
       setJoinError(lang === 'en' ? 'Failed to connect to room.' : 'Gagal terhubung ke ruangan.');
     }
   };
 
   const handleCopyLink = () => {
-    navigator.clipboard.writeText(shareableUrl);
-    setCopiedLink(true);
-    setTimeout(() => setCopiedLink(false), 2500);
+    try {
+      navigator.clipboard.writeText(shareableUrl);
+      setCopiedLink(true);
+      setTimeout(() => setCopiedLink(false), 2500);
+    } catch {}
   };
 
   const handleShareWhatsApp = () => {
@@ -189,6 +209,11 @@ export const ModalOnlineLobby: React.FC<ModalOnlineLobbyProps> = ({
         ? `Let's play traditional Indonesian Dam-Daman online with me! Click the link to join my game: ${shareableUrl}`
         : `Ayo main Dam-Daman online bareng saya! Klik link ini untuk langsung masuk ke ruangan: ${shareableUrl}`;
     window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(text)}`, '_blank');
+  };
+
+  const handleUserClose = () => {
+    handleCancelAll();
+    onClose();
   };
 
   const formatSeconds = (sec: number) => {
@@ -218,10 +243,7 @@ export const ModalOnlineLobby: React.FC<ModalOnlineLobbyProps> = ({
             </div>
           </div>
           <button
-            onClick={() => {
-              handleCancelAll();
-              onClose();
-            }}
+            onClick={handleUserClose}
             className="p-1.5 text-stone-400 hover:text-white rounded-lg hover:bg-stone-800 transition"
           >
             <X size={18} />
@@ -244,7 +266,6 @@ export const ModalOnlineLobby: React.FC<ModalOnlineLobbyProps> = ({
             <Zap size={14} />
             <span>{lang === 'en' ? 'Quick Match' : 'Cari Lawan Cepat'}</span>
           </button>
-
           <button
             onClick={() => {
               handleCancelAll();
@@ -263,64 +284,68 @@ export const ModalOnlineLobby: React.FC<ModalOnlineLobbyProps> = ({
 
         {/* Tab 1: Quick Match */}
         {activeTab === 'quick' && (
-          <div className="p-5 space-y-4 text-center">
-            <div className="max-w-xs mx-auto space-y-2">
-              <div className="w-16 h-16 mx-auto rounded-full bg-amber-500/10 border-2 border-amber-500/30 flex items-center justify-center text-amber-400">
-                {isSearching ? (
-                  <RefreshCw size={28} className="animate-spin text-amber-400" />
-                ) : (
-                  <Zap size={28} />
-                )}
-              </div>
-              <h4 className="font-bold text-stone-100 text-base">
-                {isSearching
-                  ? lang === 'en'
-                    ? 'Searching for Opponent...'
-                    : 'Mencari Lawan Online...'
-                  : lang === 'en'
-                  ? 'Ready to Play Against Anyone?'
-                  : 'Siap Bertanding Melawan Siapa Saja?'}
+          <div className="p-5 sm:p-6 space-y-4">
+            <div className="text-center space-y-1.5">
+              <h4 className="font-bold text-stone-200 text-sm sm:text-base">
+                {lang === 'en' ? 'Automatic Matchmaking' : 'Pemasangan Otomatis'}
               </h4>
-              <p className="text-xs text-stone-400 leading-relaxed">
-                {isSearching
-                  ? lang === 'en'
-                    ? `Matching with active players worldwide (${formatSeconds(searchTimer)})...`
-                    : `Menghubungkan dengan pemain aktif di internet (${formatSeconds(searchTimer)})...`
-                  : lang === 'en'
-                  ? 'Click the button below to automatically pair with other players in the matchmaking queue.'
-                  : 'Klik tombol di bawah untuk otomatis dipasangkan dengan pemain lain yang sedang mengantre.'}
+              <p className="text-xs text-stone-400 leading-relaxed max-w-sm mx-auto">
+                {lang === 'en'
+                  ? 'Pair automatically with another online player worldwide in 1 click.'
+                  : 'Otomatis dicarikan lawan tanding dengan pemain lain di seluruh dunia.'}
               </p>
             </div>
 
             {isSearching ? (
-              <div className="space-y-3 pt-2">
-                <div className="flex items-center justify-center gap-2 text-xs font-mono text-amber-300">
-                  <span className="w-2 h-2 rounded-full bg-amber-400 animate-ping" />
-                  <span>{formatSeconds(searchTimer)}</span>
+              <div className="p-5 bg-stone-950/80 rounded-2xl border border-amber-500/30 text-center space-y-3.5">
+                {/* Radar scanner animation */}
+                <div className="relative w-16 h-16 mx-auto flex items-center justify-center">
+                  <div className="absolute inset-0 rounded-full border-2 border-amber-500/40 animate-ping" />
+                  <div className="absolute inset-2 rounded-full border-2 border-amber-400/60 animate-pulse" />
+                  <div className="w-10 h-10 rounded-full bg-amber-500/20 text-amber-400 flex items-center justify-center font-mono font-bold text-xs">
+                    {formatSeconds(searchTimer)}
+                  </div>
                 </div>
+
+                <div className="space-y-1">
+                  <div className="text-xs font-bold text-amber-300">
+                    {lang === 'en' ? 'Searching for opponent...' : 'Sedang mencari lawan tanding...'}
+                  </div>
+                  <div className="text-[11px] text-stone-400">
+                    {lang === 'en' ? 'Waiting in queue' : 'Menunggu di antrean'}
+                  </div>
+                </div>
+
                 <button
                   onClick={handleCancelQuickMatch}
-                  className="px-5 py-2 rounded-xl text-xs font-semibold bg-stone-800 hover:bg-stone-700 text-rose-400 border border-stone-700 transition"
+                  className="px-4 py-1.5 rounded-lg text-xs font-semibold bg-stone-800 hover:bg-stone-700 text-stone-300 transition"
                 >
-                  {lang === 'en' ? 'Cancel Matchmaking' : 'Batal Mencari'}
+                  {lang === 'en' ? 'Cancel' : 'Batalkan'}
                 </button>
               </div>
             ) : (
-              <button
-                onClick={handleStartQuickMatch}
-                className="w-full py-3 rounded-xl text-sm font-bold bg-gradient-to-r from-amber-500 to-orange-600 hover:from-amber-400 hover:to-orange-500 text-white shadow-lg shadow-orange-950/40 active:scale-[0.99] transition flex items-center justify-center gap-2"
-              >
-                <Zap size={16} />
-                <span>{lang === 'en' ? 'Start Matchmaking Now' : 'Mulai Cari Lawan Sekarang'}</span>
-              </button>
+              <div className="space-y-3 pt-2">
+                <button
+                  onClick={handleStartQuickMatch}
+                  className="w-full py-3 rounded-xl text-sm font-bold bg-gradient-to-r from-amber-600 to-amber-500 hover:from-amber-500 hover:to-amber-400 text-white transition flex items-center justify-center gap-2 shadow-lg shadow-amber-950/50 active:scale-[0.99]"
+                >
+                  <Zap size={16} />
+                  <span>{lang === 'en' ? 'Find Match Now' : 'Cari Lawan Sekarang'}</span>
+                </button>
+                <p className="text-[11px] text-stone-500 text-center">
+                  {lang === 'en'
+                    ? 'Ultra-low latency sub-50ms WebSocket connection.'
+                    : 'Koneksi WebSocket real-time dengan latensi di bawah 50ms.'}
+                </p>
+              </div>
             )}
           </div>
         )}
 
-        {/* Tab 2: Play with Friend (Private Room) */}
+        {/* Tab 2: Play with Friend */}
         {activeTab === 'friend' && (
-          <div className="p-4 sm:p-5 space-y-4">
-            {/* Sub-tabs: Create or Join */}
+          <div className="p-5 sm:p-6 space-y-4">
+            {/* Sub-tabs: Create Room vs Join Room */}
             <div className="flex bg-stone-950 rounded-xl p-1 border border-stone-800 text-xs">
               <button
                 onClick={() => {
@@ -353,142 +378,144 @@ export const ModalOnlineLobby: React.FC<ModalOnlineLobbyProps> = ({
             {/* Sub-tab A: Create Room */}
             {friendSubTab === 'create' && (
               <div className="space-y-3.5">
-                {!isWaitingFriend ? (
-                  <div className="p-4 bg-stone-950/80 rounded-xl border border-stone-800 space-y-3 text-center">
-                    <span className="text-xs text-stone-400 block">
-                      {lang === 'en' ? 'Your Unique Room Code:' : 'Kode Ruangan Anda:'}
+                <div className="p-4 bg-stone-950/90 rounded-xl border border-amber-500/40 space-y-3">
+                  <div className="flex items-center justify-between border-b border-stone-800 pb-2">
+                    <span className="text-xs text-stone-400 font-medium">
+                      {lang === 'en' ? 'Room Code' : 'Kode Ruang'}:{' '}
+                      <strong className="text-amber-400 font-mono text-base">{generatedRoom}</strong>
                     </span>
-                    <div className="font-mono text-2xl font-black text-amber-400 tracking-wider">
-                      {generatedRoom}
-                    </div>
-                    <button
-                      onClick={handleCreateRoom}
-                      className="w-full py-2.5 rounded-xl text-xs sm:text-sm font-bold bg-amber-600 hover:bg-amber-500 text-white transition shadow-md shadow-amber-950/40"
-                    >
-                      {lang === 'en' ? 'Open Room & Invite Friend' : 'Buka Ruang & Undang Teman'}
-                    </button>
+                    <span className="flex items-center gap-1 text-[11px] text-emerald-400 font-mono">
+                      <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
+                      <span>{lang === 'en' ? 'Room Active' : 'Ruang Aktif'}</span>
+                    </span>
                   </div>
-                ) : (
-                  <div className="p-4 bg-stone-950/90 rounded-xl border border-amber-500/40 space-y-3">
-                    <div className="flex items-center justify-between border-b border-stone-800 pb-2">
-                      <span className="text-xs text-stone-400 font-medium">
-                        {lang === 'en' ? 'Room Code' : 'Kode Ruang'}:{' '}
-                        <strong className="text-amber-400 font-mono text-sm">{generatedRoom}</strong>
-                      </span>
-                      <span className="flex items-center gap-1 text-[11px] text-emerald-400 font-mono">
-                        <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
-                        <span>{lang === 'en' ? 'Room Active' : 'Ruang Aktif'}</span>
-                      </span>
-                    </div>
 
-                    {friendJoinedName ? (
-                      <div className="p-3 rounded-lg bg-emerald-950/40 border border-emerald-500/40 text-center space-y-2">
-                        <p className="text-xs text-emerald-300 font-bold">
-                          🎉 {friendJoinedName}{' '}
-                          {lang === 'en' ? 'has joined your room!' : 'telah masuk ke ruangan!'}
-                        </p>
+                  {friendJoinedName ? (
+                    <div className="p-3 rounded-lg bg-emerald-950/40 border border-emerald-500/40 text-center space-y-2">
+                      <p className="text-xs text-emerald-300 font-bold">
+                        🎉 {friendJoinedName}{' '}
+                        {lang === 'en' ? 'has joined your room!' : 'telah masuk ke ruangan!'}
+                      </p>
+                      <button
+                        onClick={handleStartWithJoinedFriend}
+                        className="w-full py-2 rounded-lg text-xs font-bold bg-emerald-600 hover:bg-emerald-500 text-white transition flex items-center justify-center gap-1.5 shadow-md"
+                      >
+                        <span>{lang === 'en' ? 'Start Game Now' : 'Mulai Bertanding Sekarang'}</span>
+                        <ArrowRight size={14} />
+                      </button>
+                    </div>
+                  ) : (
+                    <div className="space-y-3">
+                      <p className="text-xs text-stone-300 leading-relaxed text-center">
+                        {lang === 'en'
+                          ? 'Share the invitation link with your friend via WhatsApp or copy link:'
+                          : 'Kirimkan link undangan ke teman via WhatsApp atau salin link:'}
+                      </p>
+
+                      <div className="grid grid-cols-2 gap-2">
                         <button
-                          onClick={handleStartWithJoinedFriend}
-                          className="w-full py-2 rounded-lg text-xs font-bold bg-emerald-600 hover:bg-emerald-500 text-white transition flex items-center justify-center gap-1.5"
+                          onClick={handleCopyLink}
+                          className="py-2.5 px-3 rounded-xl text-xs font-semibold bg-stone-800 hover:bg-stone-700 text-stone-200 border border-stone-700 transition flex items-center justify-center gap-1.5 active:scale-95"
                         >
-                          <span>{lang === 'en' ? 'Start Game Now' : 'Mulai Bertanding Sekarang'}</span>
-                          <ArrowRight size={14} />
+                          {copiedLink ? (
+                            <Check size={14} className="text-emerald-400" />
+                          ) : (
+                            <Copy size={14} />
+                          )}
+                          <span>
+                            {copiedLink
+                              ? lang === 'en'
+                                ? 'Copied!'
+                                : 'Tersalin!'
+                              : lang === 'en'
+                              ? 'Copy Link'
+                              : 'Salin Link'}
+                          </span>
+                        </button>
+
+                        <button
+                          onClick={handleShareWhatsApp}
+                          className="py-2.5 px-3 rounded-xl text-xs font-bold bg-emerald-700 hover:bg-emerald-600 text-white transition flex items-center justify-center gap-1.5 shadow-sm active:scale-95"
+                        >
+                          <Share2 size={14} />
+                          <span>WhatsApp</span>
                         </button>
                       </div>
-                    ) : (
-                      <div className="space-y-3">
-                        <p className="text-xs text-stone-300 leading-relaxed text-center">
+
+                      <div className="pt-2 text-center flex items-center justify-center gap-2 text-stone-400 text-xs">
+                        <RefreshCw size={13} className="animate-spin text-amber-400" />
+                        <span>
                           {lang === 'en'
-                            ? 'Share the invitation link with your friend via WhatsApp or copy link:'
-                            : 'Kirimkan link undangan ke teman via WhatsApp atau salin link:'}
-                        </p>
-
-                        <div className="grid grid-cols-2 gap-2">
-                          <button
-                            onClick={handleCopyLink}
-                            className="py-2 px-3 rounded-xl text-xs font-semibold bg-stone-800 hover:bg-stone-700 text-stone-200 border border-stone-700 transition flex items-center justify-center gap-1.5"
-                          >
-                            {copiedLink ? (
-                              <Check size={14} className="text-emerald-400" />
-                            ) : (
-                              <Copy size={14} />
-                            )}
-                            <span>
-                              {copiedLink
-                                ? lang === 'en'
-                                  ? 'Copied!'
-                                  : 'Tersalin!'
-                                : lang === 'en'
-                                ? 'Copy Link'
-                                : 'Salin Link'}
-                            </span>
-                          </button>
-
-                          <button
-                            onClick={handleShareWhatsApp}
-                            className="py-2 px-3 rounded-xl text-xs font-bold bg-emerald-700 hover:bg-emerald-600 text-white transition flex items-center justify-center gap-1.5 shadow-sm"
-                          >
-                            <Share2 size={14} />
-                            <span>WhatsApp</span>
-                          </button>
-                        </div>
-
-                        <div className="flex items-center justify-center gap-2 pt-1 text-[11px] text-amber-300/80 font-mono">
-                          <RefreshCw size={12} className="animate-spin" />
-                          <span>
-                            {lang === 'en'
-                              ? 'Waiting for friend to open link...'
-                              : 'Menunggu teman membuka link...'}
-                          </span>
-                        </div>
+                            ? 'Waiting for friend to join...'
+                            : 'Menunggu teman bergabung...'}
+                        </span>
                       </div>
-                    )}
-                  </div>
-                )}
+                    </div>
+                  )}
+                </div>
+
+                <p className="text-[11px] text-stone-500 text-center">
+                  {lang === 'en'
+                    ? 'Friends opening your link will automatically connect.'
+                    : 'Teman yang membuka link akan otomatis masuk ke ruangan Anda.'}
+                </p>
               </div>
             )}
 
             {/* Sub-tab B: Join Room */}
             {friendSubTab === 'join' && (
-              <div className="p-4 bg-stone-950/80 rounded-xl border border-stone-800 space-y-3">
-                <label className="text-xs text-stone-300 font-medium block">
-                  {lang === 'en'
-                    ? 'Enter 6-digit room code from friend:'
-                    : 'Masukkan 6 digit kode dari teman:'}
-                </label>
-                <div className="flex gap-2">
+              <div className="space-y-3.5">
+                <div className="p-4 bg-stone-950/80 rounded-xl border border-stone-800 space-y-3">
+                  <span className="text-xs text-stone-400 block text-center">
+                    {lang === 'en'
+                      ? 'Enter 6-digit room code from your friend:'
+                      : 'Masukkan 6 digit kode ruang dari teman Anda:'}
+                  </span>
+
                   <input
                     type="text"
                     value={joinCodeInput}
-                    onChange={(e) => setJoinCodeInput(e.target.value.toUpperCase())}
-                    placeholder="DAM-XXXX"
+                    onChange={(e) => {
+                      setJoinCodeInput(e.target.value.toUpperCase());
+                      setJoinError(null);
+                    }}
+                    placeholder="Contoh: DAM-7842"
                     maxLength={10}
-                    className="flex-1 px-3 py-2 rounded-xl bg-stone-900 border border-stone-700 text-amber-400 font-mono text-sm tracking-wider uppercase focus:outline-hidden focus:border-amber-500"
+                    className="w-full text-center font-mono text-xl tracking-widest font-black uppercase bg-stone-900 border border-stone-700 focus:border-amber-500 rounded-xl py-2.5 text-amber-300 outline-none"
                   />
+
+                  {joinError && (
+                    <div className="flex items-center justify-center gap-1.5 text-xs text-rose-400">
+                      <ShieldAlert size={14} />
+                      <span>{joinError}</span>
+                    </div>
+                  )}
+
                   <button
                     onClick={handleJoinRoom}
-                    className="px-4 py-2 rounded-xl text-xs font-bold bg-amber-600 hover:bg-amber-500 text-white transition"
+                    disabled={isJoining}
+                    className="w-full py-2.5 rounded-xl text-xs sm:text-sm font-bold bg-amber-600 hover:bg-amber-500 text-white transition flex items-center justify-center gap-1.5 shadow-md shadow-amber-950/40 disabled:opacity-50"
                   >
-                    {lang === 'en' ? 'Join' : 'Gabung'}
+                    {isJoining ? (
+                      <RefreshCw size={14} className="animate-spin" />
+                    ) : (
+                      <ArrowRight size={14} />
+                    )}
+                    <span>
+                      {isJoining
+                        ? lang === 'en'
+                          ? 'Connecting...'
+                          : 'Menghubungkan...'
+                        : lang === 'en'
+                        ? 'Join Room'
+                        : 'Gabung Ruangan'}
+                    </span>
                   </button>
                 </div>
-
-                {joinError && (
-                  <div className="flex items-center gap-1.5 text-xs text-rose-400">
-                    <ShieldAlert size={14} />
-                    <span>{joinError}</span>
-                  </div>
-                )}
               </div>
             )}
           </div>
         )}
-
-        {/* Footer info */}
-        <div className="px-5 py-2.5 bg-stone-950 border-t border-stone-800/80 flex items-center justify-between text-[11px] text-stone-400">
-          <span>{lang === 'en' ? 'Playing as:' : 'Bermain sebagai:'} <strong className="text-stone-200">{playerName || 'Pemain'}</strong></span>
-          <span className="font-mono text-emerald-400 text-[10px]">● Supabase Realtime</span>
-        </div>
       </div>
     </div>
   );
