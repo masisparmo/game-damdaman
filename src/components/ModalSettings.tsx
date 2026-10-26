@@ -7,12 +7,12 @@
  */
 
 import React, { useState } from 'react';
-import { X, Volume2, VolumeX, Sliders, CheckCircle2, Play, RefreshCw, Palette, Globe, Brain, Download, RotateCcw } from 'lucide-react';
+import { X, Volume2, VolumeX, Sliders, CheckCircle2, Play, RefreshCw, Palette, Globe, Brain, RotateCcw } from 'lucide-react';
 import { RulesConfig } from '../game/rulesEngine';
 import { BoardTheme } from './Board';
 import { runAllQATests, TestResult } from '../game/testHarness';
 import { Language, translations } from '../i18n';
-import { getAIMemoryStats, resetLocalAIMemory, exportCollectiveBrainJSON } from '../game/aiMemory';
+import { getAIMemoryStats, resetLocalAIMemory } from '../game/aiMemory';
 
 interface ModalSettingsProps {
   isOpen: boolean;
@@ -251,6 +251,19 @@ export const ModalSettings: React.FC<ModalSettingsProps> = ({
               </div>
             </div>
 
+            {/* Cloud Connection Badge */}
+            <div className="flex items-center justify-between text-[11px] px-2.5 py-1.5 rounded-lg bg-stone-950/70 border border-stone-800">
+              <div className="flex items-center gap-1.5">
+                <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
+                <span className="text-stone-300 font-medium">
+                  {lang === 'en' ? 'Supabase Global Hive Mind' : 'Otak Global Supabase'}
+                </span>
+              </div>
+              <span className="text-emerald-400 font-mono text-[10px]">
+                {lang === 'en' ? 'Live Synchronized' : 'Tersinkronisasi Real-time'}
+              </span>
+            </div>
+
             {/* Quick Metrics */}
             <div className="grid grid-cols-3 gap-2 text-center">
               <div className="p-2 bg-stone-950/80 rounded-lg border border-stone-800">
@@ -273,24 +286,8 @@ export const ModalSettings: React.FC<ModalSettingsProps> = ({
               </div>
             </div>
 
-            {/* Export & Reset Actions */}
-            <div className="flex items-center justify-between gap-2 pt-1 border-t border-stone-800/80">
-              <button
-                onClick={() => {
-                  const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(exportCollectiveBrainJSON());
-                  const downloadAnchor = document.createElement('a');
-                  downloadAnchor.setAttribute("href", dataStr);
-                  downloadAnchor.setAttribute("download", `damdaman_master_brain_${Date.now()}.json`);
-                  document.body.appendChild(downloadAnchor);
-                  downloadAnchor.click();
-                  downloadAnchor.remove();
-                }}
-                className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-xs font-semibold bg-stone-800 hover:bg-stone-700 text-stone-200 border border-stone-700 transition"
-              >
-                <Download size={13} className="text-amber-400" />
-                <span>{t.exportBrainBtn}</span>
-              </button>
-
+            {/* Reset Action */}
+            <div className="flex items-center justify-end pt-1 border-t border-stone-800/80">
               <button
                 onClick={() => {
                   if (window.confirm(t.brainResetConfirm)) {
