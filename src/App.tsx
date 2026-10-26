@@ -62,7 +62,7 @@ export default function App() {
   const [rulesConfig, setRulesConfig] = useState<RulesConfig>(DEFAULT_RULES_CONFIG);
 
   // Modals
-  const [showTutorial, setShowTutorial] = useState<boolean>(false);
+  const [showTutorial, setShowTutorial] = useState<boolean>(true);
   const [showEtnomatematika, setShowEtnomatematika] = useState<boolean>(false);
   const [showSettings, setShowSettings] = useState<boolean>(false);
   const [showGameOver, setShowGameOver] = useState<boolean>(false);

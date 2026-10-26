@@ -6,8 +6,8 @@
  * Grounded in West Java Traditional Games Catalog & Pasuruan Ethnomathematics study.
  */
 
-import React, { useState } from 'react';
-import { X, ChevronLeft, ChevronRight, BookOpen, ShieldAlert, Trophy, Compass, Flame } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { X, Check, ChevronLeft, ChevronRight, BookOpen, ShieldAlert, Trophy, Compass, Flame } from 'lucide-react';
 
 interface ModalTutorialProps {
   isOpen: boolean;
@@ -16,6 +16,21 @@ interface ModalTutorialProps {
 
 export const ModalTutorial: React.FC<ModalTutorialProps> = ({ isOpen, onClose }) => {
   const [activeTab, setActiveTab] = useState<number>(0);
+
+  useEffect(() => {
+    if (!isOpen) return;
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        onClose();
+      } else if (e.key === 'ArrowRight') {
+        setActiveTab((prev) => Math.min(4, prev + 1));
+      } else if (e.key === 'ArrowLeft') {
+        setActiveTab((prev) => Math.max(0, prev - 1));
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [isOpen, onClose]);
 
   if (!isOpen) return null;
 
@@ -144,8 +159,14 @@ export const ModalTutorial: React.FC<ModalTutorialProps> = ({ isOpen, onClose })
   ];
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/75 backdrop-blur-sm animate-in fade-in duration-200">
-      <div className="relative w-full max-w-lg bg-stone-900 border border-stone-700 rounded-2xl shadow-2xl overflow-hidden flex flex-col max-h-[90vh]">
+    <div
+      className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/75 backdrop-blur-sm animate-in fade-in duration-200"
+      onClick={onClose}
+    >
+      <div
+        className="relative w-full max-w-lg bg-stone-900 border border-stone-700 rounded-2xl shadow-2xl overflow-hidden flex flex-col max-h-[90vh]"
+        onClick={(e) => e.stopPropagation()}
+      >
         {/* Header */}
         <div className="flex items-center justify-between px-5 py-3.5 border-b border-stone-800 bg-stone-950/60">
           <div className="flex items-center gap-2">
@@ -154,10 +175,12 @@ export const ModalTutorial: React.FC<ModalTutorialProps> = ({ isOpen, onClose })
           </div>
           <button
             onClick={onClose}
-            className="p-1.5 text-stone-400 hover:text-white rounded-lg hover:bg-stone-800 transition"
+            className="flex items-center gap-1 px-2 py-1 text-stone-400 hover:text-white rounded-lg hover:bg-stone-800 transition text-xs"
             aria-label="Tutup"
+            title="Tutup (Close)"
           >
             <X size={18} />
+            <span className="hidden sm:inline">Tutup</span>
           </button>
         </div>
 
@@ -170,21 +193,36 @@ export const ModalTutorial: React.FC<ModalTutorialProps> = ({ isOpen, onClose })
         </div>
 
         {/* Footer Navigation */}
-        <div className="flex items-center justify-between px-5 py-3 border-t border-stone-800 bg-stone-950/60">
-          <div className="flex items-center gap-1.5">
-            {slides.map((_, i) => (
-              <button
-                key={i}
-                onClick={() => setActiveTab(i)}
-                className={`h-2 rounded-full transition-all ${
-                  activeTab === i ? 'w-6 bg-amber-500' : 'w-2 bg-stone-700 hover:bg-stone-600'
-                }`}
-                aria-label={`Slide ${i + 1}`}
-              />
-            ))}
+        <div className="flex flex-wrap items-center justify-between gap-3 px-5 py-3 border-t border-stone-800 bg-stone-950/60">
+          {/* Indicator */}
+          <div className="flex items-center gap-2">
+            <div className="flex items-center gap-1.5">
+              {slides.map((_, i) => (
+                <button
+                  key={i}
+                  onClick={() => setActiveTab(i)}
+                  className={`h-2 rounded-full transition-all ${
+                    activeTab === i ? 'w-6 bg-amber-500' : 'w-2 bg-stone-700 hover:bg-stone-600'
+                  }`}
+                  aria-label={`Slide ${i + 1}`}
+                />
+              ))}
+            </div>
+            <span className="text-[11px] text-stone-400">
+              {activeTab + 1}/{slides.length}
+            </span>
           </div>
 
+          {/* Action buttons: Tutup (Close), Previous, Next, and OK */}
           <div className="flex items-center gap-2">
+            <button
+              onClick={onClose}
+              className="px-3 py-1.5 rounded-lg text-xs font-semibold bg-stone-800 hover:bg-stone-700 text-stone-300 transition"
+              title="Tutup Jendela"
+            >
+              Tutup
+            </button>
+
             <button
               onClick={() => setActiveTab(Math.max(0, activeTab - 1))}
               disabled={activeTab === 0}
@@ -193,22 +231,25 @@ export const ModalTutorial: React.FC<ModalTutorialProps> = ({ isOpen, onClose })
               <ChevronLeft size={14} />
               Sebelumnya
             </button>
-            {activeTab < slides.length - 1 ? (
+
+            {activeTab < slides.length - 1 && (
               <button
                 onClick={() => setActiveTab(activeTab + 1)}
-                className="flex items-center gap-1 px-3 py-1.5 rounded-lg text-xs font-semibold bg-amber-600 hover:bg-amber-500 transition text-white"
+                className="flex items-center gap-1 px-3 py-1.5 rounded-lg text-xs font-semibold bg-stone-700 hover:bg-stone-600 transition text-stone-100"
               >
                 Selanjutnya
                 <ChevronRight size={14} />
               </button>
-            ) : (
-              <button
-                onClick={onClose}
-                className="flex items-center gap-1 px-4 py-1.5 rounded-lg text-xs font-semibold bg-emerald-600 hover:bg-emerald-500 transition text-white"
-              >
-                Mulai Main!
-              </button>
             )}
+
+            <button
+              onClick={onClose}
+              className="flex items-center gap-1.5 px-4 py-1.5 rounded-lg text-xs font-bold bg-emerald-600 hover:bg-emerald-500 text-white shadow-md shadow-emerald-950/40 transition active:scale-95"
+              title="Konfirmasi OK dan mulai bermain"
+            >
+              <Check size={14} />
+              {activeTab === slides.length - 1 ? 'OK, Mulai Main!' : 'OK'}
+            </button>
           </div>
         </div>
       </div>
