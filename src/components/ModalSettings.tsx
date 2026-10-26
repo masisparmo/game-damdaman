@@ -3,13 +3,15 @@
  * SPDX-License-Identifier: Apache-2.0
  * 
  * Settings & QA Test Runner Modal for Maen Dam-Daman.
+ * Supports bilingual (ID & EN).
  */
 
 import React, { useState } from 'react';
-import { X, Volume2, VolumeX, Sliders, CheckCircle2, Play, RefreshCw, Palette, HelpCircle } from 'lucide-react';
+import { X, Volume2, VolumeX, Sliders, CheckCircle2, Play, RefreshCw, Palette, Globe } from 'lucide-react';
 import { RulesConfig } from '../game/rulesEngine';
 import { BoardTheme } from './Board';
 import { runAllQATests, TestResult } from '../game/testHarness';
+import { Language, translations } from '../i18n';
 
 interface ModalSettingsProps {
   isOpen: boolean;
@@ -21,6 +23,8 @@ interface ModalSettingsProps {
   boardTheme: BoardTheme;
   onChangeTheme: (theme: BoardTheme) => void;
   onResetGame: () => void;
+  lang?: Language;
+  onChangeLang?: (lang: Language) => void;
 }
 
 export const ModalSettings: React.FC<ModalSettingsProps> = ({
@@ -33,11 +37,14 @@ export const ModalSettings: React.FC<ModalSettingsProps> = ({
   boardTheme,
   onChangeTheme,
   onResetGame,
+  lang = 'id',
+  onChangeLang,
 }) => {
   const [qaResults, setQaResults] = useState<TestResult[] | null>(null);
   const [isTesting, setIsTesting] = useState(false);
 
   if (!isOpen) return null;
+  const t = translations[lang];
 
   const handleRunQA = async () => {
     setIsTesting(true);
@@ -53,12 +60,13 @@ export const ModalSettings: React.FC<ModalSettingsProps> = ({
         <div className="flex items-center justify-between px-5 py-3.5 border-b border-stone-800 bg-stone-950/60">
           <div className="flex items-center gap-2">
             <Sliders className="w-5 h-5 text-amber-400" />
-            <h3 className="font-bold text-stone-100 text-base">Pengaturan & Pengujian QA</h3>
+            <h3 className="font-bold text-stone-100 text-base">{t.settingsTitle}</h3>
           </div>
           <button
             onClick={onClose}
             className="p-1.5 text-stone-400 hover:text-white rounded-lg hover:bg-stone-800 transition"
-            aria-label="Tutup"
+            aria-label={t.close}
+            title={t.close}
           >
             <X size={18} />
           </button>
@@ -66,11 +74,45 @@ export const ModalSettings: React.FC<ModalSettingsProps> = ({
 
         {/* Content Body */}
         <div className="p-5 overflow-y-auto space-y-5 text-stone-300 text-xs sm:text-sm">
+          {/* Language Selection */}
+          {onChangeLang && (
+            <div className="p-3 bg-stone-950/60 rounded-xl border border-stone-800 space-y-2">
+              <div className="flex items-center gap-1.5 text-xs font-semibold text-amber-300 uppercase tracking-wider">
+                <Globe size={14} />
+                <span>{t.languageHeader}</span>
+              </div>
+              <div className="grid grid-cols-2 gap-2 text-xs">
+                <button
+                  onClick={() => onChangeLang('id')}
+                  className={`flex items-center justify-center gap-2 p-2.5 rounded-lg border transition ${
+                    lang === 'id'
+                      ? 'border-amber-500 bg-amber-950/60 text-amber-200 font-bold'
+                      : 'border-stone-800 bg-stone-900 text-stone-400 hover:text-stone-200'
+                  }`}
+                >
+                  <span className="text-base">🇮🇩</span>
+                  <span>Bahasa Indonesia (Default)</span>
+                </button>
+                <button
+                  onClick={() => onChangeLang('en')}
+                  className={`flex items-center justify-center gap-2 p-2.5 rounded-lg border transition ${
+                    lang === 'en'
+                      ? 'border-amber-500 bg-amber-950/60 text-amber-200 font-bold'
+                      : 'border-stone-800 bg-stone-900 text-stone-400 hover:text-stone-200'
+                  }`}
+                >
+                  <span className="text-base">🇬🇧</span>
+                  <span>English (International)</span>
+                </button>
+              </div>
+            </div>
+          )}
+
           {/* Audio & Visuals */}
           <div className="space-y-3">
             <h4 className="font-semibold text-amber-300 text-xs uppercase tracking-wider flex items-center gap-1.5">
               <Palette size={14} />
-              <span>Tema & Efek Suara</span>
+              <span>{t.audioVisualHeader}</span>
             </h4>
             
             <div className="flex items-center justify-between p-3 bg-stone-950/60 rounded-xl border border-stone-800">
@@ -81,8 +123,8 @@ export const ModalSettings: React.FC<ModalSettingsProps> = ({
                   <VolumeX className="text-stone-500" size={18} />
                 )}
                 <div>
-                  <span className="font-medium text-stone-200 block">Efek Suara Sintetis</span>
-                  <span className="text-[11px] text-stone-400">Ketukan kayu, lompatan & pinalti DAM</span>
+                  <span className="font-medium text-stone-200 block">{t.soundEffectsTitle}</span>
+                  <span className="text-[11px] text-stone-400">{t.soundEffectsDesc}</span>
                 </div>
               </div>
               <button
@@ -91,13 +133,13 @@ export const ModalSettings: React.FC<ModalSettingsProps> = ({
                   soundEnabled ? 'bg-emerald-600 text-white' : 'bg-stone-800 text-stone-400'
                 }`}
               >
-                {soundEnabled ? 'Aktif' : 'Mati'}
+                {soundEnabled ? t.soundActive : t.soundInactive}
               </button>
             </div>
 
             {/* Board Theme Selection */}
             <div className="p-3 bg-stone-950/60 rounded-xl border border-stone-800 space-y-2">
-              <span className="font-medium text-stone-200 block text-xs">Gaya Tampilan Papan:</span>
+              <span className="font-medium text-stone-200 block text-xs">{t.boardThemeLabel}</span>
               <div className="grid grid-cols-3 gap-2 text-xs">
                 <button
                   onClick={() => onChangeTheme('green')}
@@ -108,7 +150,7 @@ export const ModalSettings: React.FC<ModalSettingsProps> = ({
                   }`}
                 >
                   <span className="block text-sm mb-0.5">🟩</span>
-                  Hijau Klasik (Foto)
+                  {lang === 'en' ? 'Emerald Velvet' : 'Hijau Beludru'}
                 </button>
 
                 <button
@@ -120,7 +162,7 @@ export const ModalSettings: React.FC<ModalSettingsProps> = ({
                   }`}
                 >
                   <span className="block text-sm mb-0.5">🪵</span>
-                  Kayu Jati Nusantara
+                  {lang === 'en' ? 'Teak Wood' : 'Kayu Jati'}
                 </button>
 
                 <button
@@ -132,7 +174,7 @@ export const ModalSettings: React.FC<ModalSettingsProps> = ({
                   }`}
                 >
                   <span className="block text-sm mb-0.5">🌑</span>
-                  Modern Obsidian
+                  {lang === 'en' ? 'Obsidian Slate' : 'Batu Obsidian'}
                 </button>
               </div>
             </div>
@@ -142,14 +184,14 @@ export const ModalSettings: React.FC<ModalSettingsProps> = ({
           <div className="space-y-3">
             <h4 className="font-semibold text-amber-300 text-xs uppercase tracking-wider flex items-center gap-1.5">
               <Sliders size={14} />
-              <span>Konfigurasi Aturan Permainan</span>
+              <span>{t.rulesHeader}</span>
             </h4>
 
             {/* Multi Capture Toggle */}
             <div className="flex items-center justify-between p-3 bg-stone-950/60 rounded-xl border border-stone-800">
               <div>
-                <span className="font-medium text-stone-200 block text-xs">Pemakanan Beruntun (Multi-Jump)</span>
-                <span className="text-[11px] text-stone-400">Dapat melompat lagi jika ada sasaran makan tambahan</span>
+                <span className="font-medium text-stone-200 block text-xs">{t.ruleMultiCapture}</span>
+                <span className="text-[11px] text-stone-400">{t.ruleMultiCaptureDesc}</span>
               </div>
               <input
                 type="checkbox"
@@ -162,8 +204,8 @@ export const ModalSettings: React.FC<ModalSettingsProps> = ({
             {/* DAM Penalty Toggle */}
             <div className="flex items-center justify-between p-3 bg-stone-950/60 rounded-xl border border-stone-800">
               <div>
-                <span className="font-medium text-stone-200 block text-xs">Pinalti DAM ("Dam ora mangan")</span>
-                <span className="text-[11px] text-stone-400">Ambil 3 bidak lawan jika lawan lalai memakan</span>
+                <span className="font-medium text-stone-200 block text-xs">{t.ruleDamClaim}</span>
+                <span className="text-[11px] text-stone-400">{t.ruleDamClaimDesc}</span>
               </div>
               <input
                 type="checkbox"
@@ -176,8 +218,8 @@ export const ModalSettings: React.FC<ModalSettingsProps> = ({
             {/* King Piece Toggle */}
             <div className="flex items-center justify-between p-3 bg-stone-950/60 rounded-xl border border-stone-800">
               <div>
-                <span className="font-medium text-stone-200 block text-xs">Variasi Bidak Raja (Opsional)</span>
-                <span className="text-[11px] text-stone-400">Promosi saat mencapai puncak sayap paling ujung lawan</span>
+                <span className="font-medium text-stone-200 block text-xs">{t.ruleKing}</span>
+                <span className="text-[11px] text-stone-400">{t.ruleKingDesc}</span>
               </div>
               <input
                 type="checkbox"
@@ -192,8 +234,12 @@ export const ModalSettings: React.FC<ModalSettingsProps> = ({
           <div className="p-3.5 bg-stone-950/80 rounded-xl border border-stone-800 space-y-2.5">
             <div className="flex items-center justify-between">
               <div>
-                <span className="font-semibold text-stone-200 text-xs block">Pengujian QA Otomatis (12 Kriteria GDD)</span>
-                <span className="text-[11px] text-stone-400">Verifikasi aturan legal, lompatan, AI, dan graf</span>
+                <span className="font-semibold text-stone-200 text-xs block">{t.qaHeader}</span>
+                <span className="text-[11px] text-stone-400">
+                  {lang === 'en'
+                    ? 'Verify legal movement, jump captures, AI logic, and graph structure'
+                    : 'Verifikasi aturan legal, lompatan, AI, dan struktur graf'}
+                </span>
               </div>
               <button
                 onClick={handleRunQA}
@@ -205,7 +251,7 @@ export const ModalSettings: React.FC<ModalSettingsProps> = ({
                 ) : (
                   <Play size={13} />
                 )}
-                Jalankan Tes
+                {isTesting ? t.runningQa : t.runQaButton}
               </button>
             </div>
 
@@ -234,7 +280,7 @@ export const ModalSettings: React.FC<ModalSettingsProps> = ({
         <div className="flex items-center justify-between px-5 py-3 border-t border-stone-800 bg-stone-950/60">
           <button
             onClick={() => {
-              if (window.confirm('Mulai ulang papan permainan dari posisi awal?')) {
+              if (window.confirm(t.resetConfirm)) {
                 onResetGame();
                 onClose();
               }
@@ -242,14 +288,14 @@ export const ModalSettings: React.FC<ModalSettingsProps> = ({
             className="flex items-center gap-1.5 text-xs text-rose-400 hover:text-rose-300 transition"
           >
             <RefreshCw size={13} />
-            Reset Permainan
+            {t.reset}
           </button>
           
           <button
             onClick={onClose}
             className="px-4 py-1.5 rounded-lg text-xs font-semibold bg-stone-800 hover:bg-stone-700 text-stone-200 transition"
           >
-            Selesai
+            {t.ok}
           </button>
         </div>
       </div>

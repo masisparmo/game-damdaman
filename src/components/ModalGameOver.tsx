@@ -3,12 +3,14 @@
  * SPDX-License-Identifier: Apache-2.0
  * 
  * Game Over & Victory Summary Modal for Maen Dam-Daman.
+ * Supports bilingual (ID & EN).
  */
 
 import React, { useEffect } from 'react';
 import confetti from 'canvas-confetti';
-import { Trophy, RefreshCw, Eye, Award, XCircle } from 'lucide-react';
-import { GameState, PlayerId } from '../game/rulesEngine';
+import { Trophy, RefreshCw, Eye, Award } from 'lucide-react';
+import { GameState } from '../game/rulesEngine';
+import { Language, translations } from '../i18n';
 
 interface ModalGameOverProps {
   isOpen: boolean;
@@ -16,6 +18,7 @@ interface ModalGameOverProps {
   gameMode: 'ai' | 'pvp';
   onPlayAgain: () => void;
   onClose: () => void;
+  lang?: Language;
 }
 
 export const ModalGameOver: React.FC<ModalGameOverProps> = ({
@@ -24,6 +27,7 @@ export const ModalGameOver: React.FC<ModalGameOverProps> = ({
   gameMode,
   onPlayAgain,
   onClose,
+  lang = 'id',
 }) => {
   useEffect(() => {
     if (isOpen && gameState.gameStatus === 'won') {
@@ -39,31 +43,39 @@ export const ModalGameOver: React.FC<ModalGameOverProps> = ({
   }, [isOpen, gameState.gameStatus]);
 
   if (!isOpen) return null;
+  const t = translations[lang];
 
   const isWon = gameState.gameStatus === 'won';
   const isDraw = gameState.gameStatus === 'draw';
   const winner = gameState.winner;
 
-  // Title & description in Indonesian
-  let title = 'Permainan Berakhir';
-  let badgeColor = 'bg-stone-800 text-stone-200';
+  // Title in appropriate language
+  let title = t.gameOverTitle;
 
   if (isWon) {
     if (gameMode === 'ai') {
-      if (winner === 'P1') {
-        title = 'Selamat! Anda Menang!';
-        badgeColor = 'bg-emerald-950 text-emerald-300 border border-emerald-500/40';
-      } else {
-        title = 'AI Memenangkan Permainan!';
-        badgeColor = 'bg-rose-950 text-rose-300 border border-rose-500/40';
-      }
+      title = winner === 'P1' ? t.youWin : t.aiWins;
     } else {
-      title = winner === 'P1' ? 'Pemain 1 (Oranye) Menang!' : 'Pemain 2 (Biru) Menang!';
-      badgeColor = 'bg-amber-950 text-amber-300 border border-amber-500/40';
+      title = winner === 'P1' ? t.p1Wins : t.p2Wins;
     }
   } else if (isDraw) {
-    title = 'Permainan Berakhir Seri';
-    badgeColor = 'bg-stone-800 text-amber-300 border border-stone-600';
+    title = t.drawGame;
+  }
+
+  // Reason translation fallback
+  let reason = gameState.winReason || t.matchFinished;
+  if (lang === 'en') {
+    if (reason.includes('Seluruh bidak Pemain 1 telah habis')) {
+      reason = 'All Player 1 pieces have been captured.';
+    } else if (reason.includes('Seluruh bidak Pemain 2 telah habis')) {
+      reason = 'All Player 2 pieces have been captured.';
+    } else if (reason.includes('Kebuntuan')) {
+      reason = 'Stalemate! The active player has no legal moves remaining.';
+    } else if (reason.includes('giliran tanpa pemakanan')) {
+      reason = 'Draw: Move limit reached without any piece capture.';
+    } else if (reason.includes('Posisi papan yang sama berulang')) {
+      reason = 'Draw: Threefold repetition of the same board position.';
+    }
   }
 
   const p1Remaining = Object.values(gameState.pieces).filter(p => p.owner === 'P1').length;
@@ -87,31 +99,33 @@ export const ModalGameOver: React.FC<ModalGameOverProps> = ({
             {title}
           </h3>
           <p className="text-xs text-stone-400 max-w-sm mx-auto leading-relaxed">
-            {gameState.winReason || 'Pertandingan selesai.'}
+            {reason}
           </p>
         </div>
 
         {/* Stats Summary */}
         <div className="grid grid-cols-2 gap-3 text-left">
           <div className="p-3 bg-stone-950/70 border border-orange-950/60 rounded-2xl">
-            <span className="text-[11px] text-stone-400 block">Pemain 1 (Oranye)</span>
+            <span className="text-[11px] text-stone-400 block">{t.player1}</span>
             <div className="flex items-baseline justify-between mt-1">
               <span className="text-xl font-mono font-bold text-orange-400">{p1Remaining}</span>
-              <span className="text-[10px] text-stone-500">bidak tersisa</span>
+              <span className="text-[10px] text-stone-500">{t.remainingPieces}</span>
             </div>
           </div>
 
           <div className="p-3 bg-stone-950/70 border border-sky-950/60 rounded-2xl">
-            <span className="text-[11px] text-stone-400 block">Pemain 2 (Biru)</span>
+            <span className="text-[11px] text-stone-400 block">
+              {gameMode === 'ai' ? t.playerAi : t.player2}
+            </span>
             <div className="flex items-baseline justify-between mt-1">
               <span className="text-xl font-mono font-bold text-sky-400">{p2Remaining}</span>
-              <span className="text-[10px] text-stone-500">bidak tersisa</span>
+              <span className="text-[10px] text-stone-500">{t.remainingPieces}</span>
             </div>
           </div>
         </div>
 
         <div className="text-xs text-stone-400 bg-stone-950/40 py-2 px-3 rounded-xl border border-stone-800/60 flex items-center justify-between">
-          <span>Total Langkah Dimainkan:</span>
+          <span>{lang === 'en' ? 'Total Moves Played:' : 'Total Langkah Dimainkan:'}</span>
           <span className="font-mono text-stone-200 font-bold">{gameState.moveHistory.length}</span>
         </div>
 
@@ -122,7 +136,7 @@ export const ModalGameOver: React.FC<ModalGameOverProps> = ({
             className="flex-1 flex items-center justify-center gap-2 px-5 py-3 rounded-xl bg-amber-600 hover:bg-amber-500 active:scale-95 text-white font-bold text-sm shadow-lg shadow-amber-900/30 transition"
           >
             <RefreshCw size={16} />
-            Main Lagi
+            {t.playAgain}
           </button>
           
           <button
@@ -130,7 +144,7 @@ export const ModalGameOver: React.FC<ModalGameOverProps> = ({
             className="flex items-center justify-center gap-2 px-4 py-3 rounded-xl bg-stone-800 hover:bg-stone-700 active:scale-95 text-stone-300 font-semibold text-xs border border-stone-700 transition"
           >
             <Eye size={15} />
-            Lihat Papan
+            {lang === 'en' ? 'Inspect Board' : 'Lihat Papan'}
           </button>
         </div>
       </div>

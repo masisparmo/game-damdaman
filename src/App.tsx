@@ -42,6 +42,7 @@ import {
   Smartphone,
   Monitor,
 } from 'lucide-react';
+import { Language, translations, formatMoveDescription } from './i18n';
 
 export default function App() {
   // Game State
@@ -67,6 +68,23 @@ export default function App() {
   const [showSettings, setShowSettings] = useState<boolean>(false);
   const [showGameOver, setShowGameOver] = useState<boolean>(false);
   const [showHistoryDrawer, setShowHistoryDrawer] = useState<boolean>(false);
+
+  // Internationalization (Default: Indonesian 'id')
+  const [lang, setLang] = useState<Language>(() => {
+    try {
+      const saved = localStorage.getItem('damdaman_lang');
+      if (saved === 'en' || saved === 'id') return saved;
+    } catch {}
+    return 'id';
+  });
+
+  useEffect(() => {
+    try {
+      localStorage.setItem('damdaman_lang', lang);
+    } catch {}
+  }, [lang]);
+
+  const t = translations[lang];
 
   // AI Thinking state & lock ref to prevent race conditions
   const [isAiThinking, setIsAiThinking] = useState<boolean>(false);
@@ -301,47 +319,75 @@ export default function App() {
             </div>
             <div>
               <h1 className="text-sm sm:text-base font-extrabold tracking-tight font-serif text-stone-100">
-                Maen Dam-Daman
+                {t.title}
               </h1>
               <p className="text-[10px] sm:text-xs text-amber-400 font-medium">
-                Catur Tradisional Jawa & Graf Etnomatematika
+                {t.subtitle}
               </p>
             </div>
           </div>
 
-          {/* Quick Action Navigation */}
+          {/* Quick Action Navigation & Language Switcher */}
           <div className="flex items-center gap-1.5 sm:gap-2">
+            {/* Language Selector Pill */}
+            <div className="flex bg-stone-900 border border-stone-700/80 rounded-xl p-0.5 text-xs shadow-inner">
+              <button
+                onClick={() => setLang('id')}
+                className={`px-2 py-1 rounded-lg text-xs font-bold transition flex items-center gap-1 ${
+                  lang === 'id'
+                    ? 'bg-amber-600 text-white shadow-xs'
+                    : 'text-stone-400 hover:text-stone-200'
+                }`}
+                title="Bahasa Indonesia (Default)"
+              >
+                <span>🇮🇩</span>
+                <span>ID</span>
+              </button>
+              <button
+                onClick={() => setLang('en')}
+                className={`px-2 py-1 rounded-lg text-xs font-bold transition flex items-center gap-1 ${
+                  lang === 'en'
+                    ? 'bg-amber-600 text-white shadow-xs'
+                    : 'text-stone-400 hover:text-stone-200'
+                }`}
+                title="English (International)"
+              >
+                <span>🇬🇧</span>
+                <span>EN</span>
+              </button>
+            </div>
+
             <button
               onClick={() => setShowTutorial(true)}
               className="flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-xs font-semibold bg-stone-800/90 hover:bg-stone-700 active:scale-95 text-stone-200 transition border border-stone-700/60"
-              title="Aturan Permainan"
+              title={t.howToPlay}
             >
               <HelpCircle size={14} className="text-amber-400" />
-              <span className="hidden sm:inline">Cara Bermain</span>
+              <span className="hidden sm:inline">{t.howToPlay}</span>
             </button>
 
             <button
               onClick={() => setShowEtnomatematika(true)}
               className="flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-xs font-semibold bg-stone-800/90 hover:bg-stone-700 active:scale-95 text-stone-200 transition border border-stone-700/60"
-              title="Kajian Etnomatematika"
+              title={t.ethnomathematics}
             >
               <GraduationCap size={14} className="text-sky-400" />
-              <span className="hidden sm:inline">Etnomatematika</span>
+              <span className="hidden sm:inline">{t.ethnomathematics}</span>
             </button>
 
             <button
               onClick={() => setShowSettings(true)}
               className="p-1.5 sm:px-2.5 sm:py-1.5 rounded-lg text-xs font-semibold bg-stone-800/90 hover:bg-stone-700 active:scale-95 text-stone-200 transition border border-stone-700/60 flex items-center gap-1"
-              title="Pengaturan"
+              title={t.settings}
             >
               <Settings size={14} className="text-stone-400" />
-              <span className="hidden sm:inline">Pengaturan</span>
+              <span className="hidden sm:inline">{t.settings}</span>
             </button>
 
             <button
               onClick={() => setSoundEnabled(!soundEnabled)}
               className="p-1.5 rounded-lg text-xs font-semibold bg-stone-800/90 hover:bg-stone-700 active:scale-95 text-stone-300 transition border border-stone-700/60"
-              title={soundEnabled ? 'Matikan Suara' : 'Aktifkan Suara'}
+              title={soundEnabled ? t.soundOn : t.soundOff}
               aria-label="Toggle Sound"
             >
               {soundEnabled ? <Volume2 size={15} className="text-emerald-400" /> : <VolumeX size={15} className="text-stone-500" />}
@@ -369,7 +415,7 @@ export default function App() {
                 }`}
               >
                 <Bot size={13} />
-                Lawan AI
+                {t.vsAi}
               </button>
               <button
                 onClick={() => {
@@ -383,7 +429,7 @@ export default function App() {
                 }`}
               >
                 <Users size={13} />
-                2 Pemain
+                {t.pvp}
               </button>
             </div>
 
@@ -399,7 +445,7 @@ export default function App() {
                         : 'text-stone-400 hover:text-stone-200'
                     }`}
                   >
-                    {level === 'easy' ? 'Mudah' : level === 'medium' ? 'Sedang' : 'Sulit'}
+                    {level === 'easy' ? t.easy : level === 'medium' ? t.medium : t.hard}
                   </button>
                 ))}
               </div>
@@ -415,7 +461,7 @@ export default function App() {
                 className="flex items-center gap-1 px-2.5 py-1 rounded-lg bg-stone-900 hover:bg-stone-800 border border-stone-800 text-stone-300 hover:text-white transition active:scale-95 disabled:opacity-40"
               >
                 <RotateCcw size={13} />
-                <span>Urung</span>
+                <span>{t.undo}</span>
               </button>
             )}
 
@@ -424,18 +470,18 @@ export default function App() {
               className="flex items-center gap-1 px-2.5 py-1 rounded-lg bg-stone-900 hover:bg-stone-800 border border-stone-800 text-stone-300 hover:text-white transition active:scale-95"
             >
               <History size={13} />
-              <span>Langkah ({gameState.moveHistory.length})</span>
+              <span>{t.moves} ({gameState.moveHistory.length})</span>
             </button>
 
             <button
               onClick={() => {
-                if (window.confirm('Mulai pertandingan baru?')) {
+                if (window.confirm(t.resetConfirm)) {
                   handleRestart();
                 }
               }}
               className="px-2.5 py-1 rounded-lg bg-stone-900 hover:bg-stone-800 border border-stone-800 text-rose-400 hover:text-rose-300 transition active:scale-95 font-medium"
             >
-              Reset
+              {t.reset}
             </button>
           </div>
         </div>
@@ -457,17 +503,17 @@ export default function App() {
               <div>
                 <div className="flex items-center gap-1">
                   <span className="font-bold text-xs text-stone-100">
-                    Pemain 1
+                    {t.player1}
                   </span>
                   {gameState.currentPlayer === 'P1' && (
                     <span className="px-1.5 py-0.2 rounded text-[9px] bg-orange-500/30 text-orange-300 font-bold">
-                      Giliran
+                      {t.turn}
                     </span>
                   )}
                 </div>
                 <div className="flex items-center gap-1.5 mt-0.5">
                   <span className="text-[10px] text-stone-400">
-                    {p1Count} bidak • {p1Captured} dimakan
+                    {p1Count} {t.pieces} • {p1Captured} {t.captured}
                   </span>
                   {p1Captured > 0 && (
                     <div className="flex items-center gap-0.5">
@@ -500,11 +546,13 @@ export default function App() {
                 <div className="flex items-center gap-1 justify-end">
                   {gameState.currentPlayer === 'P2' && (
                     <span className="px-1.5 py-0.2 rounded text-[9px] bg-sky-500/30 text-sky-300 font-bold">
-                      {isAiThinking ? 'Berpikir...' : 'Giliran'}
+                      {isAiThinking ? t.thinking : t.turn}
                     </span>
                   )}
                   <span className="font-bold text-xs text-stone-100">
-                    {gameMode === 'ai' ? `AI (${aiDifficulty})` : 'Pemain 2'}
+                    {gameMode === 'ai'
+                      ? `AI (${aiDifficulty === 'easy' ? t.easy : aiDifficulty === 'medium' ? t.medium : t.hard})`
+                      : t.player2}
                   </span>
                 </div>
                 <div className="flex items-center gap-1.5 justify-end mt-0.5">
@@ -517,7 +565,7 @@ export default function App() {
                     </div>
                   )}
                   <span className="text-[10px] text-stone-400">
-                    {p2Count} bidak • {p2Captured} dimakan
+                    {p2Count} {t.pieces} • {p2Captured} {t.captured}
                   </span>
                 </div>
               </div>
@@ -526,35 +574,43 @@ export default function App() {
         </div>
 
         {/* Live Step & Capture Notification Banner */}
-        {gameState.moveHistory.length > 0 && (
-          <div
-            className={`px-3 py-1.5 rounded-xl text-xs flex items-center justify-between border transition-all ${
-              gameState.moveHistory[gameState.moveHistory.length - 1].isCapture
-                ? 'bg-rose-950/40 border-rose-600/40 text-rose-200'
-                : 'bg-stone-900/60 border-stone-800 text-stone-300'
-            }`}
-          >
-            <span className="flex items-center gap-1.5">
-              <span className="text-sm">
-                {gameState.moveHistory[gameState.moveHistory.length - 1].isCapture ? '⚔️' : '👣'}
+        {gameState.moveHistory.length > 0 && (() => {
+          const lastMove = gameState.moveHistory[gameState.moveHistory.length - 1];
+          const actor = lastMove.player === 'P1'
+            ? t.player1
+            : gameMode === 'ai'
+            ? t.playerAi
+            : t.player2;
+          const formatted = formatMoveDescription(
+            actor,
+            lastMove.fromNodeId,
+            lastMove.toNodeId,
+            lastMove.isCapture,
+            lastMove.capturedNodeId,
+            lang
+          );
+          return (
+            <div
+              className={`px-3 py-1.5 rounded-xl text-xs flex items-center justify-between border transition-all ${
+                lastMove.isCapture
+                  ? 'bg-rose-950/40 border-rose-600/40 text-rose-200'
+                  : 'bg-stone-900/60 border-stone-800 text-stone-300'
+              }`}
+            >
+              <span className="flex items-center gap-1.5">
+                <span className="text-sm">
+                  {lastMove.isCapture ? '⚔️' : '👣'}
+                </span>
+                <span>
+                  <strong>{actor}</strong>: {formatted}
+                </span>
               </span>
-              <span>
-                <strong>
-                  {gameState.moveHistory[gameState.moveHistory.length - 1].player === 'P1'
-                    ? 'Pemain 1'
-                    : gameMode === 'ai'
-                    ? 'Lawan AI'
-                    : 'Pemain 2'}
-                </strong>
-                :{' '}
-                {gameState.moveHistory[gameState.moveHistory.length - 1].description}
+              <span className="text-[10px] text-stone-500 font-mono">
+                {t.movePrefix}{gameState.moveHistory.length}
               </span>
-            </span>
-            <span className="text-[10px] text-stone-500 font-mono">
-              Langkah #{gameState.moveHistory.length}
-            </span>
-          </div>
-        )}
+            </div>
+          );
+        })()}
 
         {/* Special Action Alert: DAM Penalty Claim (Only if enabled in settings) */}
         {gameState.opponentMissedCapture && rulesConfig.damPenaltyClaim && !gameState.damClaimedThisTurn && (
@@ -562,17 +618,15 @@ export default function App() {
             <div className="flex items-center gap-2">
               <AlertTriangle className="text-amber-400 shrink-0" size={16} />
               <div className="text-xs">
-                <strong className="text-amber-300">Pinalti DAM Terbuka!</strong>{' '}
-                <span className="text-stone-300">
-                  Lawan melewatkan pemakanan. Ambil 3 bidak lawan sekarang!
-                </span>
+                <strong className="text-amber-300">{t.damPenaltyTitle}</strong>{' '}
+                <span className="text-stone-300">{t.damPenaltyDesc}</span>
               </div>
             </div>
             <button
               onClick={handleClaimDam}
               className="px-3 py-1.5 rounded-xl text-xs font-extrabold bg-gradient-to-r from-amber-600 to-rose-600 hover:from-amber-500 text-white shadow transition active:scale-95"
             >
-              Klaim Pinalti DAM!
+              {t.claimDamButton}
             </button>
           </div>
         )}
@@ -581,16 +635,14 @@ export default function App() {
         {gameState.consecutivePieceId && (
           <div className="bg-sky-950/90 border border-sky-500/80 p-3 rounded-2xl flex flex-wrap items-center justify-between gap-3 shadow-xl">
             <div className="text-xs text-sky-200">
-              <strong className="text-amber-300 block text-sm">✨ Lompatan Beruntun Tersedia!</strong>
-              <span className="text-stone-300">
-                Pilih sasaran lompat berikutnya yang menyala, atau klik tombol di sebelah untuk menyelesaikan giliran.
-              </span>
+              <strong className="text-amber-300 block text-sm">{t.multiJumpTitle}</strong>
+              <span className="text-stone-300">{t.multiJumpDesc}</span>
             </div>
             <button
               onClick={handlePassJump}
               className="px-4 py-2 rounded-xl text-xs font-extrabold bg-gradient-to-r from-amber-600 to-emerald-600 hover:from-amber-500 text-white shadow-md transition active:scale-95 shrink-0"
             >
-              Selesai Melompat ✓
+              {t.finishJumpButton}
             </button>
           </div>
         )}
@@ -615,6 +667,7 @@ export default function App() {
             showNodeLabels={showNodeLabels}
             onToggleNodeLabels={() => setShowNodeLabels(!showNodeLabels)}
             disabled={isAiThinking}
+            lang={lang}
           />
         </div>
 
@@ -622,36 +675,51 @@ export default function App() {
         {showHistoryDrawer && (
           <div className="bg-stone-900 border border-stone-800 rounded-2xl p-3 shadow-xl max-h-40 overflow-y-auto space-y-1.5 text-xs">
             <div className="flex items-center justify-between font-bold text-stone-400 border-b border-stone-800 pb-1">
-              <span>Riwayat Langkah</span>
-              <span>{gameState.moveHistory.length} langkah</span>
+              <span>{t.moveHistoryTitle}</span>
+              <span>{gameState.moveHistory.length} {t.moves}</span>
             </div>
             {gameState.moveHistory.length === 0 ? (
-              <p className="text-stone-500 italic py-1">Belum ada langkah yang dimainkan.</p>
+              <p className="text-stone-500 italic py-1">{t.noMovesYet}</p>
             ) : (
-              gameState.moveHistory.map((m, idx) => (
-                <div
-                  key={idx}
-                  className="flex items-center gap-2 p-1 rounded bg-stone-950/50 text-stone-300"
-                >
-                  <span className="font-mono text-stone-500 text-[10px]">#{idx + 1}</span>
-                  <span
-                    className={`font-bold ${
-                      m.player === 'P1' ? 'text-orange-400' : 'text-sky-400'
-                    }`}
+              gameState.moveHistory.map((m, idx) => {
+                const actor = m.player === 'P1'
+                  ? t.player1
+                  : gameMode === 'ai'
+                  ? t.playerAi
+                  : t.player2;
+                const formatted = formatMoveDescription(
+                  actor,
+                  m.fromNodeId,
+                  m.toNodeId,
+                  m.isCapture,
+                  m.capturedNodeId,
+                  lang
+                );
+                return (
+                  <div
+                    key={idx}
+                    className="flex items-center gap-2 p-1 rounded bg-stone-950/50 text-stone-300"
                   >
-                    {m.player}:
-                  </span>
-                  <span className="flex-1 text-[11px]">{m.description}</span>
-                </div>
-              ))
+                    <span className="font-mono text-stone-500 text-[10px]">#{idx + 1}</span>
+                    <span
+                      className={`font-bold ${
+                        m.player === 'P1' ? 'text-orange-400' : 'text-sky-400'
+                      }`}
+                    >
+                      {m.player}:
+                    </span>
+                    <span className="flex-1 text-[11px]">{formatted}</span>
+                  </div>
+                );
+              })
             )}
           </div>
         )}
       </main>
 
       {/* Modals */}
-      <ModalTutorial isOpen={showTutorial} onClose={() => setShowTutorial(false)} />
-      <ModalEtnomatematika isOpen={showEtnomatematika} onClose={() => setShowEtnomatematika(false)} />
+      <ModalTutorial isOpen={showTutorial} onClose={() => setShowTutorial(false)} lang={lang} />
+      <ModalEtnomatematika isOpen={showEtnomatematika} onClose={() => setShowEtnomatematika(false)} lang={lang} />
       <ModalSettings
         isOpen={showSettings}
         onClose={() => setShowSettings(false)}
@@ -665,6 +733,8 @@ export default function App() {
         boardTheme={boardTheme}
         onChangeTheme={setBoardTheme}
         onResetGame={() => handleRestart()}
+        lang={lang}
+        onChangeLang={setLang}
       />
       <ModalGameOver
         isOpen={showGameOver}
@@ -672,6 +742,7 @@ export default function App() {
         gameMode={gameMode}
         onPlayAgain={() => handleRestart()}
         onClose={() => setShowGameOver(false)}
+        lang={lang}
       />
     </div>
   );

@@ -25,6 +25,7 @@ import {
   Tag,
   Maximize2,
 } from 'lucide-react';
+import { Language } from '../i18n';
 
 export type BoardTheme = 'green' | 'wood' | 'obsidian';
 export type BoardOrientation = 'portrait' | 'landscape';
@@ -45,6 +46,7 @@ interface BoardProps {
   showNodeLabels: boolean;
   onToggleNodeLabels: () => void;
   disabled?: boolean;
+  lang?: Language;
 }
 
 export const Board: React.FC<BoardProps> = ({
@@ -63,6 +65,7 @@ export const Board: React.FC<BoardProps> = ({
   showNodeLabels,
   onToggleNodeLabels,
   disabled = false,
+  lang = 'id',
 }) => {
   const containerRef = useRef<HTMLDivElement>(null);
   const [hoveredNode, setHoveredNode] = useState<string | null>(null);
@@ -219,19 +222,19 @@ export const Board: React.FC<BoardProps> = ({
                 ? 'bg-amber-600 text-white shadow-sm'
                 : 'bg-stone-800 hover:bg-stone-700 text-stone-300'
             }`}
-            title="Ubah orientasi ke Portrait (Tegak) atau Landscape (Mendatar)"
+            title={lang === 'en' ? 'Toggle Portrait / Landscape' : 'Ubah orientasi ke Portrait (Tegak) atau Landscape (Mendatar)'}
           >
             {isPortrait ? <Smartphone size={14} /> : <Monitor size={14} />}
             <span className="font-medium text-[11px]">
-              {isPortrait ? 'Tegak (HP)' : 'Mendatar'}
+              {isPortrait ? (lang === 'en' ? 'Portrait' : 'Tegak (HP)') : (lang === 'en' ? 'Landscape' : 'Mendatar')}
             </span>
           </button>
 
           <button
             onClick={onToggleFlip}
             className="p-1.5 rounded-xl bg-stone-800 hover:bg-stone-700 active:scale-95 text-stone-300 transition"
-            title="Putar papan 180° (Untuk main berhadapan)"
-            aria-label="Putar papan 180 derajat"
+            title={lang === 'en' ? 'Flip board 180°' : 'Putar papan 180° (Untuk main berhadapan)'}
+            aria-label="Flip board"
           >
             <RotateCcw size={14} />
           </button>
@@ -283,7 +286,7 @@ export const Board: React.FC<BoardProps> = ({
                 : 'bg-stone-800/80 text-stone-400 hover:text-stone-200'
             }`}
           >
-            Pas
+            {lang === 'en' ? 'Fit' : 'Pas'}
           </button>
 
           <button
@@ -293,7 +296,7 @@ export const Board: React.FC<BoardProps> = ({
                 ? 'bg-amber-600/30 text-amber-300 border border-amber-500/40'
                 : 'bg-stone-800/80 text-stone-400 hover:text-stone-200'
             }`}
-            title="Tampilkan Simpul Graf Matematis (A..Z)"
+            title={lang === 'en' ? 'Show Graph Vertices (A..Z)' : 'Tampilkan Simpul Graf Matematis (A..Z)'}
             aria-label="Toggle node labels"
           >
             <Tag size={14} />
@@ -704,7 +707,7 @@ export const Board: React.FC<BoardProps> = ({
                       textAnchor="middle"
                       className="pointer-events-none drop-shadow-sm select-none opacity-90 font-mono"
                     >
-                      {piece.isKing ? 'RAJA' : isP1 ? 'P1' : 'P2'}
+                      {piece.isKing ? (lang === 'en' ? 'KING' : 'RAJA') : isP1 ? 'P1' : 'P2'}
                     </text>
                   </g>
                 );

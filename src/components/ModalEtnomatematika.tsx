@@ -5,35 +5,50 @@
  * Ethnomathematics & Cultural Heritage Modal for Dam-Daman.
  * Highlights the academic research paper by Salsabila & Marhayati (2024):
  * "Studi Etnomatematika: Konsep Graf pada Permainan Dam-daman Kabupaten Pasuruan".
+ * Supports bilingual (ID & EN).
  */
 
 import React from 'react';
 import { X, Network, GraduationCap, CheckCircle2 } from 'lucide-react';
+import { Language, translations } from '../i18n';
 
 interface ModalEtnomatematikaProps {
   isOpen: boolean;
   onClose: () => void;
+  lang?: Language;
 }
 
-export const ModalEtnomatematika: React.FC<ModalEtnomatematikaProps> = ({ isOpen, onClose }) => {
+export const ModalEtnomatematika: React.FC<ModalEtnomatematikaProps> = ({
+  isOpen,
+  onClose,
+  lang = 'id',
+}) => {
   if (!isOpen) return null;
+  const t = translations[lang];
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/75 backdrop-blur-sm animate-in fade-in duration-200">
-      <div className="relative w-full max-w-xl bg-stone-900 border border-amber-900/60 rounded-2xl shadow-2xl overflow-hidden flex flex-col max-h-[90vh]">
+    <div
+      className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/75 backdrop-blur-sm animate-in fade-in duration-200"
+      onClick={onClose}
+    >
+      <div
+        className="relative w-full max-w-xl bg-stone-900 border border-amber-900/60 rounded-2xl shadow-2xl overflow-hidden flex flex-col max-h-[90vh]"
+        onClick={(e) => e.stopPropagation()}
+      >
         {/* Header */}
         <div className="flex items-center justify-between px-5 py-4 border-b border-stone-800 bg-amber-950/40">
           <div className="flex items-center gap-2.5">
             <GraduationCap className="w-6 h-6 text-amber-400" />
             <div>
-              <h3 className="font-bold text-stone-100 text-base">Etnomatematika & Teori Graf</h3>
-              <p className="text-[11px] text-amber-300/80">Kajian Ilmiah Papan Dam-Daman Pasuruan & Jabar</p>
+              <h3 className="font-bold text-stone-100 text-base">{t.ethnoTitle}</h3>
+              <p className="text-[11px] text-amber-300/80">{t.ethnoSubtitle}</p>
             </div>
           </div>
           <button
             onClick={onClose}
             className="p-1.5 text-stone-400 hover:text-white rounded-lg hover:bg-stone-800 transition"
-            aria-label="Tutup"
+            aria-label={t.close}
+            title={t.close}
           >
             <X size={18} />
           </button>
@@ -44,29 +59,29 @@ export const ModalEtnomatematika: React.FC<ModalEtnomatematikaProps> = ({ isOpen
           <div className="p-3.5 bg-stone-950/70 border border-stone-800 rounded-xl space-y-2">
             <div className="flex items-center gap-2 text-amber-400 font-semibold text-xs">
               <Network size={16} />
-              <span>Sumber Penelitian Akademik:</span>
+              <span>{t.ethnoSourceTitle}</span>
             </div>
             <p className="text-stone-300 italic text-xs">
-              "Studi Etnomatematika: Konsep Graf pada Permainan Dam-daman Kabupaten Pasuruan" (Salsabila & Marhayati, 2024. Math Didactic: Jurnal Pendidikan Matematika).
+              {t.ethnoSourceCitation}
             </p>
           </div>
 
           <div className="space-y-2">
             <h4 className="font-bold text-stone-100 text-sm flex items-center gap-1.5">
-              <span>Karakteristik Graf Papan Dam-Daman</span>
+              <span>{t.ethnoGraphChar}</span>
             </h4>
             <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 text-xs">
               <div className="bg-stone-950/50 p-2.5 rounded-lg border border-stone-800/80">
-                <span className="text-stone-400 block text-[11px]">Orde Graf (Titik)</span>
-                <span className="text-amber-400 font-mono text-base font-bold">37 Simpul</span>
+                <span className="text-stone-400 block text-[11px]">{t.ethnoOrder}</span>
+                <span className="text-amber-400 font-mono text-base font-bold">{t.ethnoOrderValue}</span>
               </div>
               <div className="bg-stone-950/50 p-2.5 rounded-lg border border-stone-800/80">
-                <span className="text-stone-400 block text-[11px]">Ukuran Graf (Garis)</span>
-                <span className="text-emerald-400 font-mono text-base font-bold">76 Sisi</span>
+                <span className="text-stone-400 block text-[11px]">{t.ethnoSize}</span>
+                <span className="text-emerald-400 font-mono text-base font-bold">{t.ethnoSizeValue}</span>
               </div>
               <div className="bg-stone-950/50 p-2.5 rounded-lg border border-stone-800/80">
-                <span className="text-stone-400 block text-[11px]">Derajat Titik (Degree)</span>
-                <span className="text-sky-400 font-mono text-base font-bold">2, 3, 4, 5, 8</span>
+                <span className="text-stone-400 block text-[11px]">{t.ethnoDegree}</span>
+                <span className="text-sky-400 font-mono text-base font-bold">{t.ethnoDegreeValue}</span>
               </div>
             </div>
           </div>
@@ -75,33 +90,33 @@ export const ModalEtnomatematika: React.FC<ModalEtnomatematikaProps> = ({ isOpen
             <div className="flex items-start gap-2">
               <CheckCircle2 size={15} className="text-emerald-400 shrink-0 mt-0.5" />
               <p>
-                <strong>Graf Terhubung & Sederhana:</strong> Setiap simpul saling terhubung oleh tepat satu sisi tanpa sisi ganda dan tanpa gelang (loop).
+                <strong>{t.ethnoPoint1Title}</strong> {t.ethnoPoint1Desc}
               </p>
             </div>
             <div className="flex items-start gap-2">
               <CheckCircle2 size={15} className="text-emerald-400 shrink-0 mt-0.5" />
               <p>
-                <strong>Graf Semi-Hamilton:</strong> Terdapat lintasan yang melewati semua 37 simpul tepat satu kali dari ujung ke ujung.
+                <strong>{t.ethnoPoint2Title}</strong> {t.ethnoPoint2Desc}
               </p>
             </div>
             <div className="flex items-start gap-2">
               <CheckCircle2 size={15} className="text-emerald-400 shrink-0 mt-0.5" />
               <p>
-                <strong>Graf Berkromatik-3:</strong> Seluruh 37 simpul dapat diwarnai hanya dengan 3 warna berbeda sedemikian rupa sehingga simpul bersebelahan selalu memiliki warna berbeda.
+                <strong>{t.ethnoPoint3Title}</strong> {t.ethnoPoint3Desc}
               </p>
             </div>
             <div className="flex items-start gap-2">
               <CheckCircle2 size={15} className="text-emerald-400 shrink-0 mt-0.5" />
               <p>
-                <strong>Simpul Strategis Berderajat 8:</strong> Titik C, Q, S, A1, W, U, K memiliki 8 sisi (maksimal) yang menjadi simpul perebutan paling krusial dalam adu strategi.
+                <strong>{t.ethnoPoint4Title}</strong> {t.ethnoPoint4Desc}
               </p>
             </div>
           </div>
 
           <div className="bg-amber-950/20 border border-amber-900/40 p-3 rounded-xl text-stone-300 text-xs">
-            <p className="font-semibold text-amber-300 mb-1">Filosofi Permainan Tradisional:</p>
+            <p className="font-semibold text-amber-300 mb-1">{t.ethnoPhilosophyTitle}</p>
             <p className="text-stone-400">
-              Permainan ini mengajarkan kalkulasi langkah ke depan, kesabaran dalam menunggu giliran, kecermatan membaca jebakan musuh, serta jiwa sportif dan berlapang dada saat menghadapi kekalahan.
+              {t.ethnoPhilosophyDesc}
             </p>
           </div>
         </div>
@@ -112,7 +127,7 @@ export const ModalEtnomatematika: React.FC<ModalEtnomatematikaProps> = ({ isOpen
             onClick={onClose}
             className="px-4 py-2 rounded-lg text-xs font-semibold bg-stone-800 hover:bg-stone-700 text-stone-200 transition"
           >
-            Tutup
+            {t.close}
           </button>
         </div>
       </div>
