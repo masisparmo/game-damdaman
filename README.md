@@ -111,7 +111,16 @@ The game features a built-in AI opponent powered by heuristic search algorithms:
 ---
 
 ## 6. Key Features & Dual Language Support
-- **Dual Language (ENG & IND):** Complete bilingual support across all headers, cards, dialogs, historical guides, settings, and logs. Default language is Bahasa Indonesia.
+- **Player Name Personalization:** Prompts players to enter their name upon completing the rules guide, with custom avatar badges and quick name editing anytime.
+- **IndexedDB Match History:** Automatically persists complete offline match records locally in IndexedDB:
+  - **Player Name & Opponent** (AI or Player 2)
+  - **Match Time** (`HH:mm:ss`)
+  - **Match Date in DDMMYYYY format** (e.g. `26102026`) and readable display date
+  - **Match Duration in minutes** (calculated to one decimal place, e.g. `2.4 min`)
+  - **Match Outcome** (Won / Menang, Lost / Kalah, Draw / Seri)
+  - Remaining pieces and total move counts
+- **Dedicated History Modal:** Top-bar accessible match archive with filter tabs (All, Won, Lost, Draw), win-rate statistics, and single or bulk record management.
+- **Dual Language (ENG & IND):** Complete bilingual support across all headers, cards, dialogs, historical guides, settings, player name prompt, match history, and logs. Default language is Bahasa Indonesia.
 - **Auto-Opening Guide on First Load:** Welcomes players with an interactive 5-slide visual tutorial equipped with immediate **OK** and **Close (Tutup)** buttons.
 - **Portrait-First Mobile Layout:** Specifically optimized for vertical smartphone use, with instant toggle to traditional Landscape mode.
 - **Dynamic Board Scaling & Zoom:** Interactive slider and preset buttons (65% to 135%) to accommodate all screen dimensions.
@@ -127,6 +136,7 @@ The game features a built-in AI opponent powered by heuristic search algorithms:
 ## 7. Technology Stack
 - **Framework:** React 19 + TypeScript
 - **Styling:** Vanilla CSS & Tailwind CSS v4
+- **Database / Local Storage:** IndexedDB (`idb` lightweight native store) + LocalStorage
 - **Build Tool:** Vite 8
 - **Icons:** Lucide React
 - **Audio:** Web Audio API (Synthesized procedural audio)
@@ -271,7 +281,16 @@ Permainan menyediakan lawan komputer cerdas dengan 3 tingkat keahlian:
 ---
 
 ## 6. Fitur Unggulan & Dukungan Dual Bahasa
-- **Dual Bahasa (IND & ENG):** Seluruh antarmuka, judul, dialog panduan, etnomatematika, pengaturan, hingga rekaman riwayat langkah dapat dialihkan secara instan antara Bahasa Indonesia (default) dan Bahasa Inggris.
+- **Personalisasi Nama Pemain:** Setelah jendela panduan aturan ditutup, pemain langsung diminta memasukkan nama, dengan avatar khusus serta tombol ubah nama kapan saja.
+- **Pencatatan Riwayat Pertandingan di IndexedDB:** Setiap pertandingan otomatis tersimpan rapi dan permanen di basis data lokal IndexedDB peramban:
+  - **Nama Pemain & Lawan** (AI atau Pemain 2)
+  - **Jam Pertandingan** (`HH:mm:ss`)
+  - **Tanggal dalam format DDMMYYYY** (contoh: `26102026`) serta tanggal berformat ramah baca
+  - **Lamanya Bermain dalam Menit** (dihitung presisi 1 desimal, misal: `2.4 menit`)
+  - **Hasil Pertandingan:** Menang, Kalah, atau Seri / Draw
+  - Sisa bidak masing-masing dan total langkah yang dieksekusi
+- **Jendela / Menu Riwayat (History):** Menu khusus di bilah atas untuk melihat daftar laga, filter cepat (Semua, Menang, Kalah, Seri), statistik rasio kemenangan, serta opsi hapus riwayat.
+- **Dual Bahasa (IND & ENG):** Seluruh antarmuka, judul, dialog panduan, etnomatematika, pengaturan, form nama, jendela riwayat, hingga rekaman riwayat langkah dapat dialihkan secara instan antara Bahasa Indonesia (default) dan Bahasa Inggris.
 - **Jendela Panduan Otomatis:** Saat pertama membuka game, jendela interaktif 5 slide langsung muncul dilengkapi tombol **✓ OK** dan **Tutup** yang dapat dikonfirmasi kapan saja.
 - **Desain Vertikal (Portrait-First):** Dirancang ergonomis untuk penggunaan layar sentuh ponsel pintar, dengan tombol sekali klik untuk berpindah ke tampilan horizontal (Landscape).
 - **Skala & Zoom Papan Dinamis:** Penggeser ukuran (65% hingga 135%) serta tombol preset pas (100%) agar papan pas di berbagai ukuran layar.
@@ -287,6 +306,7 @@ Permainan menyediakan lawan komputer cerdas dengan 3 tingkat keahlian:
 ## 7. Teknologi yang Digunakan
 - **Framework:** React 19 + TypeScript
 - **Styling:** Vanilla CSS & Tailwind CSS v4
+- **Penyimpanan Lokal / Database:** IndexedDB (`DamDamanDB`) + LocalStorage
 - **Build Tool:** Vite 8
 - **Ikon Antarmuka:** Lucide React
 - **Audio:** Web Audio API (Synthesizer prosedural)

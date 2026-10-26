@@ -35,14 +35,23 @@ import {
   Bot,
   Users,
   AlertTriangle,
+  Smartphone,
+  Monitor,
+  User,
   History,
   GraduationCap,
   Volume2,
   VolumeX,
-  Smartphone,
-  Monitor,
 } from 'lucide-react';
 import { Language, translations, formatMoveDescription } from './i18n';
+import { ModalPlayerName } from './components/ModalPlayerName';
+import { ModalGameHistory } from './components/ModalGameHistory';
+import {
+  saveGameHistory,
+  formatDDMMYYYY,
+  formatDisplayDate,
+  formatTime,
+} from './game/db';
 
 export default function App() {
   // Game State
@@ -64,10 +73,25 @@ export default function App() {
 
   // Modals
   const [showTutorial, setShowTutorial] = useState<boolean>(true);
+  const [showNameModal, setShowNameModal] = useState<boolean>(false);
+  const [showGameHistory, setShowGameHistory] = useState<boolean>(false);
   const [showEtnomatematika, setShowEtnomatematika] = useState<boolean>(false);
   const [showSettings, setShowSettings] = useState<boolean>(false);
   const [showGameOver, setShowGameOver] = useState<boolean>(false);
   const [showHistoryDrawer, setShowHistoryDrawer] = useState<boolean>(false);
+
+  // Player Name State
+  const [playerName, setPlayerName] = useState<string>(() => {
+    try {
+      return localStorage.getItem('damdaman_player_name') || '';
+    } catch {}
+    return '';
+  });
+  const [p2CustomName, setP2CustomName] = useState<string>('');
+
+  // Match Duration & IndexedDB save tracker
+  const gameStartTimeRef = useRef<number>(Date.now());
+  const hasSavedToDbRef = useRef<boolean>(false);
 
   // Internationalization (Default: Indonesian 'id')
   const [lang, setLang] = useState<Language>(() => {
@@ -95,15 +119,83 @@ export default function App() {
     sound.enabled = soundEnabled;
   }, [soundEnabled]);
 
-  // Check Game Over
+  // Check Game Over & Save Match to IndexedDB
   useEffect(() => {
     if (gameState.gameStatus === 'won' || gameState.gameStatus === 'draw') {
       setShowGameOver(true);
       if (gameState.gameStatus === 'won') {
         sound.playVictory();
       }
+
+      if (!hasSavedToDbRef.current) {
+        hasSavedToDbRef.current = true;
+        const now = new Date();
+        const start = gameStartTimeRef.current || Date.now();
+        const diffMs = Math.max(1000, now.getTime() - start);
+        const mins = Math.max(0.1, Number((diffMs / 60000).toFixed(1)));
+        const minutes = Math.floor(diffMs / 60000);
+        const seconds = Math.floor((diffMs % 60000) / 1000);
+        const durationFormatted = `${minutes}m ${seconds}s`;
+
+        let result: 'menang' | 'kalah' | 'draw' = 'draw';
+        if (gameState.gameStatus === 'won') {
+          result = gameState.winner === 'P1' ? 'menang' : 'kalah';
+        }
+
+        const p1Name = playerName || (lang === 'en' ? 'Player 1' : 'Pemain 1');
+        const p2Name = gameMode === 'ai'
+          ? `AI (${aiDifficulty})`
+          : (p2CustomName || (lang === 'en' ? 'Player 2' : 'Pemain 2'));
+
+        const p1Rem = Object.values(gameState.pieces).filter((p) => p.owner === 'P1').length;
+        const p2Rem = Object.values(gameState.pieces).filter((p) => p.owner === 'P2').length;
+
+        saveGameHistory({
+          playerName: p1Name,
+          opponentName: p2Name,
+          gameMode,
+          date: formatDDMMYYYY(now),
+          dateFormatted: formatDisplayDate(now),
+          time: formatTime(now),
+          durationMinutes: mins,
+          durationFormatted,
+          result,
+          winner: gameState.winner,
+          movesCount: gameState.moveHistory.length,
+          p1Remaining: p1Rem,
+          p2Remaining: p2Rem,
+          timestamp: now.getTime(),
+        }).catch((err) => console.error('Failed saving game history to IndexedDB:', err));
+      }
     }
-  }, [gameState.gameStatus]);
+  }, [
+    gameState.gameStatus,
+    gameState.winner,
+    gameState.moveHistory.length,
+    gameState.pieces,
+    gameMode,
+    aiDifficulty,
+    playerName,
+    p2CustomName,
+    lang,
+  ]);
+
+  const handleCloseTutorial = () => {
+    setShowTutorial(false);
+    if (!playerName) {
+      setShowNameModal(true);
+    }
+  };
+
+  const handleSaveName = (p1: string, p2?: string) => {
+    setPlayerName(p1);
+    try {
+      localStorage.setItem('damdaman_player_name', p1);
+    } catch {}
+    if (p2) setP2CustomName(p2);
+    setShowNameModal(false);
+    gameStartTimeRef.current = Date.now();
+  };
 
   const gameStateRef = useRef(gameState);
   useEffect(() => {
@@ -291,6 +383,8 @@ export default function App() {
   // Reset / New Game
   const handleRestart = (config = rulesConfig) => {
     aiBusyRef.current = false;
+    hasSavedToDbRef.current = false;
+    gameStartTimeRef.current = Date.now();
     const fresh = createInitialState(config);
     setGameState(fresh);
     setSelectedPieceId(null);
@@ -364,6 +458,15 @@ export default function App() {
             >
               <HelpCircle size={14} className="text-amber-400" />
               <span className="hidden sm:inline">{t.howToPlay}</span>
+            </button>
+
+            <button
+              onClick={() => setShowGameHistory(true)}
+              className="flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-xs font-semibold bg-stone-800/90 hover:bg-stone-700 active:scale-95 text-stone-200 transition border border-stone-700/60"
+              title={t.gameHistory}
+            >
+              <History size={14} className="text-emerald-400" />
+              <span className="hidden sm:inline">{t.gameHistory}</span>
             </button>
 
             <button
@@ -501,10 +604,17 @@ export default function App() {
                 <span className="font-bold text-[11px] text-white">P1</span>
               </div>
               <div>
-                <div className="flex items-center gap-1">
+                <div className="flex items-center gap-1.5">
                   <span className="font-bold text-xs text-stone-100">
-                    {t.player1}
+                    {playerName || t.player1}
                   </span>
+                  <button
+                    onClick={() => setShowNameModal(true)}
+                    className="p-0.5 text-stone-400 hover:text-amber-300 rounded transition"
+                    title={lang === 'en' ? 'Edit player name' : 'Ubah nama pemain'}
+                  >
+                    <User size={11} />
+                  </button>
                   {gameState.currentPlayer === 'P1' && (
                     <span className="px-1.5 py-0.2 rounded text-[9px] bg-orange-500/30 text-orange-300 font-bold">
                       {t.turn}
@@ -552,7 +662,7 @@ export default function App() {
                   <span className="font-bold text-xs text-stone-100">
                     {gameMode === 'ai'
                       ? `AI (${aiDifficulty === 'easy' ? t.easy : aiDifficulty === 'medium' ? t.medium : t.hard})`
-                      : t.player2}
+                      : (p2CustomName || t.player2)}
                   </span>
                 </div>
                 <div className="flex items-center gap-1.5 justify-end mt-0.5">
@@ -577,10 +687,10 @@ export default function App() {
         {gameState.moveHistory.length > 0 && (() => {
           const lastMove = gameState.moveHistory[gameState.moveHistory.length - 1];
           const actor = lastMove.player === 'P1'
-            ? t.player1
+            ? (playerName || t.player1)
             : gameMode === 'ai'
             ? t.playerAi
-            : t.player2;
+            : (p2CustomName || t.player2);
           const formatted = formatMoveDescription(
             actor,
             lastMove.fromNodeId,
@@ -684,10 +794,10 @@ export default function App() {
             ) : (
               gameState.moveHistory.map((m, idx) => {
                 const actor = m.player === 'P1'
-                  ? t.player1
+                  ? (playerName || t.player1)
                   : gameMode === 'ai'
                   ? t.playerAi
-                  : t.player2;
+                  : (p2CustomName || t.player2);
                 const formatted = formatMoveDescription(
                   actor,
                   m.fromNodeId,
@@ -719,7 +829,20 @@ export default function App() {
       </main>
 
       {/* Modals */}
-      <ModalTutorial isOpen={showTutorial} onClose={() => setShowTutorial(false)} lang={lang} />
+      <ModalTutorial isOpen={showTutorial} onClose={handleCloseTutorial} lang={lang} />
+      <ModalPlayerName
+        isOpen={showNameModal}
+        onSaveName={handleSaveName}
+        gameMode={gameMode}
+        currentP1Name={playerName}
+        currentP2Name={p2CustomName}
+        lang={lang}
+      />
+      <ModalGameHistory
+        isOpen={showGameHistory}
+        onClose={() => setShowGameHistory(false)}
+        lang={lang}
+      />
       <ModalEtnomatematika isOpen={showEtnomatematika} onClose={() => setShowEtnomatematika(false)} lang={lang} />
       <ModalSettings
         isOpen={showSettings}
@@ -744,6 +867,8 @@ export default function App() {
         onPlayAgain={() => handleRestart()}
         onClose={() => setShowGameOver(false)}
         lang={lang}
+        playerName={playerName || t.player1}
+        opponentName={gameMode === 'ai' ? `AI (${aiDifficulty})` : (p2CustomName || t.player2)}
       />
     </div>
   );

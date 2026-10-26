@@ -19,6 +19,8 @@ interface ModalGameOverProps {
   onPlayAgain: () => void;
   onClose: () => void;
   lang?: Language;
+  playerName?: string;
+  opponentName?: string;
 }
 
 export const ModalGameOver: React.FC<ModalGameOverProps> = ({
@@ -28,6 +30,8 @@ export const ModalGameOver: React.FC<ModalGameOverProps> = ({
   onPlayAgain,
   onClose,
   lang = 'id',
+  playerName,
+  opponentName,
 }) => {
   useEffect(() => {
     if (isOpen && gameState.gameStatus === 'won') {
@@ -54,9 +58,13 @@ export const ModalGameOver: React.FC<ModalGameOverProps> = ({
 
   if (isWon) {
     if (gameMode === 'ai') {
-      title = winner === 'P1' ? t.youWin : t.aiWins;
+      title = winner === 'P1'
+        ? (playerName ? `${lang === 'en' ? 'Congrats' : 'Selamat'} ${playerName}! ${t.youWin}` : t.youWin)
+        : t.aiWins;
     } else {
-      title = winner === 'P1' ? t.p1Wins : t.p2Wins;
+      title = winner === 'P1'
+        ? `${playerName || t.player1} ${lang === 'en' ? 'Won!' : 'Menang!'}`
+        : `${opponentName || t.player2} ${lang === 'en' ? 'Won!' : 'Menang!'}`;
     }
   } else if (isDraw) {
     title = t.drawGame;
@@ -106,7 +114,7 @@ export const ModalGameOver: React.FC<ModalGameOverProps> = ({
         {/* Stats Summary */}
         <div className="grid grid-cols-2 gap-3 text-left">
           <div className="p-3 bg-stone-950/70 border border-orange-950/60 rounded-2xl">
-            <span className="text-[11px] text-stone-400 block">{t.player1}</span>
+            <span className="text-[11px] text-stone-400 block truncate font-medium">{playerName || t.player1}</span>
             <div className="flex items-baseline justify-between mt-1">
               <span className="text-xl font-mono font-bold text-orange-400">{p1Remaining}</span>
               <span className="text-[10px] text-stone-500">{t.remainingPieces}</span>
@@ -114,8 +122,8 @@ export const ModalGameOver: React.FC<ModalGameOverProps> = ({
           </div>
 
           <div className="p-3 bg-stone-950/70 border border-sky-950/60 rounded-2xl">
-            <span className="text-[11px] text-stone-400 block">
-              {gameMode === 'ai' ? t.playerAi : t.player2}
+            <span className="text-[11px] text-stone-400 block truncate font-medium">
+              {opponentName || (gameMode === 'ai' ? t.playerAi : t.player2)}
             </span>
             <div className="flex items-baseline justify-between mt-1">
               <span className="text-xl font-mono font-bold text-sky-400">{p2Remaining}</span>
