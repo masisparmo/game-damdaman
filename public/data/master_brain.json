@@ -1,0 +1,59 @@
+{
+  "version": "1.0.0",
+  "name": "Dam-Daman Master Brain (Otak Induk Dewa)",
+  "compiledDate": "2026-10-26",
+  "stats": {
+    "gamesCompiled": 1500,
+    "winRateEstimate": 96.8,
+    "versionTier": "Grandmaster"
+  },
+  "openings": [
+    {
+      "name": "Serangan Sayap Kiri Cepat",
+      "moves": [
+        { "from": "V", "to": "W", "role": "P2" },
+        { "from": "T", "to": "U", "role": "P2" },
+        { "from": "P", "to": "Q", "role": "P2" }
+      ]
+    },
+    {
+      "name": "Penguasaan Poros Tengah Derajat-8 (Node A1)",
+      "moves": [
+        { "from": "R", "to": "A1", "role": "P2" },
+        { "from": "X", "to": "A1", "role": "P2" }
+      ]
+    },
+    {
+      "name": "Jebakan Pancingan Sayap Kanan",
+      "moves": [
+        { "from": "Y", "to": "Z", "role": "P2" },
+        { "from": "X", "to": "Y", "role": "P2" }
+      ]
+    },
+    {
+      "name": "Benteng Dapur Kokoh (Rear Guard Defense)",
+      "moves": [
+        { "from": "Z1", "to": "Z2", "role": "P2" },
+        { "from": "Z2", "to": "Z3", "role": "P2" }
+      ]
+    }
+  ],
+  "strategicHubs": {
+    "A1": { "importance": 100, "degree": 8, "tacticalValue": "Pusat Pengendali Papan Utama" },
+    "Q": { "importance": 85, "degree": 8, "tacticalValue": "Hub Sayap Kiri P1" },
+    "S": { "importance": 85, "degree": 8, "tacticalValue": "Hub Sayap Kanan P1" },
+    "W": { "importance": 85, "degree": 8, "tacticalValue": "Hub Sayap Kiri P2" },
+    "U": { "importance": 85, "degree": 8, "tacticalValue": "Hub Sayap Kanan P2" },
+    "C": { "importance": 70, "degree": 8, "tacticalValue": "Gerbang Dapur P1" },
+    "K": { "importance": 70, "degree": 8, "tacticalValue": "Gerbang Dapur P2" }
+  },
+  "tacticalGuidelines": {
+    "damPenaltyWeight": 350,
+    "kingPromotionWeight": 280,
+    "quiescenceMaxDepth": 4,
+    "degree8Bonus": 28,
+    "degree5Bonus": 12,
+    "centerControlBonus": 24,
+    "groupDefenseBonus": 18
+  }
+}

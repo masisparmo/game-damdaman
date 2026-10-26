@@ -103,10 +103,17 @@ In discrete mathematics and graph theory, the Dam-Daman board represents an undi
 ---
 
 ## 5. AI Engine & Difficulty Levels
-The game features a built-in AI opponent powered by heuristic search algorithms:
+The game features a built-in AI opponent powered by heuristic search algorithms and a hybrid continuous learning architecture:
 - **Easy:** Fast heuristic-weighted greedy evaluation with slight exploratory randomization. Perfect for beginners and casual players.
 - **Medium:** Depth-limited Minimax search with Alpha-Beta pruning, balancing positional safety, piece protection, and capture opportunities.
 - **Hard:** Deeper search evaluating piece mobility, control of degree-8 hub junctions, king advancement, and defensive clustering.
+- **Master 👑 (Level Dewa):** Hybrid Grandmaster Engine featuring:
+  - **Collective Master Brain (`master_brain.json`):** Preloaded grandmaster opening repertoire and strategic hub priorities stored directly in the repository.
+  - **Quiescence Search:** Eliminates the *Horizon Effect* by evaluating complete capture chains until positions are tactically quiet.
+  - **Continuous Learning & Blunder Memory:** Automatically learns from completed matches, memorizes opponent tactics, and applies penalties to prevent repeating past blunders.
+  - **Graph Ethnomathematics Valuation:** Dominates the 7 critical degree-8 junction hubs (`A1`, `Q`, `S`, `W`, `U`, `C`, `K`).
+  - **Transposition Table:** Lightning-fast state caching for sub-second calculation without hallucinations or external API keys.
+  - **Collective Brain Export:** Allows players to export their local learned tactical patterns as JSON to contribute back to the repository.
 
 ---
 
@@ -272,11 +279,18 @@ Dalam matematika diskret dan teori graf, papan Dam-Daman merupakan graf sederhan
 
 ---
 
-## 5. Mesin Kecerdasan Buatan (AI Engine)
-Permainan menyediakan lawan komputer cerdas dengan 3 tingkat keahlian:
+## 5. Mesin Kecerdasan Buatan (AI Engine) & Pembelajaran Mandiri
+Permainan menyediakan lawan komputer cerdas dengan 4 tingkat keahlian dan arsitektur pembelajaran adaptif:
 - **Mudah (Easy):** Algoritma heuristik cepat dengan sedikit variasi acak, cocok untuk pemula yang baru mengenal aturan Dam-Daman.
 - **Sedang (Medium):** Algoritma Minimax dengan pemangkasan Alpha-Beta pada kedalaman terbatas, menyeimbangkan keselamatan posisi, pengawalan bidak, dan pemanfaatan peluang makan.
 - **Sulit (Hard):** Evaluasi mendalam yang memperhitungkan mobilitas bidak, penguasaan 7 simpul strategis berderajat 8, formasi klaster pertahanan, dan pencegahan pinalti DAM.
+- **Dewa 👑 (Master AI):** Mesin Grandmaster Hibrida dengan Pembelajaran Berkelanjutan:
+  - **Otak Induk Global (`master_brain.json`):** Membaca buku pembukaan dan taktik tingkat master yang tersimpan di repositori GitHub.
+  - **Quiescence Search (Pencarian Taktis Tenang):** Menghitung seluruh rantai saling makan hingga tuntas untuk mencegah jebakan *Horizon Effect*.
+  - **Memori Belajar & Anti-Blunder:** Otomatis mencatat setiap pertandingan di browser, mempelajari taktik lawan, dan menghindari kesalahan langkah yang pernah terjadi sebelumnya.
+  - **Dominasi Etnomatematika Simpul Derajat-8:** Memprioritaskan penguasaan 7 simpul poros utama (`A1`, `Q`, `S`, `W`, `U`, `C`, `K`).
+  - **Transposition Table:** Caching posisi cepat sub-detik tanpa perlu model LLM dan tanpa perlu API Key apa pun.
+  - **Ekspor Memori Otak Kolektif:** Pemain dapat mengekspor data pembelajaran lokal ke format JSON untuk dikontribusikan kembali ke repositori.
 
 ---
 

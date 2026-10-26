@@ -42,6 +42,7 @@ import {
   GraduationCap,
   Volume2,
   VolumeX,
+  Crown,
 } from 'lucide-react';
 import { Language, translations, formatMoveDescription } from './i18n';
 import { ModalPlayerName } from './components/ModalPlayerName';
@@ -52,6 +53,7 @@ import {
   formatDisplayDate,
   formatTime,
 } from './game/db';
+import { initMasterBrain, learnFromFinishedMatch } from './game/aiMemory';
 
 export default function App() {
   // Game State
@@ -119,7 +121,12 @@ export default function App() {
     sound.enabled = soundEnabled;
   }, [soundEnabled]);
 
-  // Check Game Over & Save Match to IndexedDB
+  // Initialize Master Brain on startup
+  useEffect(() => {
+    initMasterBrain();
+  }, []);
+
+  // Check Game Over & Save Match to IndexedDB & Learn Match Outcome
   useEffect(() => {
     if (gameState.gameStatus === 'won' || gameState.gameStatus === 'draw') {
       setShowGameOver(true);
@@ -144,7 +151,7 @@ export default function App() {
 
         const p1Name = playerName || (lang === 'en' ? 'Player 1' : 'Pemain 1');
         const p2Name = gameMode === 'ai'
-          ? `AI (${aiDifficulty})`
+          ? `AI (${t[aiDifficulty]})`
           : (p2CustomName || (lang === 'en' ? 'Player 2' : 'Pemain 2'));
 
         const p1Rem = Object.values(gameState.pieces).filter((p) => p.owner === 'P1').length;
@@ -166,6 +173,11 @@ export default function App() {
           p2Remaining: p2Rem,
           timestamp: now.getTime(),
         }).catch((err) => console.error('Failed saving game history to IndexedDB:', err));
+
+        // Continuous Learning: Record and learn from this match
+        if (gameMode === 'ai') {
+          learnFromFinishedMatch(gameState, gameState.winner);
+        }
       }
     }
   }, [
@@ -538,19 +550,29 @@ export default function App() {
 
             {gameMode === 'ai' && (
               <div className="flex items-center gap-0.5 bg-stone-900 border border-stone-800 rounded-xl px-1.5 py-0.5 text-xs">
-                {(['easy', 'medium', 'hard'] as AIDifficulty[]).map((level) => (
-                  <button
-                    key={level}
-                    onClick={() => setAiDifficulty(level)}
-                    className={`px-1.5 py-0.5 rounded text-[11px] font-medium transition ${
-                      aiDifficulty === level
-                        ? 'bg-stone-700 text-amber-300 font-bold'
-                        : 'text-stone-400 hover:text-stone-200'
-                    }`}
-                  >
-                    {level === 'easy' ? t.easy : level === 'medium' ? t.medium : t.hard}
-                  </button>
-                ))}
+                {(['easy', 'medium', 'hard', 'master'] as AIDifficulty[]).map((level) => {
+                  const isSelected = aiDifficulty === level;
+                  const isMaster = level === 'master';
+                  return (
+                    <button
+                      key={level}
+                      onClick={() => setAiDifficulty(level)}
+                      className={`px-1.5 py-0.5 rounded text-[11px] font-medium transition flex items-center gap-0.5 ${
+                        isSelected
+                          ? isMaster
+                            ? 'bg-gradient-to-r from-amber-500 to-yellow-600 text-stone-950 font-black shadow-xs'
+                            : 'bg-stone-700 text-amber-300 font-bold'
+                          : isMaster
+                          ? 'text-amber-400/80 hover:text-amber-300'
+                          : 'text-stone-400 hover:text-stone-200'
+                      }`}
+                      title={isMaster ? 'Level Dewa: Grandmaster AI + Continuous Learning' : undefined}
+                    >
+                      {isMaster && <Crown size={11} className={isSelected ? 'text-stone-950' : 'text-amber-400'} />}
+                      <span>{t[level]}</span>
+                    </button>
+                  );
+                })}
               </div>
             )}
           </div>
@@ -647,9 +669,23 @@ export default function App() {
             }`}
           >
             <div className="flex items-center gap-2 flex-row-reverse text-right w-full justify-between">
-              <div className="w-8 h-8 rounded-full bg-gradient-to-br from-sky-500 to-blue-700 flex items-center justify-center border-2 border-sky-300 shadow">
-                <span className="font-bold text-[11px] text-white">
-                  {gameMode === 'ai' ? 'AI' : 'P2'}
+              <div
+                className={`w-8 h-8 rounded-full flex items-center justify-center border-2 shadow transition-all ${
+                  gameMode === 'ai' && aiDifficulty === 'master'
+                    ? 'bg-gradient-to-br from-amber-500 via-yellow-600 to-amber-700 border-amber-300 ring-2 ring-amber-500/40 shadow-amber-950/50'
+                    : 'bg-gradient-to-br from-sky-500 to-blue-700 border-sky-300'
+                }`}
+              >
+                <span className="font-bold text-[11px] text-white flex items-center">
+                  {gameMode === 'ai' ? (
+                    aiDifficulty === 'master' ? (
+                      <Crown size={15} className="text-stone-950 fill-amber-300" />
+                    ) : (
+                      'AI'
+                    )
+                  ) : (
+                    'P2'
+                  )}
                 </span>
               </div>
               <div>
@@ -659,10 +695,8 @@ export default function App() {
                       {isAiThinking ? t.thinking : t.turn}
                     </span>
                   )}
-                  <span className="font-bold text-xs text-stone-100">
-                    {gameMode === 'ai'
-                      ? `AI (${aiDifficulty === 'easy' ? t.easy : aiDifficulty === 'medium' ? t.medium : t.hard})`
-                      : (p2CustomName || t.player2)}
+                  <span className="font-bold text-xs text-stone-100 flex items-center gap-1">
+                    {gameMode === 'ai' ? `AI (${t[aiDifficulty]})` : (p2CustomName || t.player2)}
                   </span>
                 </div>
                 <div className="flex items-center gap-1.5 justify-end mt-0.5">
@@ -868,7 +902,7 @@ export default function App() {
         onClose={() => setShowGameOver(false)}
         lang={lang}
         playerName={playerName || t.player1}
-        opponentName={gameMode === 'ai' ? `AI (${aiDifficulty})` : (p2CustomName || t.player2)}
+        opponentName={gameMode === 'ai' ? `AI (${t[aiDifficulty]})` : (p2CustomName || t.player2)}
       />
     </div>
   );

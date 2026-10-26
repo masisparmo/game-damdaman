@@ -7,11 +7,12 @@
  */
 
 import React, { useState } from 'react';
-import { X, Volume2, VolumeX, Sliders, CheckCircle2, Play, RefreshCw, Palette, Globe } from 'lucide-react';
+import { X, Volume2, VolumeX, Sliders, CheckCircle2, Play, RefreshCw, Palette, Globe, Brain, Download, RotateCcw } from 'lucide-react';
 import { RulesConfig } from '../game/rulesEngine';
 import { BoardTheme } from './Board';
 import { runAllQATests, TestResult } from '../game/testHarness';
 import { Language, translations } from '../i18n';
+import { getAIMemoryStats, resetLocalAIMemory, exportCollectiveBrainJSON } from '../game/aiMemory';
 
 interface ModalSettingsProps {
   isOpen: boolean;
@@ -42,6 +43,7 @@ export const ModalSettings: React.FC<ModalSettingsProps> = ({
 }) => {
   const [qaResults, setQaResults] = useState<TestResult[] | null>(null);
   const [isTesting, setIsTesting] = useState(false);
+  const [, setMemoryTrigger] = useState(0);
 
   if (!isOpen) return null;
   const t = translations[lang];
@@ -227,6 +229,80 @@ export const ModalSettings: React.FC<ModalSettingsProps> = ({
                 onChange={(e) => onChangeRulesConfig({ ...rulesConfig, kingEnabled: e.target.checked })}
                 className="w-4 h-4 accent-amber-500 cursor-pointer"
               />
+            </div>
+          </div>
+
+          {/* Continuous AI Memory & Hive Mind */}
+          <div className="p-3.5 bg-gradient-to-br from-amber-950/20 via-stone-900 to-stone-950 rounded-xl border border-amber-500/30 space-y-3">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <div className="p-1.5 rounded-lg bg-amber-500/20 text-amber-400">
+                  <Brain size={16} />
+                </div>
+                <div>
+                  <h4 className="font-bold text-xs sm:text-sm text-stone-100 flex items-center gap-1.5">
+                    <span>{t.aiMemoryTitle}</span>
+                    <span className="px-1.5 py-0.2 rounded text-[9px] bg-amber-500/30 text-amber-300 font-extrabold uppercase">
+                      Level Dewa
+                    </span>
+                  </h4>
+                  <p className="text-[11px] text-stone-400">{t.aiMemoryDesc}</p>
+                </div>
+              </div>
+            </div>
+
+            {/* Quick Metrics */}
+            <div className="grid grid-cols-3 gap-2 text-center">
+              <div className="p-2 bg-stone-950/80 rounded-lg border border-stone-800">
+                <div className="text-[10px] text-stone-400">{t.matchesLearnedLabel}</div>
+                <div className="font-extrabold text-sm sm:text-base text-amber-400 font-mono">
+                  {getAIMemoryStats().totalGamesLearned}
+                </div>
+              </div>
+              <div className="p-2 bg-stone-950/80 rounded-lg border border-stone-800">
+                <div className="text-[10px] text-stone-400">{t.openingsLearnedLabel}</div>
+                <div className="font-extrabold text-sm sm:text-base text-sky-400 font-mono">
+                  {getAIMemoryStats().openingsCount}
+                </div>
+              </div>
+              <div className="p-2 bg-stone-950/80 rounded-lg border border-stone-800">
+                <div className="text-[10px] text-stone-400">{t.blundersAvoidedLabel}</div>
+                <div className="font-extrabold text-sm sm:text-base text-emerald-400 font-mono">
+                  {getAIMemoryStats().blundersAvoidedCount}
+                </div>
+              </div>
+            </div>
+
+            {/* Export & Reset Actions */}
+            <div className="flex items-center justify-between gap-2 pt-1 border-t border-stone-800/80">
+              <button
+                onClick={() => {
+                  const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(exportCollectiveBrainJSON());
+                  const downloadAnchor = document.createElement('a');
+                  downloadAnchor.setAttribute("href", dataStr);
+                  downloadAnchor.setAttribute("download", `damdaman_master_brain_${Date.now()}.json`);
+                  document.body.appendChild(downloadAnchor);
+                  downloadAnchor.click();
+                  downloadAnchor.remove();
+                }}
+                className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-xs font-semibold bg-stone-800 hover:bg-stone-700 text-stone-200 border border-stone-700 transition"
+              >
+                <Download size={13} className="text-amber-400" />
+                <span>{t.exportBrainBtn}</span>
+              </button>
+
+              <button
+                onClick={() => {
+                  if (window.confirm(t.brainResetConfirm)) {
+                    resetLocalAIMemory();
+                    setMemoryTrigger((prev) => prev + 1);
+                  }
+                }}
+                className="flex items-center gap-1 text-[11px] text-stone-400 hover:text-rose-400 transition"
+              >
+                <RotateCcw size={11} />
+                <span>{t.resetBrainBtn}</span>
+              </button>
             </div>
           </div>
 
