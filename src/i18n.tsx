@@ -63,6 +63,19 @@ export const translations = {
     zoomOut: 'Perkecil',
     resetZoom: 'Reset Skala',
     nodeLabels: 'Label Simpul',
+    boardTopTerritory: (isFlipped: boolean, isAi: boolean) =>
+      isFlipped
+        ? 'WILAYAH ATAS (PEMAIN 1)'
+        : isAi
+        ? 'WILAYAH ATAS (AI / P2)'
+        : 'WILAYAH ATAS (PEMAIN 2)',
+    boardBottomTerritory: (isFlipped: boolean, isAi: boolean) =>
+      isFlipped
+        ? isAi
+          ? 'WILAYAH BAWAH (AI / P2)'
+          : 'WILAYAH BAWAH (PEMAIN 2)'
+        : 'WILAYAH BAWAH (PEMAIN 1)',
+    boardLandscapeSubtitle: 'CATUR JAWA TRADISIONAL',
 
     // Modal Common
     close: 'Tutup',
@@ -187,6 +200,19 @@ export const translations = {
     zoomOut: 'Zoom Out',
     resetZoom: 'Reset Zoom',
     nodeLabels: 'Node Labels',
+    boardTopTerritory: (isFlipped: boolean, isAi: boolean) =>
+      isFlipped
+        ? 'TOP TERRITORY (PLAYER 1)'
+        : isAi
+        ? 'TOP TERRITORY (AI / P2)'
+        : 'TOP TERRITORY (PLAYER 2)',
+    boardBottomTerritory: (isFlipped: boolean, isAi: boolean) =>
+      isFlipped
+        ? isAi
+          ? 'BOTTOM TERRITORY (AI / P2)'
+          : 'BOTTOM TERRITORY (PLAYER 2)'
+        : 'BOTTOM TERRITORY (PLAYER 1)',
+    boardLandscapeSubtitle: 'TRADITIONAL JAVANESE CHESS',
 
     // Modal Common
     close: 'Close',

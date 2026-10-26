@@ -25,7 +25,7 @@ import {
   Tag,
   Maximize2,
 } from 'lucide-react';
-import { Language } from '../i18n';
+import { Language, translations } from '../i18n';
 
 export type BoardTheme = 'green' | 'wood' | 'obsidian';
 export type BoardOrientation = 'portrait' | 'landscape';
@@ -47,6 +47,7 @@ interface BoardProps {
   onToggleNodeLabels: () => void;
   disabled?: boolean;
   lang?: Language;
+  gameMode?: 'ai' | 'pvp';
 }
 
 export const Board: React.FC<BoardProps> = ({
@@ -66,10 +67,12 @@ export const Board: React.FC<BoardProps> = ({
   onToggleNodeLabels,
   disabled = false,
   lang = 'id',
+  gameMode = 'ai',
 }) => {
   const containerRef = useRef<HTMLDivElement>(null);
   const [hoveredNode, setHoveredNode] = useState<string | null>(null);
 
+  const t = translations[lang];
   const isPortrait = orientation === 'portrait';
 
   // SVG dimensions:
@@ -420,7 +423,7 @@ export const Board: React.FC<BoardProps> = ({
                   letterSpacing="4"
                   textAnchor="middle"
                 >
-                  WILAYAH ATAS (AI / P2)
+                  {t.boardTopTerritory(isFlipped, gameMode === 'ai')}
                 </text>
                 <text
                   x={SVG_WIDTH / 2}
@@ -430,7 +433,7 @@ export const Board: React.FC<BoardProps> = ({
                   letterSpacing="4"
                   textAnchor="middle"
                 >
-                  WILAYAH BAWAH (PEMAIN 1)
+                  {t.boardBottomTerritory(isFlipped, gameMode === 'ai')}
                 </text>
               </g>
             ) : (
@@ -455,7 +458,7 @@ export const Board: React.FC<BoardProps> = ({
                   transform={`rotate(90 ${SVG_WIDTH - 30},${SVG_HEIGHT / 2})`}
                   textAnchor="middle"
                 >
-                  CATUR JAWA TRADISIONAL
+                  {t.boardLandscapeSubtitle}
                 </text>
               </g>
             )}

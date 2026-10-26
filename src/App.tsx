@@ -668,6 +668,7 @@ export default function App() {
             onToggleNodeLabels={() => setShowNodeLabels(!showNodeLabels)}
             disabled={isAiThinking}
             lang={lang}
+            gameMode={gameMode}
           />
         </div>
 
