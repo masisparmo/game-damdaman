@@ -26,6 +26,7 @@ export const translations = {
     // Game Mode & Actions
     vsAi: 'Lawan AI',
     pvp: '2 Pemain',
+    online: 'Main Online 🌐',
     easy: 'Mudah',
     medium: 'Sedang',
     hard: 'Sulit',
@@ -173,6 +174,7 @@ export const translations = {
     // Game Mode & Actions
     vsAi: 'vs AI',
     pvp: '2 Players',
+    online: 'Play Online 🌐',
     easy: 'Easy',
     medium: 'Medium',
     hard: 'Hard',

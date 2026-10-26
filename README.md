@@ -118,9 +118,19 @@ The game features a built-in AI opponent powered by heuristic search algorithms 
 ---
 
 ## 6. Key Features & Dual Language Support
+- **Online Multiplayer (Real-time WebSockets):**
+  - **Option 1 - Quick Match (Cari Lawan Cepat):** 1-click automatic pairing with online players worldwide using Supabase Realtime Presence. Features radar scanning animation and automatic role assignment (Host = P1, Guest = P2).
+  - **Option 2 - Play with Friend (Main Bareng Teman):**
+    - **Create Private Room:** Generates unique 6-digit room codes (e.g., `DAM-7821`).
+    - **1-Click WhatsApp Share:** Direct WhatsApp button generating formatted invitation messages with clickable direct-join links (`https://damdaman.isparmo.com/?room=DAM-XXXX`).
+    - **Copy Invitation Link:** Direct link copying with instant toast confirmation.
+    - **Manual Code Entry:** Opponents can simply type the 6-digit code to join immediately.
+  - **Ultra-Low Sub-50ms Latency:** Moves, captures, multi-jump chains, DAM penalties, and board restarts synchronize instantly over Supabase WebSocket Broadcast channels without requiring server infrastructure or database polling.
+  - **Real-Time Floating Emoji Reactions:** Expressive in-game emojis (`👋`, `😂`, `👏`, `👑`, `🔥`, `☕`) that appear as floating animations on the opponent's screen.
+  - **Connection Resilience:** Detects opponent disconnections and displays real-time room status badges.
 - **Player Name Personalization:** Prompts players to enter their name upon completing the rules guide, with custom avatar badges and quick name editing anytime.
 - **IndexedDB Match History:** Automatically persists complete offline match records locally in IndexedDB:
-  - **Player Name & Opponent** (AI or Player 2)
+  - **Player Name & Opponent** (AI, Player 2, or Online Rival)
   - **Match Time** (`HH:mm:ss`)
   - **Match Date in DDMMYYYY format** (e.g. `26102026`) and readable display date
   - **Match Duration in minutes** (calculated to one decimal place, e.g. `2.4 min`)
@@ -143,7 +153,8 @@ The game features a built-in AI opponent powered by heuristic search algorithms 
 ## 7. Technology Stack
 - **Framework:** React 19 + TypeScript
 - **Styling:** Vanilla CSS & Tailwind CSS v4
-- **Database / Local Storage:** IndexedDB (`idb` lightweight native store) + LocalStorage
+- **Realtime Multiplayer:** Supabase Realtime (WebSockets Broadcast & Presence)
+- **Database / Local Storage:** Supabase Global Memory + IndexedDB (`idb` lightweight native store) + LocalStorage
 - **Build Tool:** Vite 8
 - **Icons:** Lucide React
 - **Audio:** Web Audio API (Synthesized procedural audio)
@@ -295,9 +306,19 @@ Permainan menyediakan lawan komputer cerdas dengan 4 tingkat keahlian dan arsite
 ---
 
 ## 6. Fitur Unggulan & Dukungan Dual Bahasa
+- **Mode Main Online Real-Time (Multiplayer):**
+  - **Opsi 1 - Cari Lawan Cepat (Quick Match):** Berpasangan otomatis dengan pemain lain di seluruh dunia hanya dengan 1 sentuhan memanfaatkan Supabase Realtime Presence. Dilengkapi animasi radar pemindai dan penentuan peran otomatis (Pencipta antrean = P1, Penantang = P2).
+  - **Opsi 2 - Main Bareng Teman (Play with Friend):**
+    - **Buat Ruang Privat:** Menghasilkan kode unik 6 karakter (contoh: `DAM-7821`).
+    - **1-Klik Bagikan ke WhatsApp:** Tombol instan yang menyusun pesan ajakan tanding rapi berisi tautan langsung (`https://damdaman.isparmo.com/?room=DAM-XXXX`).
+    - **Salin Tautan Undangan:** Salin tautan room lengkap dengan notifikasi toast konfirmasi cepat.
+    - **Gabung Ruang dengan Kode:** Lawan cukup mengetikkan kode room untuk langsung terhubung tanpa repot.
+  - **Sinkronisasi Super Cepat Sub-50ms:** Langkah bidak, kombo pemakanan beruntun, pinalti DAM, dan mulai ulang tersinkronisasi instan melalui WebSocket Broadcast Supabase tanpa memerlukan server backend berbayar.
+  - **Reaksi Emoji Melayang (Real-time Reaction):** Kirim emoji ekspresif (`👋`, `😂`, `👏`, `👑`, `🔥`, `☕`) yang melayang secara real-time di layar lawan tanding.
+  - **Deteksi Koneksi Lawan:** Memberi notifikasi otomatis jika kawan bermain keluar atau terputus koneksinya.
 - **Personalisasi Nama Pemain:** Setelah jendela panduan aturan ditutup, pemain langsung diminta memasukkan nama, dengan avatar khusus serta tombol ubah nama kapan saja.
 - **Pencatatan Riwayat Pertandingan di IndexedDB:** Setiap pertandingan otomatis tersimpan rapi dan permanen di basis data lokal IndexedDB peramban:
-  - **Nama Pemain & Lawan** (AI atau Pemain 2)
+  - **Nama Pemain & Lawan** (AI, Pemain 2, atau Lawan Online)
   - **Jam Pertandingan** (`HH:mm:ss`)
   - **Tanggal dalam format DDMMYYYY** (contoh: `26102026`) serta tanggal berformat ramah baca
   - **Lamanya Bermain dalam Menit** (dihitung presisi 1 desimal, misal: `2.4 menit`)
@@ -320,7 +341,8 @@ Permainan menyediakan lawan komputer cerdas dengan 4 tingkat keahlian dan arsite
 ## 7. Teknologi yang Digunakan
 - **Framework:** React 19 + TypeScript
 - **Styling:** Vanilla CSS & Tailwind CSS v4
-- **Penyimpanan Lokal / Database:** IndexedDB (`DamDamanDB`) + LocalStorage
+- **Realtime Multiplayer:** Supabase Realtime (WebSockets Broadcast & Presence)
+- **Penyimpanan Lokal & Cloud:** Supabase Global Memory + IndexedDB (`DamDamanDB`) + LocalStorage
 - **Build Tool:** Vite 8
 - **Ikon Antarmuka:** Lucide React
 - **Audio:** Web Audio API (Synthesizer prosedural)

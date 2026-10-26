@@ -43,10 +43,12 @@ import {
   Volume2,
   VolumeX,
   Crown,
+  Globe,
 } from 'lucide-react';
 import { Language, translations, formatMoveDescription } from './i18n';
 import { ModalPlayerName } from './components/ModalPlayerName';
 import { ModalGameHistory } from './components/ModalGameHistory';
+import { ModalOnlineLobby } from './components/ModalOnlineLobby';
 import {
   saveGameHistory,
   formatDDMMYYYY,
@@ -54,6 +56,7 @@ import {
   formatTime,
 } from './game/db';
 import { initMasterBrain, learnFromFinishedMatch } from './game/aiMemory';
+import { onlineMatch, OnlineMatchConfig } from './game/onlineMatch';
 
 export default function App() {
   // Game State
@@ -63,7 +66,12 @@ export default function App() {
   const [historyStack, setHistoryStack] = useState<GameState[]>([]);
 
   // Settings & Modes
-  const [gameMode, setGameMode] = useState<'ai' | 'pvp'>('ai');
+  const [gameMode, setGameMode] = useState<'ai' | 'pvp' | 'online'>('ai');
+  const [showOnlineLobby, setShowOnlineLobby] = useState<boolean>(false);
+  const [onlineConfig, setOnlineConfig] = useState<OnlineMatchConfig | null>(null);
+  const [isOpponentConnected, setIsOpponentConnected] = useState<boolean>(false);
+  const [reactionToast, setReactionToast] = useState<{ emoji: string; sender: string } | null>(null);
+  const [urlRoomCode, setUrlRoomCode] = useState<string | null>(null);
   const [aiDifficulty, setAiDifficulty] = useState<AIDifficulty>('medium');
   const [boardTheme, setBoardTheme] = useState<BoardTheme>('green'); // Modern Green Velvet (matches user's green photo)
   const [orientation, setOrientation] = useState<BoardOrientation>('portrait'); // Portrait first per user request
@@ -124,6 +132,60 @@ export default function App() {
   // Initialize Master Brain on startup
   useEffect(() => {
     initMasterBrain();
+  }, []);
+
+  // Check for room invite code in URL query params (?room=DAM-XXXX)
+  useEffect(() => {
+    try {
+      const params = new URLSearchParams(window.location.search);
+      const roomParam = params.get('room');
+      if (roomParam) {
+        setUrlRoomCode(roomParam);
+        setShowOnlineLobby(true);
+      }
+    } catch {}
+  }, []);
+
+  // Online Multiplayer WebSocket Listeners
+  useEffect(() => {
+    onlineMatch.onRemoteMoveReceived = ({ move, nextState }) => {
+      if (move.isCapture) sound.playCapture();
+      else sound.playMove();
+      if (move.promotedToKing) sound.playPromotion();
+
+      setHistoryStack((prev) => [...prev, gameStateRef.current]);
+      setGameState(nextState);
+      setSelectedPieceId(null);
+      setLegalMoves([]);
+    };
+
+    onlineMatch.onRemoteClaimDam = () => {
+      sound.playDamPenalty();
+      setHistoryStack((prev) => [...prev, gameStateRef.current]);
+      setGameState((prev) => claimDamPenalty(prev));
+    };
+
+    onlineMatch.onRemotePassJump = () => {
+      sound.playMove();
+      setHistoryStack((prev) => [...prev, gameStateRef.current]);
+      setGameState((prev) => passConsecutiveJump(prev));
+      setSelectedPieceId(null);
+      setLegalMoves([]);
+    };
+
+    onlineMatch.onRemoteRestart = () => {
+      handleRestart();
+    };
+
+    onlineMatch.onReactionReceived = ({ emoji, senderName }) => {
+      sound.playSelect();
+      setReactionToast({ emoji, sender: senderName });
+      setTimeout(() => setReactionToast(null), 3000);
+    };
+
+    onlineMatch.onOpponentStatusChange = (connected) => {
+      setIsOpponentConnected(connected);
+    };
   }, []);
 
   // Check Game Over & Save Match to IndexedDB & Learn Match Outcome
@@ -293,6 +355,7 @@ export default function App() {
     (pieceId: string) => {
       if (isAiThinking || gameState.gameStatus !== 'playing') return;
       if (gameMode === 'ai' && gameState.currentPlayer === 'P2') return;
+      if (gameMode === 'online' && onlineConfig && gameState.currentPlayer !== onlineConfig.myRole) return;
 
       const piece = gameState.pieces[pieceId];
       if (!piece || piece.owner !== gameState.currentPlayer) return;
@@ -306,13 +369,14 @@ export default function App() {
       const moves = getLegalMoves(gameState, pieceId);
       setLegalMoves(moves);
     },
-    [gameState, isAiThinking, gameMode]
+    [gameState, isAiThinking, gameMode, onlineConfig]
   );
 
   // Destination Selection Handler (Execute Move)
   const handleSelectDestination = useCallback(
     (toNodeId: string) => {
       if (!selectedPieceId || isAiThinking || gameState.gameStatus !== 'playing') return;
+      if (gameMode === 'online' && onlineConfig && gameState.currentPlayer !== onlineConfig.myRole) return;
 
       const targetMove = legalMoves.find((m) => m.toNodeId === toNodeId);
       if (!targetMove) return;
@@ -334,6 +398,11 @@ export default function App() {
         const nextState = applyMove(gameState, targetMove);
         setGameState(nextState);
 
+        // Broadcast to online opponent
+        if (gameMode === 'online') {
+          onlineMatch.broadcastMove(targetMove, nextState);
+        }
+
         // If consecutive jump available for the same piece
         if (nextState.consecutivePieceId) {
           setSelectedPieceId(nextState.consecutivePieceId);
@@ -346,25 +415,33 @@ export default function App() {
         console.error('Move execution failed:', err);
       }
     },
-    [gameState, selectedPieceId, legalMoves, isAiThinking]
+    [gameState, selectedPieceId, legalMoves, isAiThinking, gameMode, onlineConfig]
   );
 
   // Claim DAM Penalty Button
   const handleClaimDam = () => {
     if (!gameState.opponentMissedCapture || gameState.damClaimedThisTurn) return;
+    if (gameMode === 'online' && onlineConfig && gameState.currentPlayer !== onlineConfig.myRole) return;
     sound.playDamPenalty();
     setHistoryStack((prev) => [...prev, gameState]);
     setGameState((prev) => claimDamPenalty(prev));
+    if (gameMode === 'online') {
+      onlineMatch.broadcastClaimDam();
+    }
   };
 
   // Pass Consecutive Jump
   const handlePassJump = () => {
     if (!gameState.consecutivePieceId) return;
+    if (gameMode === 'online' && onlineConfig && gameState.currentPlayer !== onlineConfig.myRole) return;
     sound.playMove();
     setHistoryStack((prev) => [...prev, gameState]);
     setGameState((prev) => passConsecutiveJump(prev));
     setSelectedPieceId(null);
     setLegalMoves([]);
+    if (gameMode === 'online') {
+      onlineMatch.broadcastPassJump();
+    }
   };
 
   // Undo Move
@@ -393,7 +470,7 @@ export default function App() {
   };
 
   // Reset / New Game
-  const handleRestart = (config = rulesConfig) => {
+  const handleRestart = (config = rulesConfig, isRemote = false) => {
     aiBusyRef.current = false;
     hasSavedToDbRef.current = false;
     gameStartTimeRef.current = Date.now();
@@ -405,6 +482,9 @@ export default function App() {
     setShowGameOver(false);
     setIsAiThinking(false);
     sound.playSelect();
+    if (gameMode === 'online' && !isRemote) {
+      onlineMatch.broadcastRestart();
+    }
   };
 
   // Piece counts
@@ -517,10 +597,12 @@ export default function App() {
         <div className="flex flex-wrap items-center justify-between gap-2">
           {/* Mode Switcher */}
           <div className="flex items-center gap-1.5">
-            <div className="flex bg-stone-900 border border-stone-800 rounded-xl p-0.5 text-xs">
+            <div className="flex bg-stone-900 border border-stone-800 rounded-xl p-0.5 text-xs shadow-inner">
               <button
                 onClick={() => {
                   setGameMode('ai');
+                  onlineMatch.cleanup();
+                  setOnlineConfig(null);
                   handleRestart();
                 }}
                 className={`flex items-center gap-1 px-2.5 py-1 rounded-lg font-semibold transition text-xs ${
@@ -535,6 +617,8 @@ export default function App() {
               <button
                 onClick={() => {
                   setGameMode('pvp');
+                  onlineMatch.cleanup();
+                  setOnlineConfig(null);
                   handleRestart();
                 }}
                 className={`flex items-center gap-1 px-2.5 py-1 rounded-lg font-semibold transition text-xs ${
@@ -546,7 +630,55 @@ export default function App() {
                 <Users size={13} />
                 {t.pvp}
               </button>
+              <button
+                onClick={() => {
+                  setShowOnlineLobby(true);
+                }}
+                className={`flex items-center gap-1 px-2.5 py-1 rounded-lg font-semibold transition text-xs ${
+                  gameMode === 'online'
+                    ? 'bg-emerald-600 text-white shadow-sm font-bold'
+                    : 'text-stone-400 hover:text-stone-200'
+                }`}
+              >
+                <Globe size={13} />
+                {t.online}
+              </button>
             </div>
+
+            {/* Online Room Info & Reaction Emojis */}
+            {gameMode === 'online' && onlineConfig && (
+              <div className="flex items-center gap-2">
+                <div className="flex items-center gap-1.5 bg-stone-900 border border-stone-800 rounded-xl px-2.5 py-1 text-xs">
+                  <span className="font-mono text-amber-400 font-bold">{onlineConfig.roomId}</span>
+                  <span className="text-stone-600">•</span>
+                  <span className="flex items-center gap-1 font-mono text-[11px]">
+                    <span className={`w-2 h-2 rounded-full ${isOpponentConnected ? 'bg-emerald-400 animate-pulse' : 'bg-rose-400'}`} />
+                    <span className={isOpponentConnected ? 'text-emerald-300 font-medium' : 'text-rose-300'}>
+                      {isOpponentConnected
+                        ? (lang === 'en' ? 'Online' : 'Terhubung')
+                        : (lang === 'en' ? 'Offline' : 'Terputus')}
+                    </span>
+                  </span>
+                </div>
+
+                <div className="hidden sm:flex items-center gap-1 bg-stone-900 border border-stone-800 rounded-xl px-1.5 py-0.5">
+                  {['👋', '😂', '👏', '👑', '🔥', '☕'].map((emoji) => (
+                    <button
+                      key={emoji}
+                      onClick={() => {
+                        onlineMatch.broadcastReaction(emoji);
+                        setReactionToast({ emoji, sender: playerName || 'Saya' });
+                        setTimeout(() => setReactionToast(null), 2500);
+                      }}
+                      className="hover:scale-125 active:scale-95 transition text-xs p-1"
+                      title={`Kirim ${emoji}`}
+                    >
+                      {emoji}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            )}
 
             {gameMode === 'ai' && (
               <div className="flex items-center gap-0.5 bg-stone-900 border border-stone-800 rounded-xl px-1.5 py-0.5 text-xs">
@@ -628,7 +760,11 @@ export default function App() {
               <div>
                 <div className="flex items-center gap-1.5">
                   <span className="font-bold text-xs text-stone-100">
-                    {playerName || t.player1}
+                    {gameMode === 'online' && onlineConfig
+                      ? onlineConfig.myRole === 'P1'
+                        ? `${playerName || t.player1} (${lang === 'en' ? 'You' : 'Anda'})`
+                        : onlineConfig.myName
+                      : (playerName || t.player1)}
                   </span>
                   <button
                     onClick={() => setShowNameModal(true)}
@@ -696,7 +832,13 @@ export default function App() {
                     </span>
                   )}
                   <span className="font-bold text-xs text-stone-100 flex items-center gap-1">
-                    {gameMode === 'ai' ? `AI (${t[aiDifficulty]})` : (p2CustomName || t.player2)}
+                    {gameMode === 'online' && onlineConfig
+                      ? onlineConfig.myRole === 'P2'
+                        ? `${playerName || t.player2} (${lang === 'en' ? 'You' : 'Anda'})`
+                        : onlineConfig.opponentName
+                      : gameMode === 'ai'
+                      ? `AI (${t[aiDifficulty]})`
+                      : (p2CustomName || t.player2)}
                   </span>
                 </div>
                 <div className="flex items-center gap-1.5 justify-end mt-0.5">
@@ -902,8 +1044,37 @@ export default function App() {
         onClose={() => setShowGameOver(false)}
         lang={lang}
         playerName={playerName || t.player1}
-        opponentName={gameMode === 'ai' ? `AI (${t[aiDifficulty]})` : (p2CustomName || t.player2)}
+        opponentName={
+          gameMode === 'online' && onlineConfig
+            ? onlineConfig.opponentName
+            : gameMode === 'ai'
+            ? `AI (${t[aiDifficulty]})`
+            : (p2CustomName || t.player2)
+        }
       />
+      <ModalOnlineLobby
+        isOpen={showOnlineLobby}
+        onClose={() => setShowOnlineLobby(false)}
+        playerName={playerName || (lang === 'en' ? 'Player 1' : 'Pemain 1')}
+        lang={lang}
+        initialRoomCode={urlRoomCode}
+        onStartOnlineGame={(cfg) => {
+          setOnlineConfig(cfg);
+          setGameMode('online');
+          setIsOpponentConnected(true);
+          handleRestart(rulesConfig, true);
+        }}
+      />
+      {/* Floating Reaction Toast */}
+      {reactionToast && (
+        <div className="fixed top-16 left-1/2 -translate-x-1/2 z-50 px-4 py-2 rounded-2xl bg-stone-900/95 border border-amber-500/50 shadow-2xl backdrop-blur-md flex items-center gap-2.5 text-stone-100 text-xs animate-in zoom-in-95 duration-200">
+          <span className="text-2xl">{reactionToast.emoji}</span>
+          <div>
+            <strong className="text-amber-400 block">{reactionToast.sender}</strong>
+            <span className="text-[10px] text-stone-400">{lang === 'en' ? 'sent a reaction' : 'mengirim reaksi'}</span>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
