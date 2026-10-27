@@ -64,8 +64,12 @@ import {
 } from './game/db';
 import { initMasterBrain, learnFromFinishedMatch } from './game/aiMemory';
 import { onlineMatch, OnlineMatchConfig } from './game/onlineMatch';
-import { getHeroById, DEFAULT_HERO_ID, DEFAULT_P2_HERO_ID } from './game/heroes';
-import { recordMatchPointsAndStats } from './game/leaderboard';
+import {
+  recordMatchPointsAndStats,
+  getLocalPlayerStats,
+  saveLocalPlayerStats,
+  syncPlayerStatsToCloud,
+} from './game/leaderboard';
 
 export default function App() {
   // Game State
@@ -157,6 +161,15 @@ export default function App() {
   useEffect(() => {
     initMasterBrain();
   }, []);
+
+  // Proactively sync existing player stats to Supabase Cloud on startup
+  useEffect(() => {
+    if (playerName) {
+      getLocalPlayerStats(playerName, playerAvatar).then((st) => {
+        syncPlayerStatsToCloud(st).catch(() => {});
+      });
+    }
+  }, [playerName, playerAvatar]);
 
   // Check for room invite code in URL query params (?room=DAM-XXXX)
   useEffect(() => {
@@ -314,6 +327,14 @@ export default function App() {
     }
     setShowNameModal(false);
     gameStartTimeRef.current = Date.now();
+
+    // Proactively persist profile and sync to Supabase Cloud
+    getLocalPlayerStats(p1, p1Hero).then((st) => {
+      st.playerName = p1;
+      st.playerAvatar = p1Hero;
+      saveLocalPlayerStats(st);
+      syncPlayerStatsToCloud(st).catch(() => {});
+    });
   };
 
   const gameStateRef = useRef(gameState);

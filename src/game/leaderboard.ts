@@ -298,6 +298,17 @@ export async function getGlobalLeaderboard(currentPlayerStats: PlayerStats): Pro
   let entries: LeaderboardEntry[] = [];
   let isLiveCloud = false;
 
+  // 1. Proactively push current player's profile & accumulated score to Supabase Cloud
+  // so any offline or previously earned points (like points earned before the table existed)
+  // are immediately registered in the global cloud database!
+  if (currentPlayerStats && currentPlayerStats.playerId && currentPlayerStats.playerName) {
+    try {
+      await syncPlayerStatsToCloud(currentPlayerStats);
+    } catch (err) {
+      console.warn('Proactive cloud sync notification:', err);
+    }
+  }
+
   try {
     const { data, error } = await supabase
       .from('player_rankings')
