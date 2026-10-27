@@ -50,8 +50,8 @@ export interface RulesConfig {
 
 export const DEFAULT_RULES_CONFIG: RulesConfig = {
   multiCapture: true,
-  kingEnabled: false,
-  damPenaltyClaim: false, // Default NONAKTIF sesuai Halaman 5 & 16-17 GDD
+  kingEnabled: true, // Variasi Bidak Raja aktif secara default
+  damPenaltyClaim: true, // Aturan sakral Pinalti "DAM" (Dam Ora Mangan) AKTIF secara default
   forcedCapture: false,
   maxHalfMovesNoCapture: 40,
 };
