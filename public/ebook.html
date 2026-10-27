@@ -1,0 +1,1643 @@
+<!DOCTYPE html>
+<html lang="id" class="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Ebook: Permainan Dam-Daman Online — Panduan Lengkap Cara Main Hingga Cara Membuatnya</title>
+  <meta name="description" content="Ebook Resmi Panduan Lengkap Permainan Tradisional Dam-Daman Online: Etnomatematika, Teori Graf, Aturan Main, Arsitektur React TypeScript, AI Engine, Multiplayer Supabase, dan Master Prompt Blueprint.">
+  <meta name="author" content="Isparmo (masisparmo)">
+  
+  <!-- Favicons -->
+  <link rel="icon" type="image/x-icon" href="/favicon.ico">
+  <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/favicon.png">
+  <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+  
+  <!-- Open Graph -->
+  <meta property="og:title" content="Ebook: Permainan Dam-Daman Online">
+  <meta property="og:description" content="Panduan Lengkap Cara Main Hingga Cara Membuat Game Dam-Daman dengan Etnomatematika, React TypeScript, AI Engine, dan Supabase.">
+  <meta property="og:image" content="/logo.png">
+  <meta property="og:url" content="https://damdaman.isparmo.com/ebook.html">
+  <meta property="og:type" content="article">
+
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500;600&family=Inter:wght@300;400;500;600;700&family=Plus+Jakarta+Sans:wght@500;600;700;800&family=Merriweather:ital,wght@0,300;0,400;0,700;1,300&display=swap" rel="stylesheet">
+
+  <style>
+    /* ====================================================================
+       MODERN LUXURY EDITORIAL DESIGN SYSTEM
+       Theme: Deep Obsidian & Emerald Velvet with Golden Amber Accents
+       ==================================================================== */
+    :root {
+      --font-heading: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+      --font-body: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      --font-serif: 'Merriweather', Georgia, serif;
+      --font-code: 'Fira Code', monospace;
+
+      /* Dark Theme (Default) */
+      --bg-canvas: #090d16;
+      --bg-surface: #101726;
+      --bg-surface-elevated: #162034;
+      --bg-card: rgba(22, 32, 52, 0.7);
+      --bg-sidebar: #0b111e;
+      --border-subtle: rgba(255, 255, 255, 0.08);
+      --border-strong: rgba(245, 158, 11, 0.3);
+      --border-focus: #f59e0b;
+
+      --text-primary: #f1f5f9;
+      --text-secondary: #94a3b8;
+      --text-muted: #64748b;
+      --text-accent: #fbbf24;
+
+      --color-emerald-deep: #064e3b;
+      --color-emerald-accent: #10b981;
+      --color-amber-gold: #f59e0b;
+      --color-amber-glow: rgba(245, 158, 11, 0.15);
+
+      --code-bg: #070b12;
+      --code-border: #1e293b;
+      --code-text: #38bdf8;
+
+      --sidebar-width: 320px;
+      --header-height: 64px;
+      --content-max-width: 900px;
+    }
+
+    /* Light Theme */
+    html.light {
+      --bg-canvas: #f8fafc;
+      --bg-surface: #ffffff;
+      --bg-surface-elevated: #f1f5f9;
+      --bg-card: #ffffff;
+      --bg-sidebar: #f8fafc;
+      --border-subtle: #e2e8f0;
+      --border-strong: #cbd5e1;
+      --border-focus: #d97706;
+
+      --text-primary: #0f172a;
+      --text-secondary: #475569;
+      --text-muted: #64748b;
+      --text-accent: #d97706;
+
+      --color-emerald-deep: #065f46;
+      --color-emerald-accent: #059669;
+      --color-amber-gold: #d97706;
+      --color-amber-glow: rgba(217, 119, 6, 0.12);
+
+      --code-bg: #0f172a;
+      --code-border: #cbd5e1;
+      --code-text: #0284c7;
+    }
+
+    /* Reset & Base */
+    *, *::before, *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    html {
+      scroll-behavior: smooth;
+      font-size: 16px;
+      color-scheme: dark light;
+    }
+
+    body {
+      background-color: var(--bg-canvas);
+      color: var(--text-primary);
+      font-family: var(--font-body);
+      line-height: 1.75;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+      overflow-x: hidden;
+    }
+
+    /* Reading Progress Bar */
+    #progress-container {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 3px;
+      background: transparent;
+      z-index: 100;
+    }
+
+    #progress-bar {
+      height: 100%;
+      width: 0%;
+      background: linear-gradient(90deg, #10b981, #f59e0b, #fbbf24);
+      box-shadow: 0 0 10px rgba(245, 158, 11, 0.5);
+      transition: width 0.1s ease;
+    }
+
+    /* Top Sticky Navigation */
+    .top-navbar {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: var(--header-height);
+      background: rgba(11, 17, 30, 0.85);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--border-subtle);
+      z-index: 90;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 1.5rem;
+      transition: all 0.2s ease;
+    }
+
+    html.light .top-navbar {
+      background: rgba(255, 255, 255, 0.9);
+      border-bottom: 1px solid var(--border-subtle);
+    }
+
+    .navbar-brand {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      text-decoration: none;
+      color: var(--text-primary);
+      font-family: var(--font-heading);
+      font-weight: 700;
+      font-size: 1.1rem;
+    }
+
+    .navbar-logo {
+      width: 36px;
+      height: 36px;
+      border-radius: 10px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+      border: 1px solid var(--border-strong);
+      object-contain: contain;
+    }
+
+    .navbar-actions {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+
+    .nav-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      padding: 0.5rem 0.9rem;
+      border-radius: 10px;
+      font-size: 0.85rem;
+      font-weight: 600;
+      text-decoration: none;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      border: 1px solid var(--border-subtle);
+    }
+
+    .nav-btn-primary {
+      background: linear-gradient(135deg, #059669, #047857);
+      color: #ffffff;
+      border: 1px solid rgba(16, 185, 129, 0.4);
+      box-shadow: 0 2px 8px rgba(5, 150, 105, 0.3);
+    }
+
+    .nav-btn-primary:hover {
+      background: linear-gradient(135deg, #10b981, #059669);
+      transform: translateY(-1px);
+    }
+
+    .nav-btn-ghost {
+      background: var(--bg-surface-elevated);
+      color: var(--text-secondary);
+    }
+
+    .nav-btn-ghost:hover {
+      color: var(--text-primary);
+      border-color: var(--border-strong);
+    }
+
+    /* Mobile Sidebar Toggle Button */
+    .menu-toggle-btn {
+      display: none;
+      background: transparent;
+      border: none;
+      color: var(--text-primary);
+      cursor: pointer;
+      padding: 0.5rem;
+    }
+
+    /* App Layout */
+    .app-layout {
+      display: flex;
+      margin-top: var(--header-height);
+      min-height: calc(100vh - var(--header-height));
+    }
+
+    /* Sidebar Navigation (TOC) */
+    .sidebar-toc {
+      width: var(--sidebar-width);
+      position: fixed;
+      top: var(--header-height);
+      bottom: 0;
+      left: 0;
+      background: var(--bg-sidebar);
+      border-right: 1px solid var(--border-subtle);
+      overflow-y: auto;
+      padding: 1.5rem 1rem 3rem 1.25rem;
+      z-index: 80;
+    }
+
+    .sidebar-header {
+      font-family: var(--font-heading);
+      font-size: 0.8rem;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--text-accent);
+      margin-bottom: 1rem;
+      padding-left: 0.5rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .toc-list {
+      list-style: none;
+    }
+
+    .toc-link {
+      display: block;
+      padding: 0.4rem 0.6rem;
+      border-radius: 8px;
+      font-size: 0.825rem;
+      line-height: 1.4;
+      text-decoration: none;
+      color: var(--text-secondary);
+      transition: all 0.15s ease;
+      border-left: 2px solid transparent;
+    }
+
+    .toc-link:hover {
+      color: var(--text-primary);
+      background: rgba(255, 255, 255, 0.04);
+    }
+
+    .toc-level-1 {
+      font-weight: 700;
+      margin-top: 0.8rem;
+    }
+
+    .toc-level-2 {
+      font-weight: 600;
+      margin-top: 0.6rem;
+      color: var(--text-primary);
+    }
+
+    .toc-level-3 {
+      font-size: 0.8rem;
+      padding-left: 1.2rem;
+      color: var(--text-muted);
+    }
+
+    .toc-link.active {
+      color: #fbbf24;
+      background: var(--color-amber-glow);
+      border-left: 2px solid var(--color-amber-gold);
+      font-weight: 600;
+    }
+
+    /* Main Article Container */
+    .main-container {
+      margin-left: var(--sidebar-width);
+      flex: 1;
+      padding: 2.5rem 3.5rem 6rem;
+      display: flex;
+      justify-content: center;
+    }
+
+    .article-content {
+      width: 100%;
+      max-width: var(--content-max-width);
+    }
+
+    /* Hero Book Banner */
+    .book-hero-banner {
+      background: linear-gradient(135deg, rgba(6, 78, 59, 0.7), rgba(15, 23, 42, 0.9)), radial-gradient(circle at top right, rgba(245, 158, 11, 0.15), transparent);
+      border: 1px solid rgba(245, 158, 11, 0.25);
+      border-radius: 24px;
+      padding: 3rem 2.5rem;
+      margin-bottom: 3.5rem;
+      box-shadow: 0 12px 36px rgba(0, 0, 0, 0.4);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .book-hero-banner::after {
+      content: "";
+      position: absolute;
+      top: -50px;
+      right: -50px;
+      width: 200px;
+      height: 200px;
+      background: radial-gradient(circle, rgba(245, 158, 11, 0.2) 0%, transparent 70%);
+      pointer-events: none;
+    }
+
+    .hero-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      background: rgba(245, 158, 11, 0.2);
+      border: 1px solid rgba(245, 158, 11, 0.4);
+      color: #fbbf24;
+      font-size: 0.75rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      padding: 0.3rem 0.8rem;
+      border-radius: 9999px;
+      margin-bottom: 1.25rem;
+    }
+
+    .hero-title {
+      font-family: var(--font-heading);
+      font-size: 2.4rem;
+      font-weight: 800;
+      line-height: 1.2;
+      color: #ffffff;
+      margin-bottom: 0.75rem;
+      letter-spacing: -0.02em;
+    }
+
+    .hero-subtitle {
+      font-size: 1.15rem;
+      color: #cbd5e1;
+      margin-bottom: 1.5rem;
+      font-weight: 400;
+      line-height: 1.5;
+    }
+
+    .hero-metadata {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 1.5rem;
+      font-size: 0.85rem;
+      color: #94a3b8;
+      border-top: 1px solid rgba(255, 255, 255, 0.1);
+      padding-top: 1.25rem;
+    }
+
+    .hero-meta-item {
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+    }
+
+    .hero-meta-item strong {
+      color: #f1f5f9;
+    }
+
+    /* Typography & Hierarchy */
+    .heading-1 {
+      font-family: var(--font-heading);
+      font-size: 2.2rem;
+      font-weight: 800;
+      margin-top: 3rem;
+      margin-bottom: 1.5rem;
+      color: var(--text-primary);
+      letter-spacing: -0.02em;
+      scroll-margin-top: calc(var(--header-height) + 1.5rem);
+    }
+
+    .chapter-header-box {
+      margin-top: 4.5rem;
+      margin-bottom: 1.75rem;
+      padding-bottom: 0.75rem;
+      border-bottom: 2px solid var(--border-strong);
+    }
+
+    .heading-2 {
+      font-family: var(--font-heading);
+      font-size: 1.65rem;
+      font-weight: 800;
+      color: #fbbf24;
+      line-height: 1.3;
+      letter-spacing: -0.01em;
+      scroll-margin-top: calc(var(--header-height) + 1.5rem);
+    }
+
+    .heading-3 {
+      font-family: var(--font-heading);
+      font-size: 1.25rem;
+      font-weight: 700;
+      margin-top: 2.5rem;
+      margin-bottom: 1rem;
+      color: var(--text-primary);
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      scroll-margin-top: calc(var(--header-height) + 1.5rem);
+    }
+
+    .heading-3::before {
+      content: "";
+      display: inline-block;
+      width: 6px;
+      height: 18px;
+      background: var(--color-amber-gold);
+      border-radius: 3px;
+    }
+
+    .heading-4 {
+      font-family: var(--font-heading);
+      font-size: 1.05rem;
+      font-weight: 700;
+      margin-top: 1.75rem;
+      margin-bottom: 0.75rem;
+      color: var(--text-accent);
+      scroll-margin-top: calc(var(--header-height) + 1.5rem);
+    }
+
+    .paragraph {
+      margin-bottom: 1.25rem;
+      font-size: 1rem;
+      color: var(--text-primary);
+      line-height: 1.8;
+    }
+
+    .paragraph strong {
+      color: #ffffff;
+      font-weight: 600;
+    }
+
+    html.light .paragraph strong {
+      color: #0f172a;
+    }
+
+    /* Lists */
+    .content-list, .content-ordered-list {
+      margin: 1rem 0 1.5rem 1.5rem;
+      color: var(--text-primary);
+    }
+
+    .list-item {
+      margin-bottom: 0.6rem;
+      padding-left: 0.3rem;
+      line-height: 1.7;
+    }
+
+    .list-item strong {
+      color: #fbbf24;
+      font-weight: 600;
+    }
+
+    /* Inline Code */
+    .inline-code {
+      font-family: var(--font-code);
+      background: rgba(245, 158, 11, 0.12);
+      color: #fbbf24;
+      border: 1px solid rgba(245, 158, 11, 0.25);
+      border-radius: 6px;
+      padding: 0.15rem 0.4rem;
+      font-size: 0.85em;
+    }
+
+    /* Code Blocks */
+    .code-wrapper {
+      background: var(--code-bg);
+      border: 1px solid var(--code-border);
+      border-radius: 14px;
+      margin: 1.5rem 0 2rem;
+      overflow: hidden;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.25);
+    }
+
+    .code-header {
+      background: rgba(255, 255, 255, 0.03);
+      border-bottom: 1px solid var(--code-border);
+      padding: 0.5rem 1rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .code-lang {
+      font-family: var(--font-code);
+      font-size: 0.75rem;
+      font-weight: 600;
+      color: #94a3b8;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    .copy-btn {
+      background: transparent;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      color: #94a3b8;
+      border-radius: 6px;
+      padding: 0.25rem 0.6rem;
+      font-size: 0.75rem;
+      font-weight: 500;
+      display: flex;
+      align-items: center;
+      gap: 0.35rem;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .copy-btn:hover {
+      color: #ffffff;
+      background: rgba(255, 255, 255, 0.08);
+      border-color: rgba(255, 255, 255, 0.25);
+    }
+
+    .code-wrapper pre {
+      padding: 1.25rem;
+      overflow-x: auto;
+      font-family: var(--font-code);
+      font-size: 0.85rem;
+      line-height: 1.6;
+      color: #e2e8f0;
+    }
+
+    /* Callout Boxes */
+    .callout {
+      border-radius: 14px;
+      padding: 1.25rem 1.5rem;
+      margin: 1.75rem 0;
+      display: flex;
+      gap: 1rem;
+      background: rgba(16, 185, 129, 0.08);
+      border: 1px solid rgba(16, 185, 129, 0.25);
+      border-left: 4px solid #10b981;
+    }
+
+    .callout-icon {
+      font-size: 1.3rem;
+      flex-shrink: 0;
+      line-height: 1;
+    }
+
+    .callout-body {
+      font-size: 0.925rem;
+      color: #cbd5e1;
+      line-height: 1.7;
+    }
+
+    html.light .callout-body {
+      color: #334155;
+    }
+
+    .divider {
+      border: none;
+      height: 1px;
+      background: linear-gradient(90deg, transparent, var(--border-subtle), transparent);
+      margin: 3.5rem 0;
+    }
+
+    /* Floating Back to Top Button */
+    .back-to-top {
+      position: fixed;
+      bottom: 2rem;
+      right: 2rem;
+      width: 44px;
+      height: 44px;
+      border-radius: 12px;
+      background: var(--bg-surface-elevated);
+      color: var(--text-secondary);
+      border: 1px solid var(--border-subtle);
+      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      opacity: 0;
+      visibility: hidden;
+      transition: all 0.2s ease;
+      z-index: 90;
+    }
+
+    .back-to-top.visible {
+      opacity: 1;
+      visibility: visible;
+    }
+
+    .back-to-top:hover {
+      color: #ffffff;
+      border-color: var(--color-amber-gold);
+      transform: translateY(-2px);
+    }
+
+    /* Print Styles */
+    @media print {
+      .top-navbar, .sidebar-toc, .back-to-top, .copy-btn {
+        display: none !important;
+      }
+      .main-container {
+        margin-left: 0 !important;
+        padding: 0 !important;
+      }
+      body {
+        background: #ffffff !important;
+        color: #000000 !important;
+        font-size: 12pt;
+      }
+      .heading-2 {
+        page-break-before: always;
+      }
+      .code-wrapper {
+        border: 1px solid #ccc !important;
+        page-break-inside: avoid;
+      }
+    }
+
+    /* Responsive Breakpoints */
+    @media (max-width: 1024px) {
+      .sidebar-toc {
+        transform: translateX(-100%);
+        transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        box-shadow: 4px 0 24px rgba(0, 0, 0, 0.5);
+      }
+
+      .sidebar-toc.open {
+        transform: translateX(0);
+      }
+
+      .main-container {
+        margin-left: 0;
+        padding: 2rem 1.5rem 5rem;
+      }
+
+      .menu-toggle-btn {
+        display: inline-flex;
+      }
+    }
+
+    @media (max-width: 640px) {
+      .book-hero-banner {
+        padding: 2rem 1.5rem;
+      }
+      .hero-title {
+        font-size: 1.8rem;
+      }
+      .heading-1 {
+        font-size: 1.8rem;
+      }
+      .heading-2 {
+        font-size: 1.4rem;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Top Scroll Progress Bar -->
+  <div id="progress-container">
+    <div id="progress-bar"></div>
+  </div>
+
+  <!-- Sticky Top Navigation Bar -->
+  <header class="top-navbar">
+    <div style="display: flex; align-items: center; gap: 0.5rem;">
+      <button class="menu-toggle-btn" id="sidebarToggle" aria-label="Toggle Daftar Isi">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
+      </button>
+      <a href="https://damdaman.isparmo.com" class="navbar-brand">
+        <img src="/logo.png" alt="Dam-Daman Logo" class="navbar-logo">
+        <span>Maen Dam-Daman</span>
+      </a>
+    </div>
+
+    <div class="navbar-actions">
+      <a href="https://damdaman.isparmo.com" class="nav-btn nav-btn-primary">
+        <span>🎮 Mainkan Game</span>
+      </a>
+      <a href="https://github.com/masisparmo/game-damdaman" target="_blank" rel="noopener" class="nav-btn nav-btn-ghost">
+        <span>GitHub</span>
+      </a>
+      <button class="nav-btn nav-btn-ghost" id="themeToggle" title="Ganti Tema">
+        <span id="themeIcon">☀️</span>
+      </button>
+      <button class="nav-btn nav-btn-ghost" onclick="window.print()" title="Cetak atau Simpan PDF">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 6 2 18 2 18 9"></polyline><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path><rect x="6" y="14" width="12" height="8"></rect></svg>
+      </button>
+    </div>
+  </header>
+
+  <!-- App Body Layout -->
+  <div class="app-layout">
+    
+    <!-- Left Sidebar: Table of Contents -->
+    <aside class="sidebar-toc" id="sidebar">
+      <div class="sidebar-header">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path></svg>
+        <span>Daftar Isi Buku</span>
+      </div>
+      <ul class="toc-list">
+  <li class="toc-level-2"><a href="#panduan-lengkap-cara-main-hingga-cara-membuatnya" class="toc-link">Panduan Lengkap Cara Main Hingga Cara Membuatnya</a></li>
+  <li class="toc-level-2"><a href="#prakata" class="toc-link">PRAKATA</a></li>
+  <li class="toc-level-2"><a href="#bab-1-sejarah-budaya-dan-etnomatematika-dam-daman" class="toc-link">BAB 1: SEJARAH, BUDAYA, DAN ETNOMATEMATIKA DAM-DAMAN</a></li>
+  <li class="toc-level-3"><a href="#11-latar-belakang-filosofi-tradisional" class="toc-link">1.1. Latar Belakang & Filosofi Tradisional</a></li>
+  <li class="toc-level-3"><a href="#12-landasan-akademik-etnomatematika" class="toc-link">1.2. Landasan Akademik Etnomatematika</a></li>
+  <li class="toc-level-3"><a href="#13-struktur-papan-berbasis-teori-graf" class="toc-link">1.3. Struktur Papan Berbasis Teori Graf</a></li>
+  <li class="toc-level-2"><a href="#bab-2-aturan-resmi-cara-bermain-dam-daman" class="toc-link">BAB 2: ATURAN RESMI & CARA BERMAIN DAM-DAMAN</a></li>
+  <li class="toc-level-3"><a href="#21-penyiapan-papan-distribusi-bidak" class="toc-link">2.1. Penyiapan Papan & Distribusi Bidak</a></li>
+  <li class="toc-level-3"><a href="#22-pergerakan-bidak-legal" class="toc-link">2.2. Pergerakan Bidak Legal</a></li>
+  <li class="toc-level-3"><a href="#23-mekanisme-melompati-memakan-bidak" class="toc-link">2.3. Mekanisme Melompati & Memakan Bidak</a></li>
+  <li class="toc-level-3"><a href="#24-lompatan-beruntun-multi-jump" class="toc-link">2.4. Lompatan Beruntun (Multi-Jump)</a></li>
+  <li class="toc-level-3"><a href="#25-aturan-sakral-dam-ora-mangan-pinalti-dam" class="toc-link">2.5. Aturan Sakral "DAM Ora Mangan" (Pinalti DAM)</a></li>
+  <li class="toc-level-3"><a href="#26-promosi-bidak-raja-puncak-gunungan" class="toc-link">2.6. Promosi Bidak Raja (Puncak Gunungan)</a></li>
+  <li class="toc-level-3"><a href="#27-kondisi-kemenangan-kekalahan-dan-remis-draw" class="toc-link">2.7. Kondisi Kemenangan, Kekalahan, dan Remis (Draw)</a></li>
+  <li class="toc-level-2"><a href="#bab-3-arsitektur-teknologi-perancangan-sistem" class="toc-link">BAB 3: ARSITEKTUR TEKNOLOGI & PERANCANGAN SISTEM</a></li>
+  <li class="toc-level-3"><a href="#31-pemilihan-teknologi-tech-stack" class="toc-link">3.1. Pemilihan Teknologi (Tech Stack)</a></li>
+  <li class="toc-level-3"><a href="#32-struktur-proyek-organisasi-file" class="toc-link">3.2. Struktur Proyek & Organisasi File</a></li>
+  <li class="toc-level-3"><a href="#33-sistem-grafika-vektor-dinamis-svg" class="toc-link">3.3. Sistem Grafika Vektor Dinamis (SVG)</a></li>
+  <li class="toc-level-3"><a href="#34-efek-suara-prosedural-dengan-web-audio-api" class="toc-link">3.4. Efek Suara Prosedural dengan Web Audio API</a></li>
+  <li class="toc-level-3"><a href="#35-persistensi-data-lokal-dengan-indexeddb" class="toc-link">3.5. Persistensi Data Lokal dengan IndexedDB</a></li>
+  <li class="toc-level-2"><a href="#bab-4-rekayasa-engine-permainan-game-engine" class="toc-link">BAB 4: REKAYASA ENGINE PERMAINAN (GAME ENGINE)</a></li>
+  <li class="toc-level-3"><a href="#41-representasi-state-permainan" class="toc-link">4.1. Representasi State Permainan</a></li>
+  <li class="toc-level-3"><a href="#42-model-simpul-graf-matriks-ketetanggaan" class="toc-link">4.2. Model Simpul Graf & Matriks Ketetanggaan</a></li>
+  <li class="toc-level-3"><a href="#43-algoritma-generator-langkah-legal-move-generator" class="toc-link">4.3. Algoritma Generator Langkah Legal (Move Generator)</a></li>
+  <li class="toc-level-3"><a href="#44-logika-klaim-pinalti-dam-dam-ora-mangan" class="toc-link">4.4. Logika Klaim Pinalti DAM (Dam Ora Mangan)</a></li>
+  <li class="toc-level-2"><a href="#bab-5-membangun-kecerdasan-buatan-ai-engine" class="toc-link">BAB 5: MEMBANGUN KECERDASAN BUATAN (AI ENGINE)</a></li>
+  <li class="toc-level-3"><a href="#51-tingkat-mudah-easy-heuristik-greedy-acak" class="toc-link">5.1. Tingkat Mudah (Easy): Heuristik Greedy Acak</a></li>
+  <li class="toc-level-3"><a href="#52-tingkat-sedang-medium-minimax-dengan-alpha-beta-pruning" class="toc-link">5.2. Tingkat Sedang (Medium): Minimax dengan Alpha-Beta Pruning</a></li>
+  <li class="toc-level-3"><a href="#53-tingkat-sulit-hard-evaluasi-posisi-berbobot-hub-strategis" class="toc-link">5.3. Tingkat Sulit (Hard): Evaluasi Posisi Berbobot Hub Strategis</a></li>
+  <li class="toc-level-3"><a href="#54-tingkat-dewa-master-brain-quiescence-search-pembelajaran-kontinu" class="toc-link">5.4. Tingkat Dewa (Master Brain): Quiescence Search & Pembelajaran Kontinu</a></li>
+  <li class="toc-level-2"><a href="#bab-6-multiplayer-online-realtime-dengan-supabase" class="toc-link">BAB 6: MULTIPLAYER ONLINE REALTIME DENGAN SUPABASE</a></li>
+  <li class="toc-level-3"><a href="#61-arsitektur-komunikasi-realtime-peer-to-peer" class="toc-link">6.1. Arsitektur Komunikasi Realtime Peer-to-Peer</a></li>
+  <li class="toc-level-3"><a href="#62-manajemen-room-dam-xxxx-quick-match" class="toc-link">6.2. Manajemen Room DAM-XXXX & Quick Match</a></li>
+  <li class="toc-level-3"><a href="#63-sinkronisasi-state-broadcast-reaksi-emotikon" class="toc-link">6.3. Sinkronisasi State & Broadcast Reaksi Emotikon</a></li>
+  <li class="toc-level-2"><a href="#bab-7-desain-uiux-modern-berbasis-ergonomi-chesscom" class="toc-link">BAB 7: DESAIN UI/UX MODERN BERBASIS ERGONOMI CHESS.COM</a></li>
+  <li class="toc-level-3"><a href="#71-analisis-kebutuhan-redesign" class="toc-link">7.1. Analisis Kebutuhan Redesign</a></li>
+  <li class="toc-level-3"><a href="#72-pola-sandwich-layout-opponent-bar---board---player-bar---action-bar" class="toc-link">7.2. Pola "Sandwich Layout" (Opponent Bar - Board - Player Bar - Action Bar)</a></li>
+  <li class="toc-level-3"><a href="#73-ergonomi-mobile-first-zero-scroll-viewport" class="toc-link">7.3. Ergonomi Mobile-First & Zero-Scroll Viewport</a></li>
+  <li class="toc-level-3"><a href="#74-tema-estetika-hijau-beludru-kayu-jati-batu-obsidian" class="toc-link">7.4. Tema Estetika (Hijau Beludru, Kayu Jati, Batu Obsidian)</a></li>
+  <li class="toc-level-3"><a href="#75-aksesibilitas-visual-glif-ramah-buta-warna" class="toc-link">7.5. Aksesibilitas Visual & Glif Ramah Buta Warna</a></li>
+  <li class="toc-level-2"><a href="#bab-8-jurnal-log-perjalanan-pengembangan-living-changelog" class="toc-link">BAB 8: JURNAL & LOG PERJALANAN PENGEMBANGAN (LIVING CHANGELOG)</a></li>
+  <li class="toc-level-3"><a href="#tahap-1-fondasi-awal-engine-etnomatematika" class="toc-link">📅 Tahap 1 — Fondasi Awal & Engine Etnomatematika</a></li>
+  <li class="toc-level-3"><a href="#tahap-2-kecerdasan-buatan-memori-grandmaster" class="toc-link">📅 Tahap 2 — Kecerdasan Buatan & Memori Grandmaster</a></li>
+  <li class="toc-level-3"><a href="#tahap-3-multiplayer-online-audio-sintetis-indexeddb" class="toc-link">📅 Tahap 3 — Multiplayer Online, Audio Sintetis, & IndexedDB</a></li>
+  <li class="toc-level-3"><a href="#tahap-4-master-redesign-uiux-v2-mobile-first-ergonomi-chesscom-selesai-terverifikasi" class="toc-link">📅 Tahap 4 — Master Redesign UI/UX V2 (Mobile-First & Ergonomi Chess.com) (Selesai & Terverifikasi)</a></li>
+  <li class="toc-level-3"><a href="#tahap-5-penyempurnaan-onboarding-pengguna-eliminasi-jargon-teknis-selesai-terverifikasi" class="toc-link">📅 Tahap 5 — Penyempurnaan Onboarding Pengguna & Eliminasi Jargon Teknis (Selesai & Terverifikasi)</a></li>
+  <li class="toc-level-3"><a href="#tahap-6-integrasi-identitas-visual-resmi-logo-favicon-touch-icon-selesai-terverifikasi" class="toc-link">📅 Tahap 6 — Integrasi Identitas Visual Resmi: Logo, Favicon & Touch Icon (Selesai & Terverifikasi)</a></li>
+  <li class="toc-level-3"><a href="#tahap-7-fitur-kustomisasi-profil-pemain-galeri-16-hero-karakter-nusantara-selesai-terverifikasi" class="toc-link">📅 Tahap 7 — Fitur Kustomisasi Profil Pemain & Galeri 16 Hero Karakter Nusantara (Selesai & Terverifikasi)</a></li>
+  <li class="toc-level-3"><a href="#tahap-8-sistem-statistik-papan-peringkat-global-database-supabase-sinkronisasi-indexeddb-selesai-terverifikasi" class="toc-link">📅 Tahap 8 — Sistem Statistik & Papan Peringkat Global (Database Supabase & Sinkronisasi IndexedDB) (Selesai & Terverifikasi)</a></li>
+  <li class="toc-level-2"><a href="#bab-9-master-prompt-blueprint-rekayasa-prompt-ai" class="toc-link">BAB 9: MASTER PROMPT & BLUEPRINT REKAYASA PROMPT AI</a></li>
+  <li class="toc-level-3"><a href="#91-filosofi-metodologi-prompt-engineering-game-ai" class="toc-link">9.1. Filosofi & Metodologi Prompt Engineering Game AI</a></li>
+  <li class="toc-level-3"><a href="#92-master-prompt-1-rekayasa-engine-teori-graf-aturan-sakral" class="toc-link">9.2. Master Prompt 1: Rekayasa Engine, Teori Graf & Aturan Sakral</a></li>
+  <li class="toc-level-3"><a href="#93-master-prompt-2-redesign-uiux-ergonomis-kelas-dunia-chesscom-style" class="toc-link">9.3. Master Prompt 2: Redesign UI/UX Ergonomis Kelas Dunia (Chess.com-Style)</a></li>
+  <li class="toc-level-3"><a href="#94-master-prompt-3-hero-avatar-nusantara-sistem-poin-leaderboard-global" class="toc-link">9.4. Master Prompt 3: Hero Avatar Nusantara, Sistem Poin & Leaderboard Global</a></li>
+  <li class="toc-level-3"><a href="#95-panduan-replikasi-tips-eksekusi-untuk-pengembang" class="toc-link">9.5. Panduan Replikasi & Tips Eksekusi untuk Pengembang</a></li>
+  <li class="toc-level-2"><a href="#bab-10-panduan-deployment-penutup" class="toc-link">BAB 10: PANDUAN DEPLOYMENT & PENUTUP</a></li>
+  <li class="toc-level-3"><a href="#101-menjalankan-proyek-secara-lokal" class="toc-link">10.1. Menjalankan Proyek Secara Lokal</a></li>
+  <li class="toc-level-1"><a href="#1-pasang-dependensi" class="toc-link">1. Pasang dependensi</a></li>
+  <li class="toc-level-1"><a href="#2-jalankan-server-pengembangan-lokal" class="toc-link">2. Jalankan server pengembangan lokal</a></li>
+  <li class="toc-level-1"><a href="#3-buka-di-peramban-httplocalhost3000" class="toc-link">3. Buka di peramban: http://localhost:3000</a></li>
+  <li class="toc-level-3"><a href="#102-melakukan-build-verifikasi-kualitas" class="toc-link">10.2. Melakukan Build & Verifikasi Kualitas</a></li>
+  <li class="toc-level-1"><a href="#pemeriksaan-tipe-data-typescript" class="toc-link">Pemeriksaan tipe data TypeScript</a></li>
+  <li class="toc-level-1"><a href="#kompilasi-bundel-produksi" class="toc-link">Kompilasi bundel produksi</a></li>
+  <li class="toc-level-1"><a href="#meninjau-hasil-kompilasi" class="toc-link">Meninjau hasil kompilasi</a></li>
+  <li class="toc-level-3"><a href="#103-menghubungkan-domain-kustom" class="toc-link">10.3. Menghubungkan Domain Kustom</a></li>
+</ul>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="main-container">
+      <article class="article-content">
+
+        <!-- Hero Header Card -->
+        <div class="book-hero-banner">
+          <div class="hero-badge">📖 Living Document Ebook v1.0.0</div>
+          <h1 class="hero-title">EBOOK: Permainan Dam-Daman Online</h1>
+          <p class="hero-subtitle">Panduan Lengkap Cara Main Hingga Cara Membuatnya — Mengintegrasikan Warisan Etnomatematika Nusantara, AI Engine Cerdas, dan Arsitektur Web Modern</p>
+          
+          <div class="hero-metadata">
+            <div class="hero-meta-item">
+              <span>✍️ Penulis:</span>
+              <strong>Isparmo (masisparmo)</strong>
+            </div>
+            <div class="hero-meta-item">
+              <span>🌐 Website:</span>
+              <a href="https://damdaman.isparmo.com" target="_blank" rel="noopener" style="color: #fbbf24; text-decoration: none;">damdaman.isparmo.com</a>
+            </div>
+            <div class="hero-meta-item">
+              <span>📦 Open Source:</span>
+              <a href="https://github.com/masisparmo/game-damdaman" target="_blank" rel="noopener" style="color: #60a5fa; text-decoration: none;">github.com/masisparmo/game-damdaman</a>
+            </div>
+          </div>
+        </div>
+
+        <!-- Rendered Book Content -->
+        <h1 id="ebook-permainan-dam-daman-online" class="heading-1">EBOOK: Permainan Dam-Daman Online</h1>
+
+<div class="chapter-header-box">
+  <h2 id="panduan-lengkap-cara-main-hingga-cara-membuatnya" class="heading-2">Panduan Lengkap Cara Main Hingga Cara Membuatnya</h2>
+</div>
+<p class="paragraph"><strong>Penulis:</strong> Isparmo (masisparmo)  </p>
+<p class="paragraph"><strong>Website:</strong> <a href="https://damdaman.isparmo.com" target="_blank" rel="noopener noreferrer">https://damdaman.isparmo.com</a>  </p>
+<p class="paragraph"><strong>Repository:</strong> <a href="https://github.com/masisparmo/game-damdaman" target="_blank" rel="noopener noreferrer">https://github.com/masisparmo/game-damdaman</a>  </p>
+<p class="paragraph"><strong>Status Dokumen:</strong> <em>Living Document (Terus Diperbarui Seiring Proses Pengembangan)</em>  </p>
+<p class="paragraph"><strong>Versi:</strong> 1.0.0 (Tahap Inisiasi Dokumentasi &amp; Redesign UI/UX)</p>
+<hr class="divider" />
+
+<div class="chapter-header-box">
+  <h2 id="prakata" class="heading-2">PRAKATA</h2>
+</div>
+<p class="paragraph">Buku ini lahir dari keinginan melestarikan salah satu warisan budaya permainan tradisional Nusantara: <strong>Dam-Daman</strong> (sering disebut juga <em>Damdas</em>, <em>Bas-Basan</em>, atau <em>Catur Jawa</em>). </p>
+<p class="paragraph">Di era digital, permainan tradisional sering kali terlupakan karena kalah bersaing dengan game modern. Namun, Dam-Daman memiliki keistimewaan yang luar biasa: di balik kesederhanaan papan kapur dan bidak kerikil, tersimpan <strong>struktur matematika diskrit tingkat tinggi (Teori Graf)</strong> dan *<em>filosofi kehidupan Jawa yang mendalam: </em>Eling lan Waspada***.</p>
+<p class="paragraph">Buku ini ditulis dengan pendekatan ganda yang saling melengkapi:</p>
+<ol class="content-ordered-list">
+  <li class="list-item"><strong>Untuk Pemain &amp; Pendidik:</strong> Memberikan pemahaman komprehensif tentang cara bermain, strategi menang, filosofi nilai karakter, dan konsep etnomatematika di baliknya.</li>
+  <li class="list-item"><strong>Untuk Programmer &amp; Software Engineer:</strong> Memberikan panduan teknis langkah-demi-langkah (<em>step-by-step tutorial</em>) tentang bagaimana membangun aplikasi web game strategi modern dari nol: mulai dari merancang graf SVG interaktif, membangun rule engine anti-curang, menciptakan AI Minimax tingkat dewa yang bisa belajar sendiri, menghubungkan sistem multiplayer online realtime tanpa backend server rumit, hingga menyempurnakan UI/UX sekelas aplikasi kelas dunia seperti <em>Chess.com</em>.</li>
+</ol>
+<p class="paragraph">Semoga buku ini bermanfaat bagi para pengembang game, praktisi pendidikan, pemerhati budaya, dan siapa saja yang mencintai warisan intelektual Nusantara.</p>
+<hr class="divider" />
+
+<div class="chapter-header-box">
+  <h2 id="bab-1-sejarah-budaya-dan-etnomatematika-dam-daman" class="heading-2">BAB 1: SEJARAH, BUDAYA, DAN ETNOMATEMATIKA DAM-DAMAN</h2>
+</div>
+<h3 id="11-latar-belakang-filosofi-tradisional" class="heading-3">1.1. Latar Belakang &amp; Filosofi Tradisional</h3>
+<p class="paragraph">Dam-Daman diperkirakan telah dimainkan di berbagai pelosok Nusantara (terutama di Pulau Jawa, Sunda, dan Madura) sejak awal abad ke-20 atau bahkan lebih awal. Dahulu, anak-anak dan orang dewasa memainkannya di pelataran rumah, teras surau, atau pos ronda. Papan cukup digambar menggunakan kapur atau digores di atas tanah liat, sedangkan bidak menggunakan kerikil, pecahan genteng, atau tutup botol.</p>
+<p class="paragraph">Dam-Daman bukan sekadar sarana hiburan pengisi waktu luang. Di dalamnya terkandung falsafah hidup:</p>
+<ul class="content-list">
+  <li class="list-item">**<em>Eling lan Waspada</em> (Ingat dan Waspada):*<em> Seorang pemain tidak boleh lengah sedetik pun. Satu kelalaian melihat kesempatan melompat akan berujung pada pinalti telak (</em>DAM Ora Mangan*).</li>
+  <li class="list-item"><strong>Kesabaran dan Pengendalian Diri:</strong> Menyerang secara membabi buta tanpa perhitungan matang sering kali membuka celah pertahanan sendiri.</li>
+  <li class="list-item"><strong>Kesetaraan Peluang:</strong> Semua bidak memulai permainan dengan kedudukan dan kemampuan yang sama. Kemenangan mutlak ditentukan oleh ketajaman taktik pemain, bukan faktor keberuntungan.</li>
+</ul>
+<h3 id="12-landasan-akademik-etnomatematika" class="heading-3">1.2. Landasan Akademik Etnomatematika</h3>
+<p class="paragraph">Aplikasi ini dibangun dengan merujuk langsung pada penelitian etnomatematika terindeks:</p>
+<div class="callout callout-info"><div class="callout-icon">💡</div><div class="callout-body"><strong>&quot;Studi Etnomatematika: Konsep Graf pada Permainan Dam-daman Kabupaten Pasuruan&quot;</strong>
+<em>Salsabila &amp; Marhayati (2024)</em>, Math Didactic: Jurnal Pendidikan Matematika, Vol. 10 No. 1, hal. 45-58.</div></div>
+<p class="paragraph">Etnomatematika adalah jembatan antara budaya lokal dengan matematika formal. Dam-Daman membuktikan bahwa masyarakat tradisional Nusantara telah mempraktikkan konsep topologi jaringan dan matematika diskrit berabad-abad sebelum teori tersebut diformalkan di dunia akademik barat.</p>
+<h3 id="13-struktur-papan-berbasis-teori-graf" class="heading-3">1.3. Struktur Papan Berbasis Teori Graf</h3>
+<p class="paragraph">Dalam matematika diskrit, papan Dam-Daman dimodelkan sebagai <strong>Graf Sederhana Terhubung Tak Berarah</strong> $G = (V, E)$:</p>
+<ul class="content-list">
+  <li class="list-item"><strong>Jumlah Simpul / Vertices ($|V|$):</strong> Tepat <strong>37 simpul</strong>. Terdiri dari 25 simpul pada grid tengah ($5 \times 5$) ditambah masing-masing 6 simpul pada dua sayap segitiga (<em>gunungan</em> atau <em>dapur</em>).</li>
+  <li class="list-item"><strong>Jumlah Sisi / Edges ($|E|$):</strong> Tepat <strong>76 sisi</strong> (garis penghubung ortogonal dan diagonal).</li>
+  <li class="list-item"><strong>Derajat Simpul ($d(v)$):</strong></li>
+  <li class="list-item"><em>Derajat 2 &amp; 3:</em> Simpul ujung segitiga dan sudut terluar papan.</li>
+  <li class="list-item"><em>Derajat 4 &amp; 5:</em> Persimpangan grid tengah dan simpul batas sayap.</li>
+  <li class="list-item"><em>Derajat 8 (Hub Strategis Tertinggi):</em> Terdapat <strong>7 simpul sentral</strong> (dalam notasi kode: <code class="inline-code">C</code>, <code class="inline-code">Q</code>, <code class="inline-code">S</code>, <code class="inline-code">A1</code>, <code class="inline-code">W</code>, <code class="inline-code">U</code>, <code class="inline-code">K</code>). Simpul-simpul berderajat 8 ini adalah persimpangan vital yang memungkinkan bidak bergerak ke 8 arah sekaligus, menjadikannya medan tempur paling strategis untuk mengontrol papan.</li>
+  <li class="list-item"><strong>Sifat Semi-Hamiltonian:</strong> Terdapat lintasan terbuka yang dapat mengunjungi seluruh 37 simpul tepat satu kali tanpa pengulangan.</li>
+  <li class="list-item"><strong>Pewarnaan Graf 3-Kromatik:</strong> Bilangan kromatik graf papan Dam-Daman adalah $\chi(G) = 3$. Artinya, seluruh 37 simpul dapat diwarnai dengan 3 warna berbeda sedemikian rupa sehingga tidak ada dua simpul bertetangga yang memiliki warna sama.</li>
+</ul>
+<hr class="divider" />
+
+<div class="chapter-header-box">
+  <h2 id="bab-2-aturan-resmi-cara-bermain-dam-daman" class="heading-2">BAB 2: ATURAN RESMI &amp; CARA BERMAIN DAM-DAMAN</h2>
+</div>
+<h3 id="21-penyiapan-papan-distribusi-bidak" class="heading-3">2.1. Penyiapan Papan &amp; Distribusi Bidak</h3>
+<ol class="content-ordered-list">
+  <li class="list-item">Permainan dimainkan oleh dua orang: <strong>Pemain 1 (P1 - Bidak Oranye / Motif Surya)</strong> dan <strong>Pemain 2 / AI (P2 - Bidak Biru / Motif Intan Bintang)</strong>.</li>
+  <li class="list-item">Masing-masing pemain memiliki <strong>16 bidak</strong>.</li>
+  <li class="list-item">Posisi awal:</li>
+</ol>
+<ul class="content-list">
+  <li class="list-item">16 bidak P1 ditempatkan pada daerah pertahanannya (6 simpul di sayap segitiga bawah + 10 simpul pada dua baris grid bawah).</li>
+  <li class="list-item">16 bidak P2 ditempatkan pada daerah pertahanannya (6 simpul di sayap segitiga atas + 10 simpul pada dua baris grid atas).</li>
+  <li class="list-item"><strong>Baris tengah (5 simpul netral)</strong> dibiarkan kosong sebagai zona tempur awal.</li>
+</ul>
+<h3 id="22-pergerakan-bidak-legal" class="heading-3">2.2. Pergerakan Bidak Legal</h3>
+<ul class="content-list">
+  <li class="list-item">Pemain melangkah secara bergantian, satu langkah per giliran.</li>
+  <li class="list-item">Bidak biasa dapat bergeser ke <strong>satu simpul kosong yang bertetangga langsung</strong> melalui garis lintasan yang tersedia (ke depan, ke samping, diagonal, maupun ke belakang).</li>
+  <li class="list-item">Bidak tidak boleh melompati simpul kosong lebih dari satu langkah jika bukan aksi memakan.</li>
+</ul>
+<h3 id="23-mekanisme-melompati-memakan-bidak" class="heading-3">2.3. Mekanisme Melompati &amp; Memakan Bidak</h3>
+<ul class="content-list">
+  <li class="list-item">Jika di simpul yang bertetangga terdapat bidak lawan, dan simpul persis di belakangnya (pada garis lurus yang sama) dalam kondisi kosong, maka pemain <strong>wajib atau berhak melompati</strong> bidak lawan tersebut.</li>
+  <li class="list-item">Bidak lawan yang dilompati dinyatakan mati (<em>captured</em>) dan dikeluarkan dari papan.</li>
+</ul>
+<h3 id="24-lompatan-beruntun-multi-jump" class="heading-3">2.4. Lompatan Beruntun (Multi-Jump)</h3>
+<ul class="content-list">
+  <li class="list-item">Apabila setelah mendarat dari satu lompatan memakan, bidak yang sama mendapati posisi baru yang memungkinkan untuk melompati bidak lawan lainnya, maka pemain <strong>dapat melanjutkan lompatan kedua, ketiga, dan seterusnya</strong> dalam giliran yang sama.</li>
+  <li class="list-item">Rangkaian lompatan berakhir jika tidak ada lagi bidak lawan yang bisa dimakan atau pemain memilih menyelesaikan gilirannya.</li>
+</ul>
+<h3 id="25-aturan-sakral-dam-ora-mangan-pinalti-dam" class="heading-3">2.5. Aturan Sakral &quot;DAM Ora Mangan&quot; (Pinalti DAM)</h3>
+<p class="paragraph">Inilah aturan paling unik dan menegangkan dalam Dam-Daman yang membedakannya dari catur atau dam-daman internasional (<em>checkers</em>):</p>
+<ul class="content-list">
+  <li class="list-item">Jika seorang pemain berada dalam posisi yang <strong>bisa memakan bidak lawan</strong>, namun ia <strong>lalai melihatnya</strong> atau <strong>sengaja melangkah biasa</strong>, maka lawannya berhak meneriakkan / menekan tombol <strong>&quot;DAM!&quot;</strong>.</li>
+  <li class="list-item">Sebagai ganjaran atas kelalaian tersebut (<em>Dam Ora Mangan</em>), pemain yang mengklaim pinalti berhak <strong>mengambil 3 bidak lawan sekaligus secara cuma-cuma</strong> dari papan!</li>
+  <li class="list-item">Mekanisme ini menanamkan etos ketelitian dan konsentrasi tinggi.</li>
+</ul>
+<h3 id="26-promosi-bidak-raja-puncak-gunungan" class="heading-3">2.6. Promosi Bidak Raja (Puncak Gunungan)</h3>
+<p class="paragraph">Posisi paling belakang pada area segitiga wilayah lawan disebut sebagai <strong>Puncak Gunungan</strong> atau *<em>Pucuk Dapur Lawan (</em>Triangle Apex Node<em>)</em>*. Menembus seluruh barisan pertahanan 16 bidak musuh hingga berhasil mendarat di titik puncak ini merupakan pencapaian taktis tertinggi dalam tradisi Dam-Daman / Catur Jawa.</p>
+<p class="paragraph">Aturan promosi ini kini <strong>aktif secara default</strong> dan memberikan keistimewaan serta keuntungan nyata bagi pemain:</p>
+<ol class="content-ordered-list">
+  <li class="list-item">*<em>Kehormatan Visual &amp; Mahkota Emas (</em>Golden Crown Insignia<em>):</em>*</li>
+</ol>
+<ul class="content-list">
+  <li class="list-item">Bidak yang mencapai puncak segitiga lawan langsung dipromosikan dan disematkan <strong>Mahkota Emas Berkilau</strong> di atas kepalanya.</li>
+  <li class="list-item">Dilengkapi cincin aura keemasan ganda serta label status <strong><code class="inline-code">RAJA</code></strong> (atau <strong><code class="inline-code">KING</code></strong>), menjadikannya figur paling disegani dan berwibawa di atas papan.</li>
+</ul>
+<ol class="content-ordered-list">
+  <li class="list-item"><strong>Peningkatan Bobot Strategis AI Drastis (2.5× Lipat):</strong></li>
+</ol>
+<ul class="content-list">
+  <li class="list-item">Di dalam mesin kecerdasan buatan (<em>AI Engine Minimax &amp; Quiescence Search</em>), Bidak Raja memiliki bobot nilai evaluasi <strong>25 poin</strong> (berbanding 10 poin pada bidak biasa).</li>
+  <li class="list-item"><strong>Dampak Taktis:</strong> AI memandang Bidak Raja sebagai ancaman mematikan yang sangat berbahaya. AI akan berpikir keras menyusun formasi bertahan, memprioritaskan keselamatan rajanya sendiri, atau rela mengorbankan bidak biasa demi membendung pergerakan Bidak Raja Anda.</li>
+</ul>
+<ol class="content-ordered-list">
+  <li class="list-item">*<em>Penguasaan Titik Kunci &amp; Tekanan Kebuntuan (</em>Stalemate Pressure<em>):</em>*</li>
+</ol>
+<ul class="content-list">
+  <li class="list-item">Puncak segitiga (<em>Apex</em>) memiliki keterhubungan khusus yang mengontrol jalur keluar-masuk area belakang lawan.</li>
+  <li class="list-item">Keberadaan Bidak Raja di zona ini mempersempit mobilitas sisa-sisa bidak lawan, mempercepat tercapainya kondisi kemenangan kebuntuan (<em>stalemate</em>) di mana seluruh bidak lawan terkunci total.</li>
+</ul>
+<h3 id="27-kondisi-kemenangan-kekalahan-dan-remis-draw" class="heading-3">2.7. Kondisi Kemenangan, Kekalahan, dan Remis (Draw)</h3>
+<ul class="content-list">
+  <li class="list-item"><strong>Menang Mutlak:</strong> Pemain berhasil menghabisi ke-16 bidak lawan hingga habis.</li>
+  <li class="list-item"><strong>Menang Kunci (Stalemate):</strong> Lawan masih memiliki bidak, tetapi seluruh bidaknya terkunci total dan tidak memiliki langkah legal sama sekali pada gilirannya.</li>
+  <li class="list-item"><strong>Remis (Seri):</strong></li>
+</ul>
+<ol class="content-ordered-list">
+  <li class="list-item">Terjadi <strong>40 setengah-langkah (20 putaran penuh)</strong> berturut-turut tanpa adanya bidak yang dimakan.</li>
+  <li class="list-item">Terjadi pengulangan posisi papan yang sama persis sebanyak 3 kali berturut-turut (<em>threefold repetition</em>).</li>
+</ol>
+<hr class="divider" />
+
+<div class="chapter-header-box">
+  <h2 id="bab-3-arsitektur-teknologi-perancangan-sistem" class="heading-2">BAB 3: ARSITEKTUR TEKNOLOGI &amp; PERANCANGAN SISTEM</h2>
+</div>
+<h3 id="31-pemilihan-teknologi-tech-stack" class="heading-3">3.1. Pemilihan Teknologi (Tech Stack)</h3>
+<p class="paragraph">Aplikasi dibangun dengan prinsip <em>zero-bloat</em>, kecepatan kilat (<em>sub-second response</em>), dan kemudahan akses di semua peramban (<em>cross-platform web application</em>):</p>
+<ul class="content-list">
+  <li class="list-item"><strong>React 19 &amp; TypeScript:</strong> Memberikan keandalan <em>type-safety</em>, modularitas komponen, dan <em>state management</em> modern berbasis hook.</li>
+  <li class="list-item"><strong>Vite 6 / 8:</strong> Perkakas build modern ultra-cepat dengan <em>Hot Module Replacement (HMR)</em> instan.</li>
+  <li class="list-item"><strong>Tailwind CSS v4:</strong> Utilitas penataan gaya modern, responsif, hemat ukuran CSS, dan mudah dikustomisasi.</li>
+  <li class="list-item"><strong>SVG (Scalable Vector Graphics):</strong> Papan dan bidak digambar menggunakan elemen SVG murni dengan perhitungan matematika koordinat graf, bukan gambar raster png/jpg. Menghasilkan visual yang sangat tajam di layar resolusi tinggi (Retina display) dan ukuran file yang sangat kecil.</li>
+  <li class="list-item"><strong>Lucide React:</strong> Koleksi ikon modern yang bersih dan konsisten.</li>
+  <li class="list-item"><strong>Canvas Confetti:</strong> Efek visual semarak saat pemain meraih kemenangan.</li>
+  <li class="list-item"><strong>Web Audio API:</strong> Efek suara sintetis prosedural tanpa memerlukan unduhan berkas MP3/WAV eksternal.</li>
+  <li class="list-item"><strong>IndexedDB:</strong> Database browser lokal untuk menyimpan statistik dan riwayat permainan lengkap tanpa membebani server.</li>
+  <li class="list-item"><strong>Supabase Realtime (WebSocket):</strong> Sinkronisasi langkah multiplayer online secara instan antar perangkat dengan kode kamar ringkas (<em>DAM-XXXX</em>).</li>
+</ul>
+<h3 id="32-struktur-proyek-organisasi-file" class="heading-3">3.2. Struktur Proyek &amp; Organisasi File</h3>
+
+<div class="code-wrapper">
+  <div class="code-header">
+    <span class="code-lang">CODE</span>
+    <button class="copy-btn" onclick="copyCode(this)" title="Salin Kode">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+      <span>Salin</span>
+    </button>
+  </div>
+  <pre><code class="language-">game-damdaman/
+├── public/
+│   ├── data/
+│   │   └── master_brain.json      # Pengetahuan taktik pembukaan AI Dewa
+│   ├── audio/                     # Cadangan aset suara
+│   └── favicon.svg                # Ikon aplikasi web
+├── src/
+│   ├── components/                # Komponen antarmuka pengguna (UI)
+│   │   ├── Board.tsx              # Komponen utama visual papan SVG
+│   │   ├── ModalTutorial.tsx      # Panduan cara bermain
+│   │   ├── ModalEtnomatematika.tsx# Penjelasan ilmiah teori graf
+│   │   ├── ModalSettings.tsx      # Pengaturan audio, tema, &amp; aturan
+│   │   ├── ModalGameOver.tsx      # Dialog akhir pertandingan
+│   │   ├── ModalGameHistory.tsx   # Penampil riwayat dari IndexedDB
+│   │   ├── ModalOnlineLobby.tsx   # Lobi kamar online &amp; Quick Match
+│   │   └── ModalPlayerName.tsx    # Pengganti nama pemain
+│   ├── game/                      # Logika murni permainan (Headless Engine)
+│   │   ├── boardData.ts           # Definisi 37 simpul, 76 sisi &amp; koordinat
+│   │   ├── rulesEngine.ts         # Mesin aturan langkah legal &amp; pinalti
+│   │   ├── aiEngine.ts            # Kecerdasan buatan (Easy s.d. Master)
+│   │   ├── aiMemory.ts            # Pembelajaran adaptif memori AI Dewa
+│   │   ├── onlineMatch.ts         # Integrasi Supabase Realtime
+│   │   ├── db.ts                  # Lapisan penyimpanan IndexedDB
+│   │   └── audio.ts               # Sintesis suara Web Audio API
+│   ├── i18n.tsx                   # Dukungan dual bahasa (ID &amp; EN)
+│   ├── App.tsx                    # Komponen orkestrator utama aplikasi
+│   ├── main.tsx                   # Entry point aplikasi
+│   └── index.css                  # Gaya global Tailwind
+├── EBOOK_PANDUAN_DAM_DAMAN.md     # Dokumen master buku panduan lengkap
+├── package.json                   # Dependensi &amp; script proyek
+└── vite.config.ts                 # Konfigurasi bundling Vite</code></pre>
+</div>
+<h3 id="33-sistem-grafika-vektor-dinamis-svg" class="heading-3">3.3. Sistem Grafika Vektor Dinamis (SVG)</h3>
+<p class="paragraph">Tidak seperti catur konvensional yang menggunakan petak kotak persegi (<em>checkerboard tiles</em>), papan Dam-Daman adalah <strong>jaringan topologi garis dan simpul</strong>. Oleh karena itu, pendekatan terbaik adalah menggunakan SVG dengan <code class="inline-code">viewBox</code>:</p>
+<ul class="content-list">
+  <li class="list-item"><strong>Mode Tegak (Portrait):</strong> Menggunakan kanvas $560 \times 860$ piksel. Sangat proporsional untuk layar smartphone vertikal, di mana Pemain 1 berada di sisi bawah dan Pemain 2/AI berada di sisi atas.</li>
+  <li class="list-item"><strong>Mode Mendatar (Landscape):</strong> Menggunakan kanvas $980 \times 580$ piksel untuk orientasi horizontal klasik di monitor komputer.</li>
+  <li class="list-item">Proyeksi koordinat ternormalisasi ($0.0 \dots 1.0$) dipetakan secara matematis ke koordinat piksel SVG dengan fungsi transformasi rotasi trigonometris, sehingga logika engine terpisah bersih dari tampilan visual.</li>
+</ul>
+<h3 id="34-efek-suara-prosedural-dengan-web-audio-api" class="heading-3">3.4. Efek Suara Prosedural dengan Web Audio API</h3>
+<p class="paragraph">Untuk menjamin permainan tetap ringan dan dapat dimainkan saat koneksi lambat tanpa menunggu unduhan file audio besar, seluruh efek suara disintesis langsung menggunakan <code class="inline-code">AudioContext</code>:</p>
+<ul class="content-list">
+  <li class="list-item">*<em>Suara Langkah Biasa (</em>Piece Slide<em>):</em>* Gelombang sinus frekuensi rendah dengan amplop atenuasi eksponensial lembut yang meniru ketukan batu kerikil di atas papan kayu.</li>
+  <li class="list-item">*<em>Suara Memakan Bidak (</em>Capture<em>):</em>* Nada frekuensi menengah dengan resonansi tegas.</li>
+  <li class="list-item">*<em>Suara Pinalti DAM (</em>Dam Claim<em>):</em>* Rentetan bunyi frekuensi tajam yang mengagetkan dan dramatis.</li>
+  <li class="list-item">*<em>Suara Kemenangan (</em>Victory Fanfare<em>):</em>* Rangkaian arpeggio akor mayor bernada ceria.</li>
+</ul>
+<h3 id="35-persistensi-data-lokal-dengan-indexeddb" class="heading-3">3.5. Persistensi Data Lokal dengan IndexedDB</h3>
+<p class="paragraph">Setiap pertandingan yang selesai secara otomatis dicatat ke dalam database peramban <code class="inline-code">IndexedDB</code> (database: <code class="inline-code">damdaman_db</code>, store: <code class="inline-code">game_history</code>):</p>
+<ul class="content-list">
+  <li class="list-item">Mencatat tanggal dan waktu pertandingan.</li>
+  <li class="list-item">Mode permainan (vs AI, 2 Pemain lokal, atau Online).</li>
+  <li class="list-item">Tingkat kesulitan AI jika melawan komputer.</li>
+  <li class="list-item">Pemenang dan alasan kemenangan (habis bidak / terkunci).</li>
+  <li class="list-item">Total langkah yang dimainkan.</li>
+  <li class="list-item">Durasi pertandingan.</li>
+  <li class="list-item">Seluruh notasi langkah pertandingan dari awal hingga akhir sehingga dapat ditinjau ulang di masa mendatang.</li>
+</ul>
+<hr class="divider" />
+
+<div class="chapter-header-box">
+  <h2 id="bab-4-rekayasa-engine-permainan-game-engine" class="heading-2">BAB 4: REKAYASA ENGINE PERMAINAN (GAME ENGINE)</h2>
+</div>
+<h3 id="41-representasi-state-permainan" class="heading-3">4.1. Representasi State Permainan</h3>
+<p class="paragraph">Engine permainan dirancang menggunakan paradigma <em>immutable state</em>:</p>
+
+<div class="code-wrapper">
+  <div class="code-header">
+    <span class="code-lang">TYPESCRIPT</span>
+    <button class="copy-btn" onclick="copyCode(this)" title="Salin Kode">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+      <span>Salin</span>
+    </button>
+  </div>
+  <pre><code class="language-typescript">interface GameState {
+  board: Record&lt;string, string | null&gt;; // Pemetaan Simpul -&gt; ID Bidak
+  pieces: Record&lt;string, Piece&gt;;        // Koleksi Objek Bidak
+  currentPlayer: PlayerId;              // &#x27;P1&#x27; | &#x27;P2&#x27;
+  status: &#x27;playing&#x27; | &#x27;game_over&#x27;;
+  winner: PlayerId | &#x27;draw&#x27; | null;
+  consecutivePieceId: string | null;    // Bidak yang wajib melanjutkan multi-jump
+  opponentMissedCapture: boolean;       // Indikator bahwa lawan melewatkan makan (DAM!)
+  damClaimedThisTurn: boolean;
+  moveHistory: Move[];                  // Rekaman jejak pertandingan
+}</code></pre>
+</div>
+<h3 id="42-model-simpul-graf-matriks-ketetanggaan" class="heading-3">4.2. Model Simpul Graf &amp; Matriks Ketetanggaan</h3>
+<p class="paragraph">Setiap simpul pada graf memiliki:</p>
+<ol class="content-ordered-list">
+  <li class="list-item"><code class="inline-code">id</code>: Identitas unik (misal <code class="inline-code">&#x27;A&#x27;</code>, <code class="inline-code">&#x27;B&#x27;</code>, <code class="inline-code">&#x27;C&#x27;</code>, dst.).</li>
+  <li class="list-item"><code class="inline-code">x, y</code>: Posisi ternormalisasi ($0.0$ hingga $1.0$).</li>
+  <li class="list-item"><code class="inline-code">neighbors</code>: Daftar tetangga yang terhubung langsung melalui garis.</li>
+  <li class="list-item"><code class="inline-code">jumpLines</code>: Pasangan simpul garis lurus untuk mekanisme melompati lawan. Jika tetangga $B$ dilewati dari simpul asal $A$, maka bidak akan mendarat di simpul tujuan $C$.</li>
+</ol>
+<h3 id="43-algoritma-generator-langkah-legal-move-generator" class="heading-3">4.3. Algoritma Generator Langkah Legal (Move Generator)</h3>
+<p class="paragraph">Fungsi <code class="inline-code">getLegalMoves(state, playerId)</code> mengevaluasi seluruh bidak milik pemain aktif:</p>
+<ol class="content-ordered-list">
+  <li class="list-item">Cek apakah ada bidak yang sedang dalam status <em>consecutive multi-jump</em>. Jika ada, hanya bidak tersebut yang boleh melangkah dan hanya lompatan memakan yang diizinkan.</li>
+  <li class="list-item">Cek seluruh kemungkinan langkah memakan (<em>capture moves</em>).</li>
+  <li class="list-item">Jika opsi memakan tersedia, engine menandai apakah aturan memakan wajib diterapkan atau diizinkan langkah biasa dengan konsekuensi pinalti DAM.</li>
+  <li class="list-item">Cek seluruh kemungkinan langkah bergeser biasa (<em>slide moves</em>) ke simpul tetangga yang kosong.</li>
+</ol>
+<h3 id="44-logika-klaim-pinalti-dam-dam-ora-mangan" class="heading-3">4.4. Logika Klaim Pinalti DAM (Dam Ora Mangan)</h3>
+<p class="paragraph">Saat pemain selesai melangkah, engine memeriksa apakah sebelum langkah tersebut dieksekusi, pemain tersebut sebenarnya memiliki kesempatan memakan bidak lawan namun memilih langkah biasa. Jika terdeteksi:</p>
+<ul class="content-list">
+  <li class="list-item">Flag <code class="inline-code">opponentMissedCapture</code> diset ke <code class="inline-code">true</code>.</li>
+  <li class="list-item">Tombol <strong>Klaim Pinalti DAM</strong> menjadi aktif untuk pemain yang kini mendapat giliran.</li>
+  <li class="list-item">Jika tombol diklaim, engine mengeksekusi fungsi <code class="inline-code">claimDamPenalty()</code>, menghapus 3 bidak lawan dari papan, dan mencatatnya ke dalam riwayat pertandingan.</li>
+</ul>
+<hr class="divider" />
+
+<div class="chapter-header-box">
+  <h2 id="bab-5-membangun-kecerdasan-buatan-ai-engine" class="heading-2">BAB 5: MEMBANGUN KECERDASAN BUATAN (AI ENGINE)</h2>
+</div>
+<h3 id="51-tingkat-mudah-easy-heuristik-greedy-acak" class="heading-3">5.1. Tingkat Mudah (Easy): Heuristik Greedy Acak</h3>
+<ul class="content-list">
+  <li class="list-item">Mengutamakan langkah memakan jika tersedia.</li>
+  <li class="list-item">Memilih langkah acak berbobot (<em>weighted random</em>) untuk langkah biasa.</li>
+  <li class="list-item">Cocok untuk pemula dan anak-anak yang baru mengenal permainan.</li>
+</ul>
+<h3 id="52-tingkat-sedang-medium-minimax-dengan-alpha-beta-pruning" class="heading-3">5.2. Tingkat Sedang (Medium): Minimax dengan Alpha-Beta Pruning</h3>
+<ul class="content-list">
+  <li class="list-item">Menggunakan pohon pencarian rekursif Minimax dengan kedalaman 3 hingga 4 <em>ply</em>.</li>
+  <li class="list-item">Pemangkasan Alpha-Beta (<em>Alpha-Beta Pruning</em>) untuk memangkas cabang pohon yang tidak menjanjikan, menghemat waktu komputasi secara signifikan.</li>
+  <li class="list-item">Fungsi evaluasi dasar menghitung:</li>
+</ul>
+<p class="paragraph">  $$\text{Score} = (\text{Bidak AI} - \text{Bidak Lawan}) \times 100 + \text{Mobilitas Langkah}$$</p>
+<h3 id="53-tingkat-sulit-hard-evaluasi-posisi-berbobot-hub-strategis" class="heading-3">5.3. Tingkat Sulit (Hard): Evaluasi Posisi Berbobot Hub Strategis</h3>
+<p class="paragraph">Memanfaatkan konsep etnomatematika derajat simpul:</p>
+<ul class="content-list">
+  <li class="list-item">Memberikan nilai bonus tinggi (+35 poin) jika bidak berhasil menguasai 7 Simpul Hub Berderajat 8 (<code class="inline-code">C</code>, <code class="inline-code">Q</code>, <code class="inline-code">S</code>, <code class="inline-code">A1</code>, <code class="inline-code">W</code>, <code class="inline-code">U</code>, <code class="inline-code">K</code>).</li>
+  <li class="list-item">Memberikan penalti jika bidak terisolasi di sudut mati papan.</li>
+  <li class="list-item">Memperhitungkan potensi ancaman garpu (<em>fork attack</em>) dan perlindungan bidak berteman.</li>
+</ul>
+<h3 id="54-tingkat-dewa-master-brain-quiescence-search-pembelajaran-kontinu" class="heading-3">5.4. Tingkat Dewa (Master Brain): Quiescence Search &amp; Pembelajaran Kontinu</h3>
+<p class="paragraph">Tingkat tertinggi (<em>Grandmaster AI</em>) dirancang dengan fitur canggih:</p>
+<ol class="content-ordered-list">
+  <li class="list-item"><strong>Quiescence Search:</strong> Mencegah efek <em>Horizon Effect</em> (kesalahan evaluasi akibat pemotongan kedalaman saat situasi sedang terjadi aksi saling makan beruntun). Pohon pencarian diperpanjang khusus untuk rantai memakan hingga posisi benar-benar tenang (<em>quiet</em>).</li>
+  <li class="list-item"><strong>Master Brain Knowledge (<code class="inline-code">master_brain.json</code>):</strong> Memuat buku pembukaan (<em>opening book</em>) taktis yang telah dipelajari dari ribuan simulasi langkah grandmaster.</li>
+  <li class="list-item"><strong>Pembelajaran Adaptif (Blunder Memory):</strong> Setiap kali pertandingan berakhir, modul <code class="inline-code">aiMemory.ts</code> menganalisis apakah kekalahan disebabkan oleh langkah tertentu. Nilai bobot langkah tersebut diturunkan di memori lokal agar kesalahan yang sama tidak terulang di masa mendatang.</li>
+</ol>
+<hr class="divider" />
+
+<div class="chapter-header-box">
+  <h2 id="bab-6-multiplayer-online-realtime-dengan-supabase" class="heading-2">BAB 6: MULTIPLAYER ONLINE REALTIME DENGAN SUPABASE</h2>
+</div>
+<h3 id="61-arsitektur-komunikasi-realtime-peer-to-peer" class="heading-3">6.1. Arsitektur Komunikasi Realtime Peer-to-Peer</h3>
+<p class="paragraph">Aplikasi memanfaatkan fitur <strong>Supabase Broadcast Channel</strong> (protokol WebSocket berlatensi sangat rendah). Keunggulan pendekatan ini:</p>
+<ul class="content-list">
+  <li class="list-item">Tidak memerlukan server game backend berbasis Node.js/Socket.io yang mahal untuk dihosting secara terpisah.</li>
+  <li class="list-item">Seluruh sinkronisasi state ditangani secara terdesentralisasi (<em>peer-to-peer over managed websocket channel</em>).</li>
+</ul>
+<h3 id="62-manajemen-room-dam-xxxx-quick-match" class="heading-3">6.2. Manajemen Room DAM-XXXX &amp; Quick Match</h3>
+<ul class="content-list">
+  <li class="list-item">Pemain dapat membuat ruangan privat dan membagikan tautan/kode kamar 4 huruf unik (contoh: <code class="inline-code">DAM-7821</code>).</li>
+  <li class="list-item">Pemain lain cukup memasukkan kode tersebut atau membuka tautan dengan parameter URL <code class="inline-code">?room=DAM-7821</code> untuk langsung bergabung.</li>
+  <li class="list-item">Tersedia pula fitur <strong>Quick Match</strong> yang secara otomatis mencocokkan pemain dengan antrean lobi publik yang sedang mencari lawan.</li>
+</ul>
+<h3 id="63-sinkronisasi-state-broadcast-reaksi-emotikon" class="heading-3">6.3. Sinkronisasi State &amp; Broadcast Reaksi Emotikon</h3>
+<p class="paragraph">Pesan yang disiarkan melalui channel Supabase:</p>
+<ol class="content-ordered-list">
+  <li class="list-item"><code class="inline-code">join</code>: Pengumuman kehadiran lawan dan negosiasi peran (P1 atau P2).</li>
+  <li class="list-item"><code class="inline-code">move</code>: Pengiriman langkah legal yang dieksekusi, diverifikasi ulang oleh engine lokal masing-masing pemain untuk mencegah kecurangan (<em>anti-cheat client verification</em>).</li>
+  <li class="list-item"><code class="inline-code">dam_claim</code>: Penegakan pinalti DAM secara tersinkronisasi.</li>
+  <li class="list-item"><code class="inline-code">reaction</code>: Pengiriman emotikon interaktif instan (👋, 😂, 👏, 👑, 🔥, ☕) untuk menambah keseruan interaksi sosial saat bertanding.</li>
+</ol>
+<hr class="divider" />
+
+<div class="chapter-header-box">
+  <h2 id="bab-7-desain-uiux-modern-berbasis-ergonomi-chesscom" class="heading-2">BAB 7: DESAIN UI/UX MODERN BERBASIS ERGONOMI CHESS.COM</h2>
+</div>
+<h3 id="71-analisis-kebutuhan-redesign" class="heading-3">7.1. Analisis Kebutuhan Redesign</h3>
+<p class="paragraph">Pada antarmuka versi awal:</p>
+<ul class="content-list">
+  <li class="list-item">Panel pemain (Player 1 dan Player 2) diletakkan berdampingan (<em>grid-cols-2</em>) di atas papan.</li>
+  <li class="list-item">Begitu banyak tombol utilitas (bahasa, bantuan, riwayat, etnomatematika, pengaturan, suara, mode switcher, undo, reset, dan slider zoom) berdesakan di atas papan.</li>
+  <li class="list-item">Akibatnya, pada layar smartphone, papan terdorong jauh ke bawah dan pemain harus menggulir layar (<em>scrolling</em>), yang sangat mengurangi kenyamanan bermain.</li>
+</ul>
+<h3 id="72-pola-sandwich-layout-opponent-bar---board---player-bar---action-bar" class="heading-3">7.2. Pola &quot;Sandwich Layout&quot; (Opponent Bar - Board - Player Bar - Action Bar)</h3>
+<p class="paragraph">Mengadaptasi tata letak aplikasi papan catur terpopuler di dunia (<em>Chess.com Mobile</em>), antarmuka disusun secara terstruktur dari atas ke bawah:</p>
+<ol class="content-ordered-list">
+  <li class="list-item"><strong>Compact Top Navbar:</strong> Menampilkan logo ringkas &quot;D&quot;, judul, pil mode pertandingan aktif (misal: <em>vs AI · Sedang</em>), serta tombol menu minimalis.</li>
+  <li class="list-item"><strong>Opponent Player Bar:</strong> Menampilkan avatar lawan (AI/P2), nama, indikator giliran, dan sisa bidak persis di atas papan.</li>
+  <li class="list-item"><strong>Responsive Game Board:</strong> Papan permainan menjadi fokus utama visual (<em>board-centric</em>), memanfaatkan 70-80% tinggi viewport layar, dengan penskalaan otomatis tanpa terpotong (<em>zero clipping</em>).</li>
+  <li class="list-item"><strong>Player 1 Bar:</strong> Menampilkan identitas pemain utama di bawah papan, lengkap dengan tombol terintegrasi untuk <em>Klaim Pinalti DAM</em> saat momennya tiba.</li>
+  <li class="list-item"><strong>Bottom Action Bar:</strong> Bilah tombol di bagian paling bawah yang mudah dijangkau ibu jari (<em>thumb zone</em>) berisi: <em>Mode Baru</em>, <em>Undo</em>, <em>Langkah/Riwayat</em>, dan <em>Reset</em>.</li>
+</ol>
+<h3 id="73-ergonomi-mobile-first-zero-scroll-viewport" class="heading-3">7.3. Ergonomi Mobile-First &amp; Zero-Scroll Viewport</h3>
+<ul class="content-list">
+  <li class="list-item">Menggunakan satuan viewport dinamis (<code class="inline-code">dvh</code>) dan kontainer flex adaptif dengan <code class="inline-code">min-height: 0</code>.</li>
+  <li class="list-item">Papan otomatis menyesuaikan lebar dan tinggi ruang yang tersedia tanpa menimbulkan <em>scroll</em> pada smartphone resolusi 360x800, 390x844, maupun 412x915.</li>
+</ul>
+<h3 id="74-tema-estetika-hijau-beludru-kayu-jati-batu-obsidian" class="heading-3">7.4. Tema Estetika (Hijau Beludru, Kayu Jati, Batu Obsidian)</h3>
+<p class="paragraph">Menghadirkan tiga tema visual berkelas tinggi:</p>
+<ul class="content-list">
+  <li class="list-item"><strong>Hijau Beludru (Modern Green Velvet):</strong> Mengadopsi palet klasik catur internasional dengan kontras tinggi dan garis emas berwibawa.</li>
+  <li class="list-item"><strong>Kayu Jati Klasik (Heritage Teak Wood):</strong> Nuansa ukiran kayu khas Jawa yang hangat, ramah, dan tradisional.</li>
+  <li class="list-item"><strong>Batu Obsidian (Dark Obsidian Slate):</strong> Nuansa modern minimalis bernuansa batu alam gelap yang futuristik dan elegan.</li>
+</ul>
+<h3 id="75-aksesibilitas-visual-glif-ramah-buta-warna" class="heading-3">7.5. Aksesibilitas Visual &amp; Glif Ramah Buta Warna</h3>
+<p class="paragraph">Bidak tidak hanya dibedakan berdasarkan warna oranye dan biru, melainkan diperkuat dengan glif ukiran geometris:</p>
+<ul class="content-list">
+  <li class="list-item"><strong>Bidak P1:</strong> Motif lingkaran konsentris surya (<em>Solar Motif</em>).</li>
+  <li class="list-item"><strong>Bidak P2:</strong> Motif intan bintang empat lapis lapis lazuli (<em>Star Diamond Motif</em>).</li>
+  <li class="list-item">Memastikan pemain dengan defisiensi penglihatan warna tetap dapat membedakan bidak dengan sangat jelas dan nyaman.</li>
+</ul>
+<hr class="divider" />
+
+<div class="chapter-header-box">
+  <h2 id="bab-8-jurnal-log-perjalanan-pengembangan-living-changelog" class="heading-2">BAB 8: JURNAL &amp; LOG PERJALANAN PENGEMBANGAN (LIVING CHANGELOG)</h2>
+</div>
+<div class="callout callout-info"><div class="callout-icon">💡</div><div class="callout-body"><em>Bagian ini merupakan rekaman langsung (</em>living history<em>) dari setiap proses perancangan, implementasi, perbaikan, dan penyempurnaan yang dilakukan pada proyek Maen Dam-Daman.</em></div></div>
+<h3 id="tahap-1-fondasi-awal-engine-etnomatematika" class="heading-3">📅 Tahap 1 — Fondasi Awal &amp; Engine Etnomatematika</h3>
+<ul class="content-list">
+  <li class="list-item"><strong>Pencapaian:</strong> </li>
+  <li class="list-item">Pemodelan matematis 37 simpul dan 76 garis graf papan Dam-Daman.</li>
+  <li class="list-item">Penyusunan modul <code class="inline-code">boardData.ts</code> dan fungsi legal move generator <code class="inline-code">rulesEngine.ts</code>.</li>
+  <li class="list-item">Implementasi aturan lompatan memakan (<em>jump capture</em>) dan multi-jump.</li>
+  <li class="list-item">Implementasi pinalti tradisional <em>DAM Ora Mangan</em> (pengambilan 3 bidak).</li>
+  <li class="list-item">Pembuatan komponen visual papan interaktif awal berbasis SVG.</li>
+</ul>
+<h3 id="tahap-2-kecerdasan-buatan-memori-grandmaster" class="heading-3">📅 Tahap 2 — Kecerdasan Buatan &amp; Memori Grandmaster</h3>
+<ul class="content-list">
+  <li class="list-item"><strong>Pencapaian:</strong></li>
+  <li class="list-item">Pembuatan AI tingkat Easy, Medium, dan Hard dengan Minimax + Alpha-Beta Pruning.</li>
+  <li class="list-item">Penyusunan bobot strategis untuk 7 simpul berderajat 8.</li>
+  <li class="list-item">Integrasi <em>Level Dewa (Master Brain)</em> dengan berkas <code class="inline-code">master_brain.json</code> dan algoritma <em>Quiescence Search</em>.</li>
+  <li class="list-item">Penambahan modul <code class="inline-code">aiMemory.ts</code> untuk pencatatan blunder dan adaptasi gaya bermain.</li>
+</ul>
+<h3 id="tahap-3-multiplayer-online-audio-sintetis-indexeddb" class="heading-3">📅 Tahap 3 — Multiplayer Online, Audio Sintetis, &amp; IndexedDB</h3>
+<ul class="content-list">
+  <li class="list-item"><strong>Pencapaian:</strong></li>
+  <li class="list-item">Integrasi Supabase Realtime channel untuk fitur bermain online dengan kode kamar unik <code class="inline-code">DAM-XXXX</code>.</li>
+  <li class="list-item">Penambahan fitur Quick Match dan siaran reaksi emotikon interaktif.</li>
+  <li class="list-item">Pembuatan synthesizer suara prosedural dengan Web Audio API di <code class="inline-code">audio.ts</code>.</li>
+  <li class="list-item">Pembuatan database lokal <code class="inline-code">IndexedDB</code> di <code class="inline-code">db.ts</code> untuk menyimpan rekap dan statistik pertandingan.</li>
+  <li class="list-item">Implementasi dukungan dual bahasa (Bahasa Indonesia &amp; Bahasa Inggris) di <code class="inline-code">i18n.tsx</code>.</li>
+</ul>
+<h3 id="tahap-4-master-redesign-uiux-v2-mobile-first-ergonomi-chesscom-selesai-terverifikasi" class="heading-3">📅 Tahap 4 — Master Redesign UI/UX V2 (Mobile-First &amp; Ergonomi Chess.com) <em>(Selesai &amp; Terverifikasi)</em></h3>
+<ul class="content-list">
+  <li class="list-item"><strong>Latar Belakang:</strong></li>
+  <li class="list-item">Pada versi sebelumnya, kartu pemain berdampingan (<em>grid-cols-2</em>) di atas papan dan kontrol bertumpuk menyebabkan papan terdesak ke bawah serta memicu scrolling di smartphone.</li>
+  <li class="list-item"><strong>Perubahan Arsitektur Antarmuka:</strong></li>
+  <li class="list-item"><strong>Zona 1 (Compact Top Navbar):</strong> Header ramping (~48px) dengan logo &quot;D&quot;, judul permainan, dan pill mode interaktif (contoh: <code class="inline-code">vs Sedang ▾</code> / <code class="inline-code">2 Pemain ▾</code> / <code class="inline-code">Online ▾</code>) yang dapat diklik untuk membuka modal pemilihan mode dan tingkat AI. Utilitas sekunder (Bahasa, Suara, Bantuan, Riwayat, Etnomatematika, Pengaturan) tersusun rapi tanpa memicu <em>horizontal overflow</em>.</li>
+  <li class="list-item"><strong>Zona 2 (Opponent Player Bar):</strong> Kartu lawan diletakkan di atas papan dengan avatar AI/P2, nama lawan, sisa bidak, dan indikator giliran/berpikir.</li>
+  <li class="list-item"><strong>Zona 3 (Responsive Game Board):</strong> Container fleksibel dengan auto-fit penuh. Papan SVG memanfaatkan ruang vertikal optimal tanpa memotong ujung sayap segitiga (<em>gunungan</em>) atas maupun bawah. Toolbar zoom manual lama dipindahkan menjadi <em>floating controls</em> di sudut papan sehingga tidak memakan ruang vertikal.</li>
+  <li class="list-item"><strong>Zona 4 (Player 1 Bar):</strong> Kartu Pemain 1 diletakkan di bawah papan lengkap dengan tombol aksi khusus (<em>Klaim Pinalti DAM</em> dan <em>Selesai Lompat</em>) yang terintegrasi langsung tanpa mengubah posisi/tinggi papan (<em>zero Cumulative Layout Shift</em>).</li>
+  <li class="list-item"><strong>Zona 5 (Bottom Action Bar):</strong> 4 tombol aksi ergonomis di zona ibu jari (<em>thumb zone</em>): <code class="inline-code">Mode</code>, <code class="inline-code">Undo</code>, <code class="inline-code">Langkah (N)</code>, dan <code class="inline-code">Reset</code>.</li>
+  <li class="list-item"><strong>Komponen Baru:</strong> <code class="inline-code">ModalGameMode.tsx</code> sebagai dialog elegan untuk memilih mode (vs AI, 2 Pemain, Online) dan 4 tingkat kecerdasan AI.</li>
+  <li class="list-item"><strong>Verifikasi Kualitas &amp; Pengujian:</strong></li>
+  <li class="list-item"><strong>Pemeriksaan Tipe TypeScript (<code class="inline-code">npm run lint</code>):</strong> Lulus 100% (0 error). Memperbaiki kompatibilitas tipe <code class="inline-code">gameMode: &#x27;ai&#x27; | &#x27;pvp&#x27; | &#x27;online&#x27;</code> di <code class="inline-code">db.ts</code>, <code class="inline-code">Board.tsx</code>, <code class="inline-code">ModalPlayerName.tsx</code>, dan <code class="inline-code">ModalGameOver.tsx</code>, serta penanganan promise di <code class="inline-code">aiMemory.ts</code>.</li>
+  <li class="list-item"><strong>Kompilasi Produksi (<code class="inline-code">npm run build</code>):</strong> Berhasil dengan Vite dalam 751ms.</li>
+  <li class="list-item"><strong>Pengujian Browser Aktual (Viewport HP 390x844):</strong> </li>
+  <li class="list-item">Papan terlihat 100% utuh dengan <strong>Zero Vertical Scrolling</strong>.</li>
+  <li class="list-item">Modal tutorial, modal mode AI, dan pemilihan bidak berfungsi sangat responsif.</li>
+  <li class="list-item">AI merespons seketika terhadap langkah pemain dan penegakan aturan melompat/memakan terbukti akurat.</li>
+</ul>
+<h3 id="tahap-5-penyempurnaan-onboarding-pengguna-eliminasi-jargon-teknis-selesai-terverifikasi" class="heading-3">📅 Tahap 5 — Penyempurnaan Onboarding Pengguna &amp; Eliminasi Jargon Teknis <em>(Selesai &amp; Terverifikasi)</em></h3>
+<ul class="content-list">
+  <li class="list-item"><strong>Latar Belakang &amp; Masukan Pengguna:</strong></li>
+  <li class="list-item">Pengguna non-Indonesia memerlukan tombol pilihan bahasa langsung pada jendela awal saat pertama kali membuka aplikasi.</li>
+  <li class="list-item">Pada layar smartphone sempit, tombol aksi di jendela cara bermain (<em>ModalTutorial</em>) mengalami <em>overflow</em> (terpotong ke luar bingkai).</li>
+  <li class="list-item">Antarmuka masih memuat istilah teknis IT seperti <em>IndexedDB</em>, <em>simpul/vertex</em>, dan <em>sisi/edge</em> yang membingungkan bagi masyarakat umum.</li>
+  <li class="list-item"><strong>Solusi &amp; Perbaikan:</strong></li>
+  <li class="list-item"><strong>Pilihan Bahasa di Jendela Awal:</strong> Menambahkan tombol toggle bahasa instan (<code class="inline-code">ID</code> / <code class="inline-code">EN</code>) di pojok kanan atas <code class="inline-code">ModalTutorial</code>, <code class="inline-code">ModalPlayerName</code>, dan bilah atas sehingga pemain internasional dapat beralih bahasa seketika tanpa masalah rendering emoji bendera di perangkat mobile.</li>
+  <li class="list-item"><strong>Navigasi Mobile-Safe:</strong> Merombak bilah navigasi bawah <code class="inline-code">ModalTutorial</code> menjadi responsif: tombol <em>Sebelumnya</em> di kiri, indikator titik di tengah, dan tombol <em>Selanjutnya</em> / <em>Mulai Bermain</em> di kanan. Menghilangkan tombol berlebih sehingga <strong>100% bebas dari overflow</strong>.</li>
+  <li class="list-item"><strong>Penyucian Bahasa dari Jargon IT:</strong> Mengganti istilah <em>IndexedDB</em> menjadi bahasa awam yang ramah (<em>&quot;Pencatatan Otomatis Riwayat&quot;</em>), serta menyederhanakan penjelasan geometri papan menjadi <em>&quot;37 titik temu garis dan 76 garis lintasan&quot;</em> tanpa jargon asing.</li>
+  <li class="list-item"><strong>Hasil Pengujian Browser:</strong></li>
+  <li class="list-item">Terverifikasi lulus pengujian visual mobile portrait (390 × 844) dengan tombol yang pas di dalam jendela dan alih bahasa instan.</li>
+</ul>
+<h3 id="tahap-6-integrasi-identitas-visual-resmi-logo-favicon-touch-icon-selesai-terverifikasi" class="heading-3">📅 Tahap 6 — Integrasi Identitas Visual Resmi: Logo, Favicon &amp; Touch Icon <em>(Selesai &amp; Terverifikasi)</em></h3>
+<ul class="content-list">
+  <li class="list-item"><strong>Latar Belakang:</strong></li>
+  <li class="list-item">Aplikasi sebelumnya masih menggunakan placeholder huruf &quot;D&quot; pada bilah navigasi dan belum memiliki favicon resmi untuk tab peramban maupun ikon instalasi PWA/layar beranda smartphone.</li>
+  <li class="list-item"><strong>Aset Grafis yang Diintegrasikan:</strong></li>
+  <li class="list-item"><code class="inline-code">logo.png</code> (512 × 512 px) — Logo resolusi tinggi dengan latar belakang <em>squircle</em> hijau zamrud khas alas kain dam-daman, menampilkan pola papan autentik dengan bidak biru dan oranye.</li>
+  <li class="list-item"><code class="inline-code">icon-192.png</code> &amp; <code class="inline-code">icon-512.png</code> — Ikon standar Progressive Web App (PWA) dan Android Launcher.</li>
+  <li class="list-item"><code class="inline-code">apple-touch-icon.png</code> (180 × 180 px) — Ikon layar utama iOS/Safari.</li>
+  <li class="list-item"><code class="inline-code">favicon.ico</code>, <code class="inline-code">favicon.png</code>, dan <code class="inline-code">favicon-16x16.png</code> — Favicon peramban web modern dan retro.</li>
+  <li class="list-item"><strong>Titik Integrasi Kode:</strong></li>
+  <li class="list-item"><strong><code class="inline-code">index.html</code>:</strong> Ditambahkan metadata lengkap untuk <code class="inline-code">&lt;link rel=&quot;icon&quot;&gt;</code>, <code class="inline-code">&lt;link rel=&quot;apple-touch-icon&quot;&gt;</code>, serta Open Graph &amp; Twitter Card image (<code class="inline-code">og:image</code> / <code class="inline-code">twitter:image</code>).</li>
+  <li class="list-item"><strong><code class="inline-code">src/App.tsx</code>:</strong> Mengganti placeholder kotak &quot;D&quot; pada bilah navigasi atas dengan <code class="inline-code">&lt;img src=&quot;/logo.png&quot; /&gt;</code> berhiaskan cincin aksen keemasan.</li>
+  <li class="list-item"><strong><code class="inline-code">ModalTutorial.tsx</code> &amp; <code class="inline-code">ModalPlayerName.tsx</code>:</strong> Menampilkan logo resmi pada tajuk jendela panduan dan jendela registrasi nama pemain untuk memperkuat <em>branding</em> permainan nusantara yang prestisius.</li>
+  <li class="list-item"><strong>Hasil Pengujian:</strong></li>
+  <li class="list-item">Seluruh aset gambar termuat dengan status HTTP 200 tanpa galat.</li>
+  <li class="list-item">Tampilan <em>header</em>, modal panduan, dan favicon peramban terlihat tajam, proporsional, dan sangat profesional di semua ukuran layar.</li>
+</ul>
+<h3 id="tahap-7-fitur-kustomisasi-profil-pemain-galeri-16-hero-karakter-nusantara-selesai-terverifikasi" class="heading-3">📅 Tahap 7 — Fitur Kustomisasi Profil Pemain &amp; Galeri 16 Hero Karakter Nusantara <em>(Selesai &amp; Terverifikasi)</em></h3>
+<ul class="content-list">
+  <li class="list-item"><strong>Latar Belakang &amp; Permintaan Pengguna:</strong></li>
+  <li class="list-item">Pemain menginginkan fitur untuk mengubah nama serta memilih ikon karakter pahlawan (<em>hero icon</em>) dari galeri 16 karakter budaya nusantara yang autentik.</li>
+  <li class="list-item"><strong>Aset Hero Karakter yang Diintegrasikan (<code class="inline-code">public/heroes/</code>):</strong></li>
+  <li class="list-item"><code class="inline-code">anak-laki-laki.png</code>, <code class="inline-code">anak-perempuan.png</code>, <code class="inline-code">anak-pria.png</code>, <code class="inline-code">anak-wanita.png</code></li>
+  <li class="list-item"><code class="inline-code">bu-haji.png</code>, <code class="inline-code">pak-haji.png</code></li>
+  <li class="list-item"><code class="inline-code">petani-pria-muda.png</code>, <code class="inline-code">petani-pria.png</code>, <code class="inline-code">petani-wanita-muda.png</code>, <code class="inline-code">petani-wanita.png</code></li>
+  <li class="list-item"><code class="inline-code">preman-pria-marah.png</code>, <code class="inline-code">preman-wanita-marah.png</code> (Pendekar)</li>
+  <li class="list-item"><code class="inline-code">pria-batik.png</code>, <code class="inline-code">pria-dewasa.png</code>, <code class="inline-code">wanita-dewasa.png</code>, <code class="inline-code">wanita-kebaya.png</code></li>
+  <li class="list-item"><strong>Implementasi Arsitektur &amp; Antarmuka:</strong></li>
+  <li class="list-item"><strong>Modul Hero (<code class="inline-code">src/game/heroes.ts</code>):</strong> Mengatur metadata dwibahasa (ID &amp; EN) untuk ke-16 karakter beserta gambar dan fungsi pencarian avatar.</li>
+  <li class="list-item"><strong>Jendela Kustomisasi Profil (<code class="inline-code">src/components/ModalPlayerName.tsx</code>):</strong></li>
+  <li class="list-item">Pratinjau avatar hero berukuran besar dengan cincin aksen keemasan menyala.</li>
+  <li class="list-item">Input nama pemain yang responsif dengan pembatas 20 karakter.</li>
+  <li class="list-item">Galeri grid 16 karakter dengan efek sorot sentuh, centang aktif, dan label nama.</li>
+  <li class="list-item">Pengaturan mandiri untuk Pemain 1 dan Pemain 2 pada mode 2 Pemain (PvP).</li>
+  <li class="list-item">Tombol silang (<code class="inline-code">X</code>) untuk menutup jendela kapan saja saat bermain.</li>
+  <li class="list-item"><strong>Bilah Pemain 1 &amp; Bilah Lawan (<code class="inline-code">src/App.tsx</code>):</strong></li>
+  <li class="list-item">Mengganti lingkaran polos &quot;P1&quot; dengan foto avatar hero pilihan pemain lengkap dengan lencana nomor dan nama hero.</li>
+  <li class="list-item">Mengklik avatar pada bilah pemain atau tombol profil di bilah atas akan langsung memunculkan jendela profil secara instan.</li>
+  <li class="list-item"><strong>Hasil Pengujian Komprehensif:</strong></li>
+  <li class="list-item">Uji kompilasi TypeScript dan bundel Vite lulus dengan status sukses.</li>
+  <li class="list-item">Uji browser aktual membuktikan perubahan nama dan pemilihan avatar (seperti <em>Pak Haji</em>, <em>Pria Batik</em>, dll.) langsung tersimpan ke memori perangkat dan langsung merefleksikan perubahan pada seluruh bilah permainan tanpa perlu memuat ulang peramban.</li>
+</ul>
+<h3 id="tahap-8-sistem-statistik-papan-peringkat-global-database-supabase-sinkronisasi-indexeddb-selesai-terverifikasi" class="heading-3">📅 Tahap 8 — Sistem Statistik &amp; Papan Peringkat Global (Database Supabase &amp; Sinkronisasi IndexedDB) <em>(Selesai &amp; Terverifikasi)</em></h3>
+<ul class="content-list">
+  <li class="list-item"><strong>Latar Belakang &amp; Permintaan Pengguna:</strong></li>
+  <li class="list-item">Diperlukan sistem akumulasi nilai dan perangkingan pemain secara global yang tersimpan di cloud database (Supabase) dan tersinkronisasi offline di memori lokal peramban (IndexedDB).</li>
+  <li class="list-item"><strong>Ketentuan Resmi Perhitungan Nilai (Scoring Rules):</strong></li>
+  <li class="list-item"><strong>Menang vs AI Tingkat Mudah (Easy):</strong> Mendapatkan <strong>+1 Poin</strong>.</li>
+  <li class="list-item"><strong>Menang vs AI Tingkat Sedang (Medium):</strong> Mendapatkan <strong>+2 Poin</strong>.</li>
+  <li class="list-item"><strong>Menang vs AI Tingkat Sulit (Hard):</strong> Mendapatkan <strong>+3 Poin</strong>.</li>
+  <li class="list-item"><strong>Menang vs AI Tingkat Dewa (Master 👑):</strong> Mendapatkan <strong>+5 Poin</strong>.</li>
+  <li class="list-item"><strong>Menang vs Pemain Lain (Offline PvP maupun Duel Online):</strong> Mendapatkan <strong>+2 Poin</strong>.</li>
+  <li class="list-item">Nilai kemenangan ini diakumulasikan secara kumulatif untuk menentukan peringkat pemain global.</li>
+  <li class="list-item"><strong>Implementasi Arsitektur Database &amp; Sinkronisasi:</strong></li>
+  <li class="list-item"><strong>Skema Supabase Cloud (<code class="inline-code">supabase_schema.sql</code>):</strong> Tabel <code class="inline-code">public.player_rankings</code> dengan kolom <code class="inline-code">player_id</code>, <code class="inline-code">player_name</code>, <code class="inline-code">player_avatar</code>, <code class="inline-code">total_points</code>, rincian kemenangan tiap tingkat, <code class="inline-code">win_rate</code>, dan indeks performa tinggi <code class="inline-code">idx_player_rankings_points</code>.</li>
+  <li class="list-item"><strong>Mesin Sinkronisasi Lokal &amp; Cloud (<code class="inline-code">src/game/leaderboard.ts</code>):</strong> </li>
+  <li class="list-item">Mendukung skema IndexedDB Versi 2 (<code class="inline-code">DamDamanDB</code> -&gt; store <code class="inline-code">player_stats</code> dan <code class="inline-code">leaderboard_cache</code>).</li>
+  <li class="list-item">Menyimpan skor secara offline-first seketika saat laga selesai, lalu mengunggahnya (<em>upsert</em>) ke database Supabase secara otomatis saat koneksi aktif.</li>
+  <li class="list-item"><strong>Antarmuka Pengguna (<code class="inline-code">src/components/ModalLeaderboard.tsx</code>):</strong></li>
+  <li class="list-item"><strong>Tab Peringkat Global:</strong> Menampilkan podium Top 3 (Emas 🥇, Perak 🥈, Perunggu 🥉), tabel seluruh pemain, lencana pahlawan, poin, rasio menang, dan kartu lengket <em>&quot;Peringkat Saya&quot;</em>.</li>
+  <li class="list-item"><strong>Tab Statistik Pribadi:</strong> Menampilkan ringkasan metrik (Total Poin, Pertandingan, Menang, Rasio Menang %) serta matriks rincian poin per tingkat kesulitan.</li>
+  <li class="list-item"><strong>Tab Ketentuan Nilai:</strong> Panduan transparan sistem poin ramah pengguna tanpa istilah teknis.</li>
+  <li class="list-item"><strong>Integrasi Modal Selesai Laga (<code class="inline-code">ModalGameOver.tsx</code>):</strong> Menampilkan animasi perolehan poin berkilau (contoh: <code class="inline-code">+5 Poin Peringkat Global!</code>) dan tombol langsung menuju papan peringkat.</li>
+  <li class="list-item"><strong>Hasil Pengujian Komprehensif:</strong></li>
+  <li class="list-item">Pengujian build &amp; lint sukses 100%.</li>
+  <li class="list-item">Pengujian browser subagent memastikan podium juara, tabel peringkat, matriks statistik, dan ketentuan poin termuat cepat dan responsif di desktop maupun mobile.</li>
+</ul>
+<hr class="divider" />
+<hr class="divider" />
+
+<div class="chapter-header-box">
+  <h2 id="bab-9-master-prompt-blueprint-rekayasa-prompt-ai" class="heading-2">BAB 9: MASTER PROMPT &amp; BLUEPRINT REKAYASA PROMPT AI</h2>
+</div>
+<h3 id="91-filosofi-metodologi-prompt-engineering-game-ai" class="heading-3">9.1. Filosofi &amp; Metodologi Prompt Engineering Game AI</h3>
+<p class="paragraph">Dalam pembangunan game strategi tradisional berbasis AI seperti Dam-Daman, model kecerdasan buatan (<em>Large Language Model</em> seperti Claude, Gemini, maupun GPT-4) memerlukan instruksi teknis yang sangat terstruktur, kaya konteks, dan minim ambiguitas (<em>Role, Context, Constraints, Step-by-Step Deliverables</em>). Menginstruksikan AI hanya dengan kalimat umum seperti <em>&quot;Buatkan saya game dam-daman&quot;</em> cenderung menghasilkan kode generik tanpa pemahaman mendalam tentang teori graf, aturan tradisi lokal, atau ergonomi visual modern.</p>
+<p class="paragraph">Di bawah ini adalah tiga <strong>Master Prompt</strong> utama yang dirancang dan dieksekusi secara berurutan (<em>iterative prompt engineering</em>) dalam membangun aplikasi ini dari nol hingga taraf produksi kelas dunia:</p>
+<hr class="divider" />
+<h3 id="92-master-prompt-1-rekayasa-engine-teori-graf-aturan-sakral" class="heading-3">9.2. Master Prompt 1: Rekayasa Engine, Teori Graf &amp; Aturan Sakral</h3>
+<p class="paragraph">Master prompt ini digunakan pada fase fondasi awal untuk menginstruksikan AI membangun inti logika permainan (<em>Game Engine Core</em>), pemodelan matematika graf, validasi langkah bidak, dan kecerdasan buatan minimax:</p>
+
+<div class="code-wrapper">
+  <div class="code-header">
+    <span class="code-lang">MARKDOWN</span>
+    <button class="copy-btn" onclick="copyCode(this)" title="Salin Kode">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+      <span>Salin</span>
+    </button>
+  </div>
+  <pre><code class="language-markdown">Role: Senior Game Architect &amp; Algorithmic Ethnomathematician.
+Context:
+Bangun game web interaktif papan tradisional Indonesia &quot;Dam-Daman&quot; menggunakan React, TypeScript, Tailwind CSS, dan SVG Rendering. 
+Game ini harus mengimplementasikan landasan ilmiah Etnomatematika Teori Graf berdasarkan studi autentik tradisi Jawa/Pasuruan:
+
+1. Spesifikasi Papan Graf (Graph Theory Modeling):
+   - Graf planar terdiri dari tepat 37 simpul (vertices) dan 76 garis lintasan (edges).
+   - Grid Utama: bujur sangkar 5x5 (25 simpul) berkoordinat reguler dengan garis horizontal, vertikal, dan diagonal penuh.
+   - Dua Gunungan / Dapur: masing-masing berbentuk segitiga dengan 6 simpul di sisi utara (Player 2) dan sisi selatan (Player 1).
+   - Simpul Puncak Gunungan (Triangle Apex) hanya memiliki 2 derajat keterhubungan (derajat keluar/masuk terbatas).
+   - Simpul sentral dan persimpangan diagonal memiliki derajat keterhubungan tinggi (hingga derajat 8).
+
+2. Konfigurasi Awal Permainan (Initial Board Setup):
+   - Pemain 1 (Bidak Biru / Bawah): 16 bidak menempati baris 1-2 dan 6 simpul gunungan selatan.
+   - Pemain 2 (Bidak Oranye / Atas): 16 bidak menempati baris 4-5 dan 6 simpul gunungan utara.
+   - Baris tengah (baris ke-3) dikosongkan (hanya 5 simpul kosong sebagai ruang manuver awal).
+
+3. Penegakan Aturan Permainan &amp; Mekanisme Validasi (Rule Engine):
+   - Langkah Biasa: Bidak hanya boleh melangkah ke simpul tetangga kosong yang terhubung langsung oleh garis lintasan (jarak graf = 1).
+   - Melompati &amp; Memakan: Jika terdapat bidak lawan di simpul tetangga dan simpul di belakangnya segaris lurus dalam keadaan kosong, bidak wajib melompati dan memakan bidak lawan tersebut.
+   - Lompatan Beruntun (Multi-Jump): Jika setelah mendarat masih terdapat peluang memakan lanjutan, giliran bidak belum berakhir dan wajib menyelesaikan rangkaian lompatan.
+   - Aturan Sakral &quot;DAM Ora Mangan&quot; (Pinalti DAM): Jika seorang pemain memiliki kesempatan memakan bidak lawan tetapi sengaja atau lalai melakukan langkah biasa, pemain lawan berhak mengeklaim &quot;DAM!&quot; dan mengambil 3 bidak pemain tersebut secara sepihak sebagai pinalti.
+   - Promosi Bidak Raja (King Promotion): Bidak yang berhasil mendarat di puncak segitiga gunungan lawan dipromosikan menjadi Bidak Raja dengan kemampuan bergerak bebas meluncur sepanjang garis lurus tanpa batas jarak selama tidak terhalang.
+
+4. Mesin Kecerdasan Buatan (AI Engine):
+   - Implementasikan 4 tingkat kesulitan:
+     a. Mudah (Easy): Algoritma greedy acak dengan prioritas memakan.
+     b. Sedang (Medium): Minimax kedalaman 3 ply dengan pemangkasan Alpha-Beta Pruning.
+     c. Sulit (Hard): Minimax kedalaman 5 ply dengan evaluasi posisi berbobot simpul hub strategis.
+     d. Dewa (Master): Quiescence Search pada langkah pemakanan untuk mengeliminasi Horizon Effect serta pembobotan mobilitas graf.
+
+5. Efek Suara Prosedural Sintetis:
+   - Manfaatkan Web Audio API murni (AudioContext) untuk mensintesis gelombang audio ketukan kayu (wood thud) dan efek pinalti tanpa dependensi aset file audio eksternal.</code></pre>
+</div>
+<hr class="divider" />
+<h3 id="93-master-prompt-2-redesign-uiux-ergonomis-kelas-dunia-chesscom-style" class="heading-3">9.3. Master Prompt 2: Redesign UI/UX Ergonomis Kelas Dunia (Chess.com-Style)</h3>
+<p class="paragraph">Master prompt ini digunakan untuk merombak antarmuka dari prototipe fungsional menjadi antarmuka elegan, responsif, dan ergonomis ala aplikasi catur modern:</p>
+
+<div class="code-wrapper">
+  <div class="code-header">
+    <span class="code-lang">MARKDOWN</span>
+    <button class="copy-btn" onclick="copyCode(this)" title="Salin Kode">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+      <span>Salin</span>
+    </button>
+  </div>
+  <pre><code class="language-markdown">Role: Principal Product Designer &amp; Lead Frontend Engineer (Chess.com &amp; Lichess Design System Specialist).
+Objective:
+Redesign seluruh antarmuka Game Dam-Daman menjadi aplikasi bergengsi, modern, bertaraf internasional, dengan tema kemewahan beludru zamrud dan batu obsidian (&quot;Velvet Emerald &amp; Obsidian Luxury&quot;).
+
+Key Design &amp; Layout Requirements:
+1. &quot;Sandwich Layout&quot; Architecture:
+   - Opponent Bar (Atas): Avatar hero lawan, nama, status sisa bidak aktif, indikator giliran bercahaya, dan jam hitung mundur catur.
+   - Interactive Game Board (Tengah): Papan SVG adaptif bertekstur kain beludru zamrud mendalam (#064e3b / #022c22) dengan garis lintasan beraksen keemasan (amber-400/500). Highlight langkah legal berupa titik cincin glow lembut, serta efek animasi bidak terpilih.
+   - Player Bar (Bawah): Avatar hero pemain, nama profil kustom, status sisa bidak, dan jam catur.
+   - Quick Action Bar (Paling Bawah): Bilah aksi ergonomis yang pas dijangkau ibu jari: [Mode Laga / Tingkat AI], [Undo], [Bantuan / Hints], [Reset / Laga Baru].
+
+2. Zero-Scroll Viewport Ergonomics:
+   - Pada layar smartphone portrait (lebar 360px hingga 430px), seluruh elemen antarmuka harus tampil proporsional dalam satu layar 100dvh tanpa scrollbar vertikal sama sekali.
+   - Papan permainan harus mengisi lebar layar secara optimal dengan bantalan pengaman (safe padding) agar tidak tertabrak notch atau tombol sistem.
+
+3. Dual Language System (ID / EN):
+   - Sediakan tombol alih bahasa instan dengan label ringkas murni &quot;ID&quot; dan &quot;EN&quot;.
+   - DILARANG menggunakan emoji bendera (🇮🇩 / 🇬🇧) untuk menghindari bug rendering font sistem mobile yang menampilkan huruf ganda (misal: &quot;ID ID&quot; atau &quot;GB EN&quot;).
+   - Seluruh teks panduan, label tombol, dialog konfirmasi, dan status permainan harus mendukung dwibahasa secara lengkap.
+
+4. Eliminasi Jargon Teknis:
+   - Hapus seluruh istilah teknis IT/database (seperti IndexedDB, Supabase, WebSocket, Vertex, Edge) dari antarmuka pengguna.
+   - Gunakan bahasa awam yang ramah: &quot;Tersimpan di Perangkat Ini&quot;, &quot;Tersinkronisasi Online&quot;, &quot;Titik Temu Garis&quot;, dan &quot;Garis Lintasan&quot;.</code></pre>
+</div>
+<hr class="divider" />
+<h3 id="94-master-prompt-3-hero-avatar-nusantara-sistem-poin-leaderboard-global" class="heading-3">9.4. Master Prompt 3: Hero Avatar Nusantara, Sistem Poin &amp; Leaderboard Global</h3>
+<p class="paragraph">Master prompt ini digunakan untuk mengintegrasikan identitas budaya nusantara ke dalam profil pemain, serta membangun arsitektur persistensi data offline-first dengan sinkronisasi cloud global:</p>
+
+<div class="code-wrapper">
+  <div class="code-header">
+    <span class="code-lang">MARKDOWN</span>
+    <button class="copy-btn" onclick="copyCode(this)" title="Salin Kode">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+      <span>Salin</span>
+    </button>
+  </div>
+  <pre><code class="language-markdown">Role: Fullstack Cloud Architect &amp; Game Progression Specialist.
+Objective:
+Rancang dan implementasikan fitur Personalisasi Profil Pemain dengan Karakter Budaya Nusantara serta Sistem Akumulasi Poin &amp; Peringkat Global.
+
+Detailed Specifications:
+1. Galeri Hero Avatar Budaya Nusantara:
+   - Sediakan modal pemilihan karakter pahlawan berisi 16 ikon ilustrasi khas Nusantara (Pak Haji, Bu Haji, Petani Pria &amp; Wanita, Anak Tradisional, Pemuda Adat, dll).
+   - Simpan avatar dan nama profil pemain di memori lokal agar persisten antar-sesi bermain.
+
+2. Aturan Perhitungan Skor &amp; Nilai Kemenangan (Scoring Rules):
+   - Menang vs AI Tingkat Mudah (Easy): +1 Poin.
+   - Menang vs AI Tingkat Sedang (Medium): +2 Poin.
+   - Menang vs AI Tingkat Sulit (Hard): +3 Poin.
+   - Menang vs AI Tingkat Dewa (Master): +5 Poin.
+   - Menang vs Pemain Lain (Offline PvP maupun Duel Online): +2 Poin.
+   - Nilai kemenangan diakumulasikan secara kumulatif untuk menentukan peringkat pemain global.
+
+3. Arsitektur Sinkronisasi Ganda (Offline-First + Cloud Database):
+   - Penyimpanan Lokal (IndexedDB): Menyimpan data profil, riwayat pertandingan, akumulasi poin, serta cache papan peringkat agar aplikasi berfungsi 100% saat offline.
+   - Database Cloud (Supabase): Skema tabel `player_rankings` dengan kolom `player_id`, `player_name`, `player_avatar`, `total_points`, rincian poin per tingkat kesulitan, dan indeks performa tinggi `idx_player_rankings_points`.
+   - Sinkronisasi Otomatis: Saat laga usai dan koneksi internet tersedia, skor lokal otomatis di-upsert ke cloud database secara mulus di latar belakang tanpa mengganggu jalannya permainan.
+
+4. Antarmuka Leaderboard &amp; Statistik:
+   - Podium Visual Juara: Menampilkan 3 peringkat teratas dengan piala Emas (Juara 1), Perak (Juara 2), dan Perunggu (Juara 3).
+   - Tabel Peringkat Lengkap: Nomor urut, avatar hero, nama pemain, total kemenangan, persentase menang (win rate), dan total akumulasi poin.
+   - Kartu Lengket &quot;Peringkat Saya&quot;: Menampilkan posisi peringkat pemain saat ini di baris bawah tabel.
+   - Tab Statistik &amp; Aturan Poin: Menampilkan matriks perolehan poin per tingkat dan panduan transparansi skor.</code></pre>
+</div>
+<hr class="divider" />
+<h3 id="95-panduan-replikasi-tips-eksekusi-untuk-pengembang" class="heading-3">9.5. Panduan Replikasi &amp; Tips Eksekusi untuk Pengembang</h3>
+<p class="paragraph">Bagi Anda yang ingin mereplikasi pembuatan game strategi berbasis AI menggunakan asisten cerdas seperti Claude, Gemini, atau GPT, berikut tips krusial agar hasilnya optimal:</p>
+<ol class="content-ordered-list">
+  <li class="list-item"><strong>Iterasi Modular (Iterative Prompting):</strong> Jangan meminta seluruh sistem dibangun dalam satu prompt raksasa. Eksekusi Engine terlebih dahulu (Master Prompt 1), uji coba mekanismenya, lalu poles antarmukanya (Master Prompt 2), kemudian lengkapi dengan sistem penyimpanan &amp; profil (Master Prompt 3).</li>
+  <li class="list-item"><strong>Berikan Definisi Topologi Eksplisit:</strong> Selalu sertakan pemetaan koordinat (x, y) dan daftar ketetanggaan (<em>adjacency list</em>) eksplisit dalam prompt agar AI tidak berhalusinasi menyambungkan garis lintasan yang keliru.</li>
+  <li class="list-item"><strong>Simulasi Skenario Uji Kasus Khusus:</strong> Mintalah AI menyertakan skenario pengujian unit (<em>test cases</em>) untuk aturan pinalti <em>DAM Ora Mangan</em>, multi-jump berantai, dan promosi bidak raja guna memastikan tidak ada celah logika (<em>edge case bugs</em>).</li>
+  <li class="list-item"><strong>Verifikasi Visual Browser Otomatis:</strong> Lakukan audit visual responsivitas pada resolusi mobile (360–430 piksel) untuk memastikan tata letak <em>Zero-Scroll</em> terjaga sempurna.</li>
+</ol>
+<hr class="divider" />
+
+<div class="chapter-header-box">
+  <h2 id="bab-10-panduan-deployment-penutup" class="heading-2">BAB 10: PANDUAN DEPLOYMENT &amp; PENUTUP</h2>
+</div>
+<h3 id="101-menjalankan-proyek-secara-lokal" class="heading-3">10.1. Menjalankan Proyek Secara Lokal</h3>
+<p class="paragraph">Pastikan Node.js telah terpasang di komputer Anda. Buka terminal di direktori proyek:</p>
+
+<div class="code-wrapper">
+  <div class="code-header">
+    <span class="code-lang">BASH</span>
+    <button class="copy-btn" onclick="copyCode(this)" title="Salin Kode">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+      <span>Salin</span>
+    </button>
+  </div>
+  <pre><code class="language-bash"># 1. Pasang dependensi
+npm install
+
+# 2. Jalankan server pengembangan lokal
+npm run dev
+
+# 3. Buka di peramban: http://localhost:3000</code></pre>
+</div>
+<h3 id="102-melakukan-build-verifikasi-kualitas" class="heading-3">10.2. Melakukan Build &amp; Verifikasi Kualitas</h3>
+
+<div class="code-wrapper">
+  <div class="code-header">
+    <span class="code-lang">BASH</span>
+    <button class="copy-btn" onclick="copyCode(this)" title="Salin Kode">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+      <span>Salin</span>
+    </button>
+  </div>
+  <pre><code class="language-bash"># Pemeriksaan tipe data TypeScript
+npm run lint
+
+# Kompilasi bundel produksi
+npm run build
+
+# Meninjau hasil kompilasi
+npm run preview</code></pre>
+</div>
+<h3 id="103-menghubungkan-domain-kustom" class="heading-3">10.3. Menghubungkan Domain Kustom</h3>
+<p class="paragraph">Aplikasi ini dihosting secara otomatis pada platform Cloudflare Pages / Vercel / GitHub Pages dengan domain kustom:</p>
+<ul class="content-list">
+  <li class="list-item">Buat berkas <code class="inline-code">public/CNAME</code> berisi nama domain Anda: <code class="inline-code">damdaman.isparmo.com</code>.</li>
+  <li class="list-item">Atur DNS CNAME Record di penyedia domain Anda mengarah ke server hosting.</li>
+  <li class="list-item">Aktifkan sertifikat SSL/TLS otomatis untuk keamanan koneksi HTTPS.</li>
+</ul>
+<hr class="divider" />
+<p class="paragraph"><em>Dokumen ini akan terus diperbarui secara berkala pada setiap pencapaian penting dalam pengembangan Maen Dam-Daman.</em></p>
+
+        <!-- Bottom Footer -->
+        <div style="margin-top: 5rem; padding-top: 2rem; border-top: 1px solid var(--border-subtle); display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 1rem; color: var(--text-muted); font-size: 0.85rem;">
+          <p>© 2026 Isparmo (masisparmo). Hak Cipta Dilindungi Undang-Undang.</p>
+          <p>Dibuat dengan ❤️ untuk Pelestarian Budaya Tradisional Nusantara.</p>
+        </div>
+
+      </article>
+    </main>
+
+  </div>
+
+  <!-- Floating Back to Top Button -->
+  <button class="back-to-top" id="backToTop" aria-label="Kembali ke atas">
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="18 15 12 9 6 15"></polyline></svg>
+  </button>
+
+  <!-- Interactive Client-side Script -->
+  <script>
+    // 1. Reading Progress Bar
+    window.addEventListener('scroll', () => {
+      const scrollTop = document.documentElement.scrollTop || document.body.scrollTop;
+      const scrollHeight = document.documentElement.scrollHeight - document.documentElement.clientHeight;
+      const progress = (scrollTop / scrollHeight) * 100;
+      document.getElementById('progress-bar').style.width = progress + '%';
+
+      // Back to top visibility
+      const btt = document.getElementById('backToTop');
+      if (scrollTop > 400) {
+        btt.classList.add('visible');
+      } else {
+        btt.classList.remove('visible');
+      }
+    });
+
+    // 2. Back to Top Click
+    document.getElementById('backToTop').addEventListener('click', () => {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    });
+
+    // 3. Mobile Sidebar Toggle
+    const sidebar = document.getElementById('sidebar');
+    const toggleBtn = document.getElementById('sidebarToggle');
+    if (toggleBtn) {
+      toggleBtn.addEventListener('click', () => {
+        sidebar.classList.toggle('open');
+      });
+    }
+
+    // Close sidebar when clicking any TOC link on mobile
+    document.querySelectorAll('.toc-link').forEach(link => {
+      link.addEventListener('click', () => {
+        if (window.innerWidth <= 1024) {
+          sidebar.classList.remove('open');
+        }
+      });
+    });
+
+    // 4. Dark/Light Mode Switcher
+    const themeToggle = document.getElementById('themeToggle');
+    const themeIcon = document.getElementById('themeIcon');
+    const htmlElem = document.documentElement;
+
+    // Load saved preference
+    const savedTheme = localStorage.getItem('damdaman_ebook_theme');
+    if (savedTheme === 'light') {
+      htmlElem.classList.remove('dark');
+      htmlElem.classList.add('light');
+      themeIcon.textContent = '🌙';
+    }
+
+    themeToggle.addEventListener('click', () => {
+      if (htmlElem.classList.contains('dark')) {
+        htmlElem.classList.remove('dark');
+        htmlElem.classList.add('light');
+        themeIcon.textContent = '🌙';
+        localStorage.setItem('damdaman_ebook_theme', 'light');
+      } else {
+        htmlElem.classList.remove('light');
+        htmlElem.classList.add('dark');
+        themeIcon.textContent = '☀️';
+        localStorage.setItem('damdaman_ebook_theme', 'dark');
+      }
+    });
+
+    // 5. One-click Copy Code Button
+    function copyCode(btn) {
+      const codeWrapper = btn.closest('.code-wrapper');
+      const codeElement = codeWrapper.querySelector('code');
+      if (!codeElement) return;
+
+      navigator.clipboard.writeText(codeElement.innerText).then(() => {
+        const originalText = btn.innerHTML;
+        btn.innerHTML = '<span style="color: #10b981; font-weight: 700;">✓ Tersalin!</span>';
+        setTimeout(() => {
+          btn.innerHTML = originalText;
+        }, 2000);
+      });
+    }
+
+    // 6. ScrollSpy for Sidebar TOC
+    const headings = Array.from(document.querySelectorAll('.heading-1, .heading-2, .heading-3'));
+    const tocLinks = Array.from(document.querySelectorAll('.toc-link'));
+
+    window.addEventListener('scroll', () => {
+      const scrollPos = window.scrollY + 100;
+      let currentId = '';
+
+      for (let i = 0; i < headings.length; i++) {
+        if (headings[i].offsetTop <= scrollPos) {
+          currentId = headings[i].id;
+        }
+      }
+
+      if (currentId) {
+        tocLinks.forEach(link => {
+          if (link.getAttribute('href') === '#' + currentId) {
+            link.classList.add('active');
+          } else {
+            link.classList.remove('active');
+          }
+        });
+      }
+    });
+  </script>
+</body>
+</html>
