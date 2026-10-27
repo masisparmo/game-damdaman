@@ -4,6 +4,7 @@
 Script to build a professional, rich-text HTML/CSS version of the Dam-Daman eBook
 from EBOOK_PANDUAN_DAM_DAMAN.md into public/ebook.html.
 Fully responsive, optimized for mobile (320px - 768px), tablet, and desktop.
+Includes Full Rich Text rendering for mathematics (KaTeX + fallback) and nested bold/italics.
 """
 
 import os
@@ -12,10 +13,26 @@ import html
 
 def slugify(text):
     text = text.lower()
-    text = re.sub(r'[*_`]', '', text)
+    text = re.sub(r'[*_`$]', '', text)
+    text = text.replace('\\times', 'x').replace('\\chi', 'chi')
     text = re.sub(r'[^a-z0-9\s-]', '', text)
     text = re.sub(r'[\s_]+', '-', text)
     return text.strip('-')
+
+def format_math(tex, is_display=False):
+    clean = tex.strip()
+    clean = clean.replace('\\times', '×')
+    clean = clean.replace('\\dots', '…')
+    clean = clean.replace('\\chi', 'χ')
+    clean = re.sub(r'\\text\{([^}]+)\}', r'<span class="math-text">\1</span>', clean)
+    
+    # Italicize standalone single-letter variables: G, V, E, v, B, A, C
+    clean = re.sub(r'(?<![A-Za-z0-9_])([A-Za-z])(?![A-Za-z0-9_])', r'<em>\1</em>', clean)
+    
+    tag = "div" if is_display else "span"
+    cls = "math-display" if is_display else "math-inline"
+    escaped_tex = html.escape(tex)
+    return f'<{tag} class="{cls}" data-tex="{escaped_tex}">{clean}</{tag}>'
 
 def parse_markdown_to_html(md_text):
     lines = md_text.splitlines()
@@ -34,21 +51,55 @@ def parse_markdown_to_html(md_text):
     blockquote_lines = []
     
     def format_inline(text):
-        # Escape basic HTML first, but protect our tags
-        text = html.escape(text)
-        
-        # Inline code `code`
-        text = re.sub(r'`([^`]+)`', r'<code class="inline-code">\1</code>', text)
-        
-        # Bold **text**
-        text = re.sub(r'\*\*([^*]+)\*\*', r'<strong>\1</strong>', text)
-        
-        # Italic *text*
-        text = re.sub(r'\*([^*]+)\*', r'<em>\1</em>', text)
-        
-        # Links [text](url)
-        text = re.sub(r'\[([^\]]+)\]\(([^)]+)\)', r'<a href="\2" target="_blank" rel="noopener noreferrer">\1</a>', text)
-        
+        # 1. Protect inline code `code`
+        code_tokens = []
+        def save_code(m):
+            code_tokens.append(f'<code class="inline-code">{html.escape(m.group(1))}</code>')
+            return f'__CODE_TOKEN_{len(code_tokens)-1}__'
+        text = re.sub(r'`([^`]+?)`', save_code, text)
+
+        # 2. Protect links [text](url)
+        link_tokens = []
+        def save_link(m):
+            link_tokens.append(f'<a href="{m.group(2)}" target="_blank" rel="noopener noreferrer">{m.group(1)}</a>')
+            return f'__LINK_TOKEN_{len(link_tokens)-1}__'
+        text = re.sub(r'\[([^\]]+)\]\(([^)]+)\)', save_link, text)
+
+        # 3. Handle Display Math ($$...$$) first
+        math_tokens = []
+        def save_display_math(m):
+            math_tokens.append(format_math(m.group(1), is_display=True))
+            return f'__MATH_TOKEN_{len(math_tokens)-1}__'
+        text = re.sub(r'\$\$([^\$]+?)\$\$', save_display_math, text)
+
+        # 4. Handle Inline Math ($...$)
+        def save_inline_math(m):
+            math_tokens.append(format_math(m.group(1), is_display=False))
+            return f'__MATH_TOKEN_{len(math_tokens)-1}__'
+        text = re.sub(r'\$([^\$]+?)\$', save_inline_math, text)
+
+        # 5. Handle Triple Asterisks / Nested Bold-Italic variants
+        text = re.sub(r'\*\*\*([^*]+?)\*\*\*', r'<strong><em>\1</em></strong>', text)
+        text = re.sub(r'\*\*\*([^*]+?)\*([^*]*?)\*\*', r'<strong><em>\1</em>\2</strong>', text)
+        text = re.sub(r'\*\*([^*]+?)\*([^*]+?)\*\*\*', r'<strong>\1<em>\2</em></strong>', text)
+
+        # 6. Standard Bold **text** (non-greedy, can contain single *)
+        text = re.sub(r'\*\*(.+?)\*\*', r'<strong>\1</strong>', text)
+
+        # 7. Standard Italic *text*
+        text = re.sub(r'(?<!\*)\*([^*\s][^*]*?[^*\s]|\S)\*(?!\*)', r'<em>\1</em>', text)
+
+        # 8. Underscore italic _text_
+        text = re.sub(r'(?<!\w)_([^_]+?)_(?!\w)', r'<em>\1</em>', text)
+
+        # Restore tokens
+        for i, tok in enumerate(code_tokens):
+            text = text.replace(f'__CODE_TOKEN_{i}__', tok)
+        for i, tok in enumerate(link_tokens):
+            text = text.replace(f'__LINK_TOKEN_{i}__', tok)
+        for i, tok in enumerate(math_tokens):
+            text = text.replace(f'__MATH_TOKEN_{i}__', tok)
+
         return text
 
     def close_list():
@@ -73,7 +124,8 @@ def parse_markdown_to_html(md_text):
             level = len(match_h.group(1))
             title = match_h.group(2).strip()
             # Clean title
-            clean_title = re.sub(r'[*_`]', '', title)
+            clean_title = re.sub(r'[*_`$]', '', title)
+            clean_title = clean_title.replace('\\times', 'x').replace('\\chi', 'chi')
             slug = slugify(clean_title)
             if clean_title.upper() != 'DAFTAR ISI' and not clean_title.startswith('EBOOK:') and not clean_title.startswith('Panduan Lengkap'):
                 toc_items.append({'level': level, 'title': clean_title, 'slug': slug})
@@ -151,7 +203,8 @@ def parse_markdown_to_html(md_text):
             close_blockquote()
             level = len(h_match.group(1))
             heading_text = h_match.group(2).strip()
-            clean_title = re.sub(r'[*_`]', '', heading_text)
+            clean_title = re.sub(r'[*_`$]', '', heading_text)
+            clean_title = clean_title.replace('\\times', 'x').replace('\\chi', 'chi')
             slug = slugify(clean_title)
 
             # Styling specific levels
@@ -253,6 +306,11 @@ def generate_full_html():
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500;600&family=Inter:wght@300;400;500;600;700&family=Plus+Jakarta+Sans:wght@500;600;700;800&family=Merriweather:ital,wght@0,300;0,400;0,700;1,300&display=swap" rel="stylesheet">
+
+  <!-- KaTeX for High-Quality Mathematical Typography -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"></script>
 
   <style>
     /* ====================================================================
@@ -785,6 +843,38 @@ def generate_full_html():
       padding: 0.15rem 0.4rem;
       font-size: 0.85em;
       word-break: break-all;
+    }}
+
+    /* Mathematical Typography (KaTeX & Fallback Rich Text) */
+    .math-inline {{
+      font-family: 'KaTeX_Math', 'Cambria Math', 'Latin Modern Math', 'Times New Roman', serif;
+      font-style: normal;
+      color: #fbbf24;
+      padding: 0 0.15rem;
+    }}
+
+    .math-inline em {{
+      font-style: italic;
+      font-family: 'KaTeX_Math', 'Cambria Math', Georgia, serif;
+    }}
+
+    .math-display {{
+      text-align: center;
+      margin: 1.5rem 0;
+      padding: 1rem;
+      background: rgba(245, 158, 11, 0.05);
+      border: 1px solid rgba(245, 158, 11, 0.2);
+      border-radius: 12px;
+      overflow-x: auto;
+      font-family: 'KaTeX_Math', 'Cambria Math', serif;
+      font-size: 1.1rem;
+      color: #fbbf24;
+    }}
+
+    .math-text {{
+      font-family: var(--font-body);
+      font-style: normal;
+      font-weight: 600;
     }}
 
     /* Code Blocks */
@@ -1351,6 +1441,21 @@ def generate_full_html():
         }});
       }}
     }});
+
+    // 7. KaTeX Auto-Rendering (Enhanced Math Typography)
+    function renderAllMath() {{
+      if (window.renderMathInElement) {{
+        renderMathInElement(document.body, {{
+          delimiters: [
+            {{left: '$$', right: '$$', display: true}},
+            {{left: '$', right: '$', display: false}}
+          ],
+          throwOnError: false
+        }});
+      }}
+    }}
+    window.addEventListener('DOMContentLoaded', renderAllMath);
+    window.addEventListener('load', renderAllMath);
   </script>
 </body>
 </html>'''
