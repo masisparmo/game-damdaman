@@ -3,6 +3,7 @@
 """
 Script to build a professional, rich-text HTML/CSS version of the Dam-Daman eBook
 from EBOOK_PANDUAN_DAM_DAMAN.md into public/ebook.html.
+Fully responsive, optimized for mobile (320px - 768px), tablet, and desktop.
 """
 
 import os
@@ -28,7 +29,6 @@ def parse_markdown_to_html(md_text):
     
     in_list = False
     list_type = None # 'ul' or 'ol'
-    list_indent = 0
     
     in_blockquote = False
     blockquote_lines = []
@@ -75,11 +75,12 @@ def parse_markdown_to_html(md_text):
             # Clean title
             clean_title = re.sub(r'[*_`]', '', title)
             slug = slugify(clean_title)
-            if clean_title.upper() != 'DAFTAR ISI' and not clean_title.startswith('EBOOK:'):
+            if clean_title.upper() != 'DAFTAR ISI' and not clean_title.startswith('EBOOK:') and not clean_title.startswith('Panduan Lengkap'):
                 toc_items.append({'level': level, 'title': clean_title, 'slug': slug})
 
     # Second pass: convert content
     skip_table_of_contents = False
+    skip_header_frontmatter = True
 
     for i, line in enumerate(lines):
         # Handle multi-backtick code blocks (``` or ````)
@@ -118,6 +119,13 @@ def parse_markdown_to_html(md_text):
             continue
 
         stripped = line.strip()
+
+        # Skip raw markdown metadata at top before PRAKATA (since already rendered in Hero Card)
+        if skip_header_frontmatter:
+            if stripped.startswith('## PRAKATA') or stripped.startswith('## BAB 1:'):
+                skip_header_frontmatter = False
+            else:
+                continue
 
         # Skip original markdown Table of Contents section since we generate an interactive sidebar & sticky TOC
         if stripped == '## DAFTAR ISI':
@@ -176,7 +184,6 @@ def parse_markdown_to_html(md_text):
         ol_match = re.match(r'^(\s*)\d+\.\s+(.+)$', line)
 
         if ul_match:
-            indent = len(ul_match.group(1))
             content = format_inline(ul_match.group(2))
             if not in_list or list_type != 'ul':
                 close_list()
@@ -186,7 +193,6 @@ def parse_markdown_to_html(md_text):
             html_out.append(f'  <li class="list-item">{content}</li>')
             continue
         elif ol_match:
-            indent = len(ol_match.group(1))
             content = format_inline(ol_match.group(2))
             if not in_list or list_type != 'ol':
                 close_list()
@@ -198,13 +204,9 @@ def parse_markdown_to_html(md_text):
         else:
             close_list()
 
-        # Empty line
-        if not stripped:
-            continue
-
-        # Paragraph text
-        formatted_p = format_inline(line)
-        html_out.append(f'<p class="paragraph">{formatted_p}</p>')
+        # Regular Paragraph
+        if stripped:
+            html_out.append(f'<p class="paragraph">{format_inline(line)}</p>')
 
     close_list()
     close_blockquote()
@@ -229,7 +231,7 @@ def generate_full_html():
 <html lang="id" class="dark">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
   <title>Ebook: Permainan Dam-Daman Online — Panduan Lengkap Cara Main Hingga Cara Membuatnya</title>
   <meta name="description" content="Ebook Resmi Panduan Lengkap Permainan Tradisional Dam-Daman Online: Etnomatematika, Teori Graf, Aturan Main, Arsitektur React TypeScript, AI Engine, Multiplayer Supabase, dan Master Prompt Blueprint.">
   <meta name="author" content="Isparmo (masisparmo)">
@@ -256,6 +258,7 @@ def generate_full_html():
     /* ====================================================================
        MODERN LUXURY EDITORIAL DESIGN SYSTEM
        Theme: Deep Obsidian & Emerald Velvet with Golden Amber Accents
+       Fully Responsive: Mobile-First + Desktop Perfection
        ==================================================================== */
     :root {{
       --font-heading: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
@@ -287,9 +290,9 @@ def generate_full_html():
       --code-border: #1e293b;
       --code-text: #38bdf8;
 
-      --sidebar-width: 320px;
+      --sidebar-width: 310px;
       --header-height: 64px;
-      --content-max-width: 900px;
+      --content-max-width: 860px;
     }}
 
     /* Light Theme */
@@ -329,16 +332,24 @@ def generate_full_html():
       scroll-behavior: smooth;
       font-size: 16px;
       color-scheme: dark light;
+      width: 100%;
+      max-width: 100vw;
+      overflow-x: hidden;
+      -webkit-text-size-adjust: 100%;
     }}
 
     body {{
       background-color: var(--bg-canvas);
       color: var(--text-primary);
       font-family: var(--font-body);
+      font-size: 1rem;
       line-height: 1.75;
       -webkit-font-smoothing: antialiased;
       -moz-osx-font-smoothing: grayscale;
+      width: 100%;
+      max-width: 100vw;
       overflow-x: hidden;
+      position: relative;
     }}
 
     /* Reading Progress Bar */
@@ -349,7 +360,7 @@ def generate_full_html():
       width: 100%;
       height: 3px;
       background: transparent;
-      z-index: 100;
+      z-index: 110;
     }}
 
     #progress-bar {{
@@ -367,8 +378,9 @@ def generate_full_html():
       left: 0;
       right: 0;
       height: var(--header-height);
-      background: rgba(11, 17, 30, 0.85);
+      background: rgba(11, 17, 30, 0.9);
       backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
       border-bottom: 1px solid var(--border-subtle);
       z-index: 90;
       display: flex;
@@ -376,44 +388,48 @@ def generate_full_html():
       justify-content: space-between;
       padding: 0 1.5rem;
       transition: all 0.2s ease;
+      max-width: 100vw;
+      box-sizing: border-box;
     }}
 
     html.light .top-navbar {{
-      background: rgba(255, 255, 255, 0.9);
+      background: rgba(255, 255, 255, 0.92);
       border-bottom: 1px solid var(--border-subtle);
     }}
 
     .navbar-brand {{
       display: flex;
       align-items: center;
-      gap: 0.75rem;
+      gap: 0.65rem;
       text-decoration: none;
       color: var(--text-primary);
       font-family: var(--font-heading);
       font-weight: 700;
-      font-size: 1.1rem;
+      font-size: 1.05rem;
+      white-space: nowrap;
     }}
 
     .navbar-logo {{
-      width: 36px;
-      height: 36px;
-      border-radius: 10px;
+      width: 34px;
+      height: 34px;
+      border-radius: 9px;
       box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
       border: 1px solid var(--border-strong);
-      object-contain: contain;
+      object-fit: contain;
+      flex-shrink: 0;
     }}
 
     .navbar-actions {{
       display: flex;
       align-items: center;
-      gap: 0.75rem;
+      gap: 0.5rem;
     }}
 
     .nav-btn {{
       display: inline-flex;
       align-items: center;
-      gap: 0.4rem;
-      padding: 0.5rem 0.9rem;
+      gap: 0.35rem;
+      padding: 0.45rem 0.85rem;
       border-radius: 10px;
       font-size: 0.85rem;
       font-weight: 600;
@@ -421,6 +437,7 @@ def generate_full_html():
       cursor: pointer;
       transition: all 0.2s ease;
       border: 1px solid var(--border-subtle);
+      white-space: nowrap;
     }}
 
     .nav-btn-primary {{
@@ -452,7 +469,30 @@ def generate_full_html():
       border: none;
       color: var(--text-primary);
       cursor: pointer;
-      padding: 0.5rem;
+      padding: 0.4rem;
+      border-radius: 8px;
+    }}
+
+    .menu-toggle-btn:hover {{
+      background: rgba(255, 255, 255, 0.08);
+    }}
+
+    /* Sidebar Overlay (Mobile Drawer Backdrop) */
+    .sidebar-overlay {{
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.65);
+      backdrop-filter: blur(4px);
+      -webkit-backdrop-filter: blur(4px);
+      z-index: 95;
+      opacity: 0;
+      transition: opacity 0.25s ease;
+    }}
+
+    .sidebar-overlay.active {{
+      display: block;
+      opacity: 1;
     }}
 
     /* App Layout */
@@ -460,6 +500,9 @@ def generate_full_html():
       display: flex;
       margin-top: var(--header-height);
       min-height: calc(100vh - var(--header-height));
+      width: 100%;
+      max-width: 100vw;
+      overflow-x: hidden;
     }}
 
     /* Sidebar Navigation (TOC) */
@@ -538,15 +581,21 @@ def generate_full_html():
     /* Main Article Container */
     .main-container {{
       margin-left: var(--sidebar-width);
-      flex: 1;
+      flex: 1 1 0%;
+      min-width: 0; /* CRITICAL FOR FLEX CHILD MOBILE RESIZING */
+      max-width: 100%;
       padding: 2.5rem 3.5rem 6rem;
       display: flex;
       justify-content: center;
+      overflow-x: hidden;
     }}
 
     .article-content {{
       width: 100%;
       max-width: var(--content-max-width);
+      min-width: 0; /* CRITICAL */
+      overflow-wrap: break-word;
+      word-break: break-word;
     }}
 
     /* Hero Book Banner */
@@ -554,11 +603,12 @@ def generate_full_html():
       background: linear-gradient(135deg, rgba(6, 78, 59, 0.7), rgba(15, 23, 42, 0.9)), radial-gradient(circle at top right, rgba(245, 158, 11, 0.15), transparent);
       border: 1px solid rgba(245, 158, 11, 0.25);
       border-radius: 24px;
-      padding: 3rem 2.5rem;
+      padding: 2.75rem 2.5rem;
       margin-bottom: 3.5rem;
       box-shadow: 0 12px 36px rgba(0, 0, 0, 0.4);
       position: relative;
       overflow: hidden;
+      max-width: 100%;
     }}
 
     .book-hero-banner::after {{
@@ -590,7 +640,7 @@ def generate_full_html():
 
     .hero-title {{
       font-family: var(--font-heading);
-      font-size: 2.4rem;
+      font-size: 2.3rem;
       font-weight: 800;
       line-height: 1.2;
       color: #ffffff;
@@ -599,11 +649,11 @@ def generate_full_html():
     }}
 
     .hero-subtitle {{
-      font-size: 1.15rem;
+      font-size: 1.1rem;
       color: #cbd5e1;
       margin-bottom: 1.5rem;
       font-weight: 400;
-      line-height: 1.5;
+      line-height: 1.55;
     }}
 
     .hero-metadata {{
@@ -631,7 +681,7 @@ def generate_full_html():
       font-family: var(--font-heading);
       font-size: 2.2rem;
       font-weight: 800;
-      margin-top: 3rem;
+      margin-top: 3.5rem;
       margin-bottom: 1.5rem;
       color: var(--text-primary);
       letter-spacing: -0.02em;
@@ -671,10 +721,11 @@ def generate_full_html():
     .heading-3::before {{
       content: "";
       display: inline-block;
-      width: 6px;
+      width: 5px;
       height: 18px;
       background: var(--color-amber-gold);
       border-radius: 3px;
+      flex-shrink: 0;
     }}
 
     .heading-4 {{
@@ -692,6 +743,8 @@ def generate_full_html():
       font-size: 1rem;
       color: var(--text-primary);
       line-height: 1.8;
+      overflow-wrap: break-word;
+      word-break: break-word;
     }}
 
     .paragraph strong {{
@@ -713,6 +766,8 @@ def generate_full_html():
       margin-bottom: 0.6rem;
       padding-left: 0.3rem;
       line-height: 1.7;
+      overflow-wrap: break-word;
+      word-break: break-word;
     }}
 
     .list-item strong {{
@@ -729,6 +784,7 @@ def generate_full_html():
       border-radius: 6px;
       padding: 0.15rem 0.4rem;
       font-size: 0.85em;
+      word-break: break-all;
     }}
 
     /* Code Blocks */
@@ -738,6 +794,8 @@ def generate_full_html():
       border-radius: 14px;
       margin: 1.5rem 0 2rem;
       overflow: hidden;
+      max-width: 100%;
+      min-width: 0;
       box-shadow: 0 8px 24px rgba(0, 0, 0, 0.25);
     }}
 
@@ -783,10 +841,13 @@ def generate_full_html():
     .code-wrapper pre {{
       padding: 1.25rem;
       overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
       font-family: var(--font-code);
       font-size: 0.85rem;
       line-height: 1.6;
       color: #e2e8f0;
+      max-width: 100%;
+      white-space: pre;
     }}
 
     /* Callout Boxes */
@@ -799,6 +860,8 @@ def generate_full_html():
       background: rgba(16, 185, 129, 0.08);
       border: 1px solid rgba(16, 185, 129, 0.25);
       border-left: 4px solid #10b981;
+      max-width: 100%;
+      min-width: 0;
     }}
 
     .callout-icon {{
@@ -811,6 +874,8 @@ def generate_full_html():
       font-size: 0.925rem;
       color: #cbd5e1;
       line-height: 1.7;
+      overflow-wrap: break-word;
+      word-break: break-word;
     }}
 
     html.light .callout-body {{
@@ -859,7 +924,7 @@ def generate_full_html():
 
     /* Print Styles */
     @media print {{
-      .top-navbar, .sidebar-toc, .back-to-top, .copy-btn {{
+      .top-navbar, .sidebar-toc, .back-to-top, .copy-btn, .sidebar-overlay {{
         display: none !important;
       }}
       .main-container {{
@@ -885,7 +950,8 @@ def generate_full_html():
       .sidebar-toc {{
         transform: translateX(-100%);
         transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-        box-shadow: 4px 0 24px rgba(0, 0, 0, 0.5);
+        box-shadow: 8px 0 32px rgba(0, 0, 0, 0.6);
+        z-index: 100;
       }}
 
       .sidebar-toc.open {{
@@ -894,7 +960,7 @@ def generate_full_html():
 
       .main-container {{
         margin-left: 0;
-        padding: 2rem 1.5rem 5rem;
+        padding: 2rem 1.75rem 5rem;
       }}
 
       .menu-toggle-btn {{
@@ -902,18 +968,163 @@ def generate_full_html():
       }}
     }}
 
-    @media (max-width: 640px) {{
+    @media (max-width: 768px) {{
+      :root {{
+        --header-height: 56px;
+      }}
+
+      html {{
+        font-size: 15.5px;
+      }}
+
+      .top-navbar {{
+        padding: 0 0.85rem;
+      }}
+
+      .navbar-brand span {{
+        font-size: 0.95rem;
+      }}
+
+      .navbar-logo {{
+        width: 30px;
+        height: 30px;
+      }}
+
+      /* Hide secondary actions on mobile to prevent navbar overflow */
+      .nav-btn-github, .nav-btn-print {{
+        display: none !important;
+      }}
+
+      .nav-btn {{
+        padding: 0.4rem 0.65rem;
+        font-size: 0.8rem;
+      }}
+
+      .main-container {{
+        padding: 1.25rem 1rem 4rem 1rem;
+        width: 100%;
+        max-width: 100%;
+      }}
+
+      .article-content {{
+        width: 100%;
+        max-width: 100%;
+      }}
+
       .book-hero-banner {{
-        padding: 2rem 1.5rem;
+        padding: 1.5rem 1.15rem;
+        border-radius: 16px;
+        margin-bottom: 2rem;
       }}
+
       .hero-title {{
-        font-size: 1.8rem;
+        font-size: 1.55rem;
+        line-height: 1.25;
+        margin-bottom: 0.6rem;
       }}
+
+      .hero-subtitle {{
+        font-size: 0.92rem;
+        line-height: 1.55;
+        margin-bottom: 1.25rem;
+      }}
+
+      .hero-metadata {{
+        flex-direction: column;
+        gap: 0.45rem;
+        padding-top: 1rem;
+      }}
+
+      .chapter-header-box {{
+        margin-top: 2.75rem;
+        margin-bottom: 1.25rem;
+      }}
+
       .heading-1 {{
-        font-size: 1.8rem;
+        font-size: 1.55rem;
+        line-height: 1.3;
+        margin-top: 2rem;
+        margin-bottom: 1rem;
       }}
+
       .heading-2 {{
-        font-size: 1.4rem;
+        font-size: 1.25rem;
+        line-height: 1.35;
+      }}
+
+      .heading-3 {{
+        font-size: 1.1rem;
+        line-height: 1.4;
+        margin-top: 1.75rem;
+        margin-bottom: 0.75rem;
+      }}
+
+      .heading-4 {{
+        font-size: 0.98rem;
+      }}
+
+      .paragraph {{
+        font-size: 0.98rem;
+        line-height: 1.75;
+        margin-bottom: 1.15rem;
+      }}
+
+      .list-item {{
+        font-size: 0.96rem;
+        line-height: 1.7;
+        margin-bottom: 0.45rem;
+      }}
+
+      .content-list, .content-ordered-list {{
+        margin-left: 1.15rem;
+        margin-bottom: 1.25rem;
+      }}
+
+      .callout {{
+        padding: 0.9rem 1rem;
+        gap: 0.65rem;
+        border-radius: 10px;
+        margin: 1.25rem 0;
+      }}
+
+      .callout-body {{
+        font-size: 0.9rem;
+        line-height: 1.6;
+      }}
+
+      .code-wrapper {{
+        border-radius: 10px;
+        margin: 1.25rem 0;
+      }}
+
+      .code-wrapper pre {{
+        padding: 0.85rem;
+        font-size: 0.76rem;
+      }}
+
+      .back-to-top {{
+        bottom: 1.25rem;
+        right: 1.25rem;
+        width: 38px;
+        height: 38px;
+      }}
+    }}
+
+    @media (max-width: 480px) {{
+      .navbar-brand span {{
+        display: none;
+      }}
+
+      .hero-title {{
+        font-size: 1.35rem;
+      }}
+
+      .btn-text-desktop {{
+        display: none !important;
+      }}
+
+      .btn-text-mobile {{
+        display: inline !important;
       }}
     }}
   </style>
@@ -927,7 +1138,7 @@ def generate_full_html():
 
   <!-- Sticky Top Navigation Bar -->
   <header class="top-navbar">
-    <div style="display: flex; align-items: center; gap: 0.5rem;">
+    <div style="display: flex; align-items: center; gap: 0.5rem; min-width: 0;">
       <button class="menu-toggle-btn" id="sidebarToggle" aria-label="Toggle Daftar Isi">
         <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
       </button>
@@ -939,19 +1150,23 @@ def generate_full_html():
 
     <div class="navbar-actions">
       <a href="https://damdaman.isparmo.com" class="nav-btn nav-btn-primary">
-        <span>🎮 Mainkan Game</span>
+        <span class="btn-text-desktop">🎮 Mainkan Game</span>
+        <span class="btn-text-mobile" style="display: none;">🎮 Main</span>
       </a>
-      <a href="https://github.com/masisparmo/game-damdaman" target="_blank" rel="noopener" class="nav-btn nav-btn-ghost">
+      <a href="https://github.com/masisparmo/game-damdaman" target="_blank" rel="noopener" class="nav-btn nav-btn-ghost nav-btn-github">
         <span>GitHub</span>
       </a>
       <button class="nav-btn nav-btn-ghost" id="themeToggle" title="Ganti Tema">
         <span id="themeIcon">☀️</span>
       </button>
-      <button class="nav-btn nav-btn-ghost" onclick="window.print()" title="Cetak atau Simpan PDF">
+      <button class="nav-btn nav-btn-ghost nav-btn-print" onclick="window.print()" title="Cetak atau Simpan PDF">
         <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 6 2 18 2 18 9"></polyline><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path><rect x="6" y="14" width="12" height="8"></rect></svg>
       </button>
     </div>
   </header>
+
+  <!-- Mobile Sidebar Overlay Backdrop -->
+  <div class="sidebar-overlay" id="sidebarOverlay"></div>
 
   <!-- App Body Layout -->
   <div class="app-layout">
@@ -1016,7 +1231,7 @@ def generate_full_html():
     window.addEventListener('scroll', () => {{
       const scrollTop = document.documentElement.scrollTop || document.body.scrollTop;
       const scrollHeight = document.documentElement.scrollHeight - document.documentElement.clientHeight;
-      const progress = (scrollTop / scrollHeight) * 100;
+      const progress = scrollHeight > 0 ? (scrollTop / scrollHeight) * 100 : 0;
       document.getElementById('progress-bar').style.width = progress + '%';
 
       // Back to top visibility
@@ -1033,20 +1248,39 @@ def generate_full_html():
       window.scrollTo({{ top: 0, behavior: 'smooth' }});
     }});
 
-    // 3. Mobile Sidebar Toggle
+    // 3. Mobile Sidebar Toggle & Overlay
     const sidebar = document.getElementById('sidebar');
     const toggleBtn = document.getElementById('sidebarToggle');
+    const overlay = document.getElementById('sidebarOverlay');
+
+    function toggleSidebar() {{
+      const isOpen = sidebar.classList.toggle('open');
+      if (overlay) {{
+        overlay.classList.toggle('active', isOpen);
+      }}
+      document.body.style.overflow = isOpen ? 'hidden' : '';
+    }}
+
+    function closeSidebar() {{
+      sidebar.classList.remove('open');
+      if (overlay) {{
+        overlay.classList.remove('active');
+      }}
+      document.body.style.overflow = '';
+    }}
+
     if (toggleBtn) {{
-      toggleBtn.addEventListener('click', () => {{
-        sidebar.classList.toggle('open');
-      }});
+      toggleBtn.addEventListener('click', toggleSidebar);
+    }}
+    if (overlay) {{
+      overlay.addEventListener('click', closeSidebar);
     }}
 
     // Close sidebar when clicking any TOC link on mobile
     document.querySelectorAll('.toc-link').forEach(link => {{
       link.addEventListener('click', () => {{
         if (window.innerWidth <= 1024) {{
-          sidebar.classList.remove('open');
+          closeSidebar();
         }}
       }});
     }});
