@@ -52,7 +52,16 @@
   - [7.4. Tema Estetika (Hijau Beludru, Kayu Jati, Batu Obsidian)](#74-tema-estetika-hijau-beludru-kayu-jati-batu-obsidian)
   - [7.5. Aksesibilitas Visual & Glif Ramah Buta Warna](#75-aksesibilitas-visual--glif-ramah-buta-warna)
 - [BAB 8: JURNAL & LOG PERJALANAN PENGEMBANGAN (LIVING CHANGELOG)](#bab-8-jurnal--log-perjalanan-pengembangan-living-changelog)
-- [BAB 9: PANDUAN DEPLOYMENT & PENUTUP](#bab-9-panduan-deployment--penutup)
+- [BAB 9: MASTER PROMPT & BLUEPRINT REKAYASA PROMPT AI](#bab-9-master-prompt--blueprint-rekayasa-prompt-ai)
+  - [9.1. Filosofi & Metodologi Prompt Engineering Game AI](#91-filosofi--metodologi-prompt-engineering-game-ai)
+  - [9.2. Master Prompt 1: Rekayasa Engine, Teori Graf & Aturan Sakral](#92-master-prompt-1-rekayasa-engine-teori-graf--aturan-sakral)
+  - [9.3. Master Prompt 2: Redesign UI/UX Ergonomis Kelas Dunia (Chess.com-Style)](#93-master-prompt-2-redesign-uiux-ergonomis-kelas-dunia-chesscom-style)
+  - [9.4. Master Prompt 3: Hero Avatar Nusantara, Sistem Poin & Leaderboard Global](#94-master-prompt-3-hero-avatar-nusantara-sistem-poin--leaderboard-global)
+  - [9.5. Panduan Replikasi & Tips Eksekusi untuk Pengembang](#95-panduan-replikasi--tips-eksekusi-untuk-pengembang)
+- [BAB 10: PANDUAN DEPLOYMENT & PENUTUP](#bab-10-panduan-deployment--penutup)
+  - [10.1. Menjalankan Proyek Secara Lokal](#101-menjalankan-proyek-secara-lokal)
+  - [10.2. Melakukan Build & Verifikasi Kualitas](#102-melakukan-build--verifikasi-kualitas)
+  - [10.3. Menghubungkan Domain Kustom](#103-menghubungkan-domain-kustom)
 
 ---
 
@@ -461,9 +470,137 @@ Bidak tidak hanya dibedakan berdasarkan warna oranye dan biru, melainkan diperku
 
 ---
 
-## BAB 9: PANDUAN DEPLOYMENT & PENUTUP
+---
 
-### 9.1. Menjalankan Proyek Secara Lokal
+## BAB 9: MASTER PROMPT & BLUEPRINT REKAYASA PROMPT AI
+
+### 9.1. Filosofi & Metodologi Prompt Engineering Game AI
+Dalam pembangunan game strategi tradisional berbasis AI seperti Dam-Daman, model kecerdasan buatan (*Large Language Model* seperti Claude, Gemini, maupun GPT-4) memerlukan instruksi teknis yang sangat terstruktur, kaya konteks, dan minim ambiguitas (*Role, Context, Constraints, Step-by-Step Deliverables*). Menginstruksikan AI hanya dengan kalimat umum seperti *"Buatkan saya game dam-daman"* cenderung menghasilkan kode generik tanpa pemahaman mendalam tentang teori graf, aturan tradisi lokal, atau ergonomi visual modern.
+
+Di bawah ini adalah tiga **Master Prompt** utama yang dirancang dan dieksekusi secara berurutan (*iterative prompt engineering*) dalam membangun aplikasi ini dari nol hingga taraf produksi kelas dunia:
+
+---
+
+### 9.2. Master Prompt 1: Rekayasa Engine, Teori Graf & Aturan Sakral
+Master prompt ini digunakan pada fase fondasi awal untuk menginstruksikan AI membangun inti logika permainan (*Game Engine Core*), pemodelan matematika graf, validasi langkah bidak, dan kecerdasan buatan minimax:
+
+````markdown
+Role: Senior Game Architect & Algorithmic Ethnomathematician.
+Context:
+Bangun game web interaktif papan tradisional Indonesia "Dam-Daman" menggunakan React, TypeScript, Tailwind CSS, dan SVG Rendering. 
+Game ini harus mengimplementasikan landasan ilmiah Etnomatematika Teori Graf berdasarkan studi autentik tradisi Jawa/Pasuruan:
+
+1. Spesifikasi Papan Graf (Graph Theory Modeling):
+   - Graf planar terdiri dari tepat 37 simpul (vertices) dan 76 garis lintasan (edges).
+   - Grid Utama: bujur sangkar 5x5 (25 simpul) berkoordinat reguler dengan garis horizontal, vertikal, dan diagonal penuh.
+   - Dua Gunungan / Dapur: masing-masing berbentuk segitiga dengan 6 simpul di sisi utara (Player 2) dan sisi selatan (Player 1).
+   - Simpul Puncak Gunungan (Triangle Apex) hanya memiliki 2 derajat keterhubungan (derajat keluar/masuk terbatas).
+   - Simpul sentral dan persimpangan diagonal memiliki derajat keterhubungan tinggi (hingga derajat 8).
+
+2. Konfigurasi Awal Permainan (Initial Board Setup):
+   - Pemain 1 (Bidak Biru / Bawah): 16 bidak menempati baris 1-2 dan 6 simpul gunungan selatan.
+   - Pemain 2 (Bidak Oranye / Atas): 16 bidak menempati baris 4-5 dan 6 simpul gunungan utara.
+   - Baris tengah (baris ke-3) dikosongkan (hanya 5 simpul kosong sebagai ruang manuver awal).
+
+3. Penegakan Aturan Permainan & Mekanisme Validasi (Rule Engine):
+   - Langkah Biasa: Bidak hanya boleh melangkah ke simpul tetangga kosong yang terhubung langsung oleh garis lintasan (jarak graf = 1).
+   - Melompati & Memakan: Jika terdapat bidak lawan di simpul tetangga dan simpul di belakangnya segaris lurus dalam keadaan kosong, bidak wajib melompati dan memakan bidak lawan tersebut.
+   - Lompatan Beruntun (Multi-Jump): Jika setelah mendarat masih terdapat peluang memakan lanjutan, giliran bidak belum berakhir dan wajib menyelesaikan rangkaian lompatan.
+   - Aturan Sakral "DAM Ora Mangan" (Pinalti DAM): Jika seorang pemain memiliki kesempatan memakan bidak lawan tetapi sengaja atau lalai melakukan langkah biasa, pemain lawan berhak mengeklaim "DAM!" dan mengambil 3 bidak pemain tersebut secara sepihak sebagai pinalti.
+   - Promosi Bidak Raja (King Promotion): Bidak yang berhasil mendarat di puncak segitiga gunungan lawan dipromosikan menjadi Bidak Raja dengan kemampuan bergerak bebas meluncur sepanjang garis lurus tanpa batas jarak selama tidak terhalang.
+
+4. Mesin Kecerdasan Buatan (AI Engine):
+   - Implementasikan 4 tingkat kesulitan:
+     a. Mudah (Easy): Algoritma greedy acak dengan prioritas memakan.
+     b. Sedang (Medium): Minimax kedalaman 3 ply dengan pemangkasan Alpha-Beta Pruning.
+     c. Sulit (Hard): Minimax kedalaman 5 ply dengan evaluasi posisi berbobot simpul hub strategis.
+     d. Dewa (Master): Quiescence Search pada langkah pemakanan untuk mengeliminasi Horizon Effect serta pembobotan mobilitas graf.
+
+5. Efek Suara Prosedural Sintetis:
+   - Manfaatkan Web Audio API murni (AudioContext) untuk mensintesis gelombang audio ketukan kayu (wood thud) dan efek pinalti tanpa dependensi aset file audio eksternal.
+````
+
+---
+
+### 9.3. Master Prompt 2: Redesign UI/UX Ergonomis Kelas Dunia (Chess.com-Style)
+Master prompt ini digunakan untuk merombak antarmuka dari prototipe fungsional menjadi antarmuka elegan, responsif, dan ergonomis ala aplikasi catur modern:
+
+````markdown
+Role: Principal Product Designer & Lead Frontend Engineer (Chess.com & Lichess Design System Specialist).
+Objective:
+Redesign seluruh antarmuka Game Dam-Daman menjadi aplikasi bergengsi, modern, bertaraf internasional, dengan tema kemewahan beludru zamrud dan batu obsidian ("Velvet Emerald & Obsidian Luxury").
+
+Key Design & Layout Requirements:
+1. "Sandwich Layout" Architecture:
+   - Opponent Bar (Atas): Avatar hero lawan, nama, status sisa bidak aktif, indikator giliran bercahaya, dan jam hitung mundur catur.
+   - Interactive Game Board (Tengah): Papan SVG adaptif bertekstur kain beludru zamrud mendalam (#064e3b / #022c22) dengan garis lintasan beraksen keemasan (amber-400/500). Highlight langkah legal berupa titik cincin glow lembut, serta efek animasi bidak terpilih.
+   - Player Bar (Bawah): Avatar hero pemain, nama profil kustom, status sisa bidak, dan jam catur.
+   - Quick Action Bar (Paling Bawah): Bilah aksi ergonomis yang pas dijangkau ibu jari: [Mode Laga / Tingkat AI], [Undo], [Bantuan / Hints], [Reset / Laga Baru].
+
+2. Zero-Scroll Viewport Ergonomics:
+   - Pada layar smartphone portrait (lebar 360px hingga 430px), seluruh elemen antarmuka harus tampil proporsional dalam satu layar 100dvh tanpa scrollbar vertikal sama sekali.
+   - Papan permainan harus mengisi lebar layar secara optimal dengan bantalan pengaman (safe padding) agar tidak tertabrak notch atau tombol sistem.
+
+3. Dual Language System (ID / EN):
+   - Sediakan tombol alih bahasa instan dengan label ringkas murni "ID" dan "EN".
+   - DILARANG menggunakan emoji bendera (🇮🇩 / 🇬🇧) untuk menghindari bug rendering font sistem mobile yang menampilkan huruf ganda (misal: "ID ID" atau "GB EN").
+   - Seluruh teks panduan, label tombol, dialog konfirmasi, dan status permainan harus mendukung dwibahasa secara lengkap.
+
+4. Eliminasi Jargon Teknis:
+   - Hapus seluruh istilah teknis IT/database (seperti IndexedDB, Supabase, WebSocket, Vertex, Edge) dari antarmuka pengguna.
+   - Gunakan bahasa awam yang ramah: "Tersimpan di Perangkat Ini", "Tersinkronisasi Online", "Titik Temu Garis", dan "Garis Lintasan".
+````
+
+---
+
+### 9.4. Master Prompt 3: Hero Avatar Nusantara, Sistem Poin & Leaderboard Global
+Master prompt ini digunakan untuk mengintegrasikan identitas budaya nusantara ke dalam profil pemain, serta membangun arsitektur persistensi data offline-first dengan sinkronisasi cloud global:
+
+````markdown
+Role: Fullstack Cloud Architect & Game Progression Specialist.
+Objective:
+Rancang dan implementasikan fitur Personalisasi Profil Pemain dengan Karakter Budaya Nusantara serta Sistem Akumulasi Poin & Peringkat Global.
+
+Detailed Specifications:
+1. Galeri Hero Avatar Budaya Nusantara:
+   - Sediakan modal pemilihan karakter pahlawan berisi 16 ikon ilustrasi khas Nusantara (Pak Haji, Bu Haji, Petani Pria & Wanita, Anak Tradisional, Pemuda Adat, dll).
+   - Simpan avatar dan nama profil pemain di memori lokal agar persisten antar-sesi bermain.
+
+2. Aturan Perhitungan Skor & Nilai Kemenangan (Scoring Rules):
+   - Menang vs AI Tingkat Mudah (Easy): +1 Poin.
+   - Menang vs AI Tingkat Sedang (Medium): +2 Poin.
+   - Menang vs AI Tingkat Sulit (Hard): +3 Poin.
+   - Menang vs AI Tingkat Dewa (Master): +5 Poin.
+   - Menang vs Pemain Lain (Offline PvP maupun Duel Online): +2 Poin.
+   - Nilai kemenangan diakumulasikan secara kumulatif untuk menentukan peringkat pemain global.
+
+3. Arsitektur Sinkronisasi Ganda (Offline-First + Cloud Database):
+   - Penyimpanan Lokal (IndexedDB): Menyimpan data profil, riwayat pertandingan, akumulasi poin, serta cache papan peringkat agar aplikasi berfungsi 100% saat offline.
+   - Database Cloud (Supabase): Skema tabel `player_rankings` dengan kolom `player_id`, `player_name`, `player_avatar`, `total_points`, rincian poin per tingkat kesulitan, dan indeks performa tinggi `idx_player_rankings_points`.
+   - Sinkronisasi Otomatis: Saat laga usai dan koneksi internet tersedia, skor lokal otomatis di-upsert ke cloud database secara mulus di latar belakang tanpa mengganggu jalannya permainan.
+
+4. Antarmuka Leaderboard & Statistik:
+   - Podium Visual Juara: Menampilkan 3 peringkat teratas dengan piala Emas (Juara 1), Perak (Juara 2), dan Perunggu (Juara 3).
+   - Tabel Peringkat Lengkap: Nomor urut, avatar hero, nama pemain, total kemenangan, persentase menang (win rate), dan total akumulasi poin.
+   - Kartu Lengket "Peringkat Saya": Menampilkan posisi peringkat pemain saat ini di baris bawah tabel.
+   - Tab Statistik & Aturan Poin: Menampilkan matriks perolehan poin per tingkat dan panduan transparansi skor.
+````
+
+---
+
+### 9.5. Panduan Replikasi & Tips Eksekusi untuk Pengembang
+Bagi Anda yang ingin mereplikasi pembuatan game strategi berbasis AI menggunakan asisten cerdas seperti Claude, Gemini, atau GPT, berikut tips krusial agar hasilnya optimal:
+
+1. **Iterasi Modular (Iterative Prompting):** Jangan meminta seluruh sistem dibangun dalam satu prompt raksasa. Eksekusi Engine terlebih dahulu (Master Prompt 1), uji coba mekanismenya, lalu poles antarmukanya (Master Prompt 2), kemudian lengkapi dengan sistem penyimpanan & profil (Master Prompt 3).
+2. **Berikan Definisi Topologi Eksplisit:** Selalu sertakan pemetaan koordinat (x, y) dan daftar ketetanggaan (*adjacency list*) eksplisit dalam prompt agar AI tidak berhalusinasi menyambungkan garis lintasan yang keliru.
+3. **Simulasi Skenario Uji Kasus Khusus:** Mintalah AI menyertakan skenario pengujian unit (*test cases*) untuk aturan pinalti *DAM Ora Mangan*, multi-jump berantai, dan promosi bidak raja guna memastikan tidak ada celah logika (*edge case bugs*).
+4. **Verifikasi Visual Browser Otomatis:** Lakukan audit visual responsivitas pada resolusi mobile (360–430 piksel) untuk memastikan tata letak *Zero-Scroll* terjaga sempurna.
+
+---
+
+## BAB 10: PANDUAN DEPLOYMENT & PENUTUP
+
+### 10.1. Menjalankan Proyek Secara Lokal
 Pastikan Node.js telah terpasang di komputer Anda. Buka terminal di direktori proyek:
 ```bash
 # 1. Pasang dependensi
@@ -475,7 +612,7 @@ npm run dev
 # 3. Buka di peramban: http://localhost:3000
 ```
 
-### 9.2. Melakukan Build & Verifikasi Kualitas
+### 10.2. Melakukan Build & Verifikasi Kualitas
 ```bash
 # Pemeriksaan tipe data TypeScript
 npm run lint
@@ -487,7 +624,7 @@ npm run build
 npm run preview
 ```
 
-### 9.3. Menghubungkan Domain Kustom
+### 10.3. Menghubungkan Domain Kustom
 Aplikasi ini dihosting secara otomatis pada platform Cloudflare Pages / Vercel / GitHub Pages dengan domain kustom:
 * Buat berkas `public/CNAME` berisi nama domain Anda: `damdaman.isparmo.com`.
 * Atur DNS CNAME Record di penyedia domain Anda mengarah ke server hosting.
