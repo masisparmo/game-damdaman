@@ -64,6 +64,7 @@ import {
 } from './game/db';
 import { initMasterBrain, learnFromFinishedMatch } from './game/aiMemory';
 import { onlineMatch, OnlineMatchConfig } from './game/onlineMatch';
+import { getHeroById, DEFAULT_HERO_ID, DEFAULT_P2_HERO_ID } from './game/heroes';
 import {
   recordMatchPointsAndStats,
   getLocalPlayerStats,
