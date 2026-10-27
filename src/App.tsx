@@ -48,12 +48,14 @@ import {
   Gamepad2,
   RefreshCw,
   Sparkles,
+  Trophy,
 } from 'lucide-react';
 import { Language, translations, formatMoveDescription } from './i18n';
 import { ModalPlayerName } from './components/ModalPlayerName';
 import { ModalGameHistory } from './components/ModalGameHistory';
 import { ModalOnlineLobby } from './components/ModalOnlineLobby';
 import { ModalGameMode } from './components/ModalGameMode';
+import { ModalLeaderboard } from './components/ModalLeaderboard';
 import {
   saveGameHistory,
   formatDDMMYYYY,
@@ -62,6 +64,8 @@ import {
 } from './game/db';
 import { initMasterBrain, learnFromFinishedMatch } from './game/aiMemory';
 import { onlineMatch, OnlineMatchConfig } from './game/onlineMatch';
+import { getHeroById, DEFAULT_HERO_ID, DEFAULT_P2_HERO_ID } from './game/heroes';
+import { recordMatchPointsAndStats } from './game/leaderboard';
 
 export default function App() {
   // Game State
@@ -95,15 +99,29 @@ export default function App() {
   const [showGameOver, setShowGameOver] = useState<boolean>(false);
   const [showHistoryDrawer, setShowHistoryDrawer] = useState<boolean>(false);
   const [showGameModeModal, setShowGameModeModal] = useState<boolean>(false);
+  const [showLeaderboard, setShowLeaderboard] = useState<boolean>(false);
+  const [lastEarnedPoints, setLastEarnedPoints] = useState<number>(0);
 
-  // Player Name State
+  // Player Name & Hero Avatar State
   const [playerName, setPlayerName] = useState<string>(() => {
     try {
       return localStorage.getItem('damdaman_player_name') || '';
     } catch {}
     return '';
   });
+  const [playerAvatar, setPlayerAvatar] = useState<string>(() => {
+    try {
+      return localStorage.getItem('damdaman_player_avatar') || DEFAULT_HERO_ID;
+    } catch {}
+    return DEFAULT_HERO_ID;
+  });
   const [p2CustomName, setP2CustomName] = useState<string>('');
+  const [p2Avatar, setP2Avatar] = useState<string>(() => {
+    try {
+      return localStorage.getItem('damdaman_p2_avatar') || DEFAULT_P2_HERO_ID;
+    } catch {}
+    return DEFAULT_P2_HERO_ID;
+  });
 
   // Match Duration & IndexedDB save tracker
   const gameStartTimeRef = useRef<number>(Date.now());
@@ -242,6 +260,17 @@ export default function App() {
           timestamp: now.getTime(),
         }).catch((err) => console.error('Failed saving game history to IndexedDB:', err));
 
+        // Record points and player stats for Global Ranking (Supabase & IndexedDB)
+        recordMatchPointsAndStats(
+          result,
+          gameMode,
+          aiDifficulty,
+          p1Name,
+          playerAvatar
+        ).then(({ pointsEarned }) => {
+          setLastEarnedPoints(pointsEarned);
+        }).catch((err) => console.warn('Could not record match stats:', err));
+
         // Continuous Learning: Record and learn from this match
         if (gameMode === 'ai') {
           learnFromFinishedMatch(gameState, gameState.winner);
@@ -267,12 +296,22 @@ export default function App() {
     }
   };
 
-  const handleSaveName = (p1: string, p2?: string) => {
+  const handleSaveProfile = (p1: string, p1Hero: string, p2?: string, p2Hero?: string) => {
     setPlayerName(p1);
+    setPlayerAvatar(p1Hero);
     try {
       localStorage.setItem('damdaman_player_name', p1);
+      localStorage.setItem('damdaman_player_avatar', p1Hero);
     } catch {}
-    if (p2) setP2CustomName(p2);
+    if (p2) {
+      setP2CustomName(p2);
+    }
+    if (p2Hero) {
+      setP2Avatar(p2Hero);
+      try {
+        localStorage.setItem('damdaman_p2_avatar', p2Hero);
+      } catch {}
+    }
     setShowNameModal(false);
     gameStartTimeRef.current = Date.now();
   };
@@ -479,6 +518,7 @@ export default function App() {
   const handleRestart = (config = rulesConfig, isRemote = false) => {
     aiBusyRef.current = false;
     hasSavedToDbRef.current = false;
+    setLastEarnedPoints(0);
     gameStartTimeRef.current = Date.now();
     const fresh = createInitialState(config);
     setGameState(fresh);
@@ -546,6 +586,23 @@ export default function App() {
 
           {/* Quick Action Utilities */}
           <div className="flex items-center gap-1 sm:gap-1.5">
+            {/* Player Profile & Hero Avatar Button */}
+            <button
+              onClick={() => setShowNameModal(true)}
+              className="flex items-center gap-1.5 px-2 py-1 rounded-xl bg-stone-800/80 hover:bg-stone-700 active:scale-95 text-xs font-semibold text-stone-200 border border-stone-700/60 transition group"
+              title={t.playerProfile}
+              aria-label="Profile"
+            >
+              <img
+                src={getHeroById(playerAvatar).image}
+                alt="Hero"
+                className="w-4 h-4 rounded-md object-cover ring-1 ring-amber-500/40"
+              />
+              <span className="text-[11px] max-w-[65px] sm:max-w-[80px] truncate hidden min-[360px]:inline">
+                {playerName || (lang === 'en' ? 'Profile' : 'Profil')}
+              </span>
+            </button>
+
             {/* Language Switcher */}
             <button
               onClick={() => setLang(lang === 'id' ? 'en' : 'id')}
@@ -589,6 +646,16 @@ export default function App() {
               <History size={15} />
             </button>
 
+            {/* Global Leaderboard & Rankings */}
+            <button
+              onClick={() => setShowLeaderboard(true)}
+              className="p-1.5 rounded-xl bg-stone-800/80 hover:bg-stone-700 active:scale-95 text-yellow-400 hover:text-yellow-300 transition border border-stone-700/60"
+              title={t.leaderboardTitle}
+              aria-label="Leaderboard & Rankings"
+            >
+              <Trophy size={15} />
+            </button>
+
             {/* Ethnomathematics */}
             <button
               onClick={() => setShowEtnomatematika(true)}
@@ -624,25 +691,42 @@ export default function App() {
         >
           {/* Opponent Info */}
           <div className="flex items-center gap-2.5">
-            <div
-              className={`w-8 h-8 rounded-full flex items-center justify-center border-2 shadow transition-all shrink-0 ${
-                gameMode === 'ai' && aiDifficulty === 'master'
-                  ? 'bg-gradient-to-br from-amber-500 via-yellow-600 to-amber-700 border-amber-300 ring-2 ring-amber-500/40 shadow-amber-950/50'
-                  : 'bg-gradient-to-br from-sky-500 to-blue-700 border-sky-300'
-              }`}
-            >
-              <span className="font-bold text-[11px] text-white flex items-center">
-                {gameMode === 'ai' ? (
-                  aiDifficulty === 'master' ? (
-                    <Crown size={15} className="text-stone-950 fill-amber-300" />
+            {gameMode === 'pvp' ? (
+              <button
+                onClick={() => setShowNameModal(true)}
+                className="relative group transition-transform active:scale-95 shrink-0"
+                title={lang === 'en' ? 'Edit player profile & hero' : 'Ubah profil & hero pemain'}
+              >
+                <img
+                  src={getHeroById(p2Avatar).image}
+                  alt={getHeroById(p2Avatar).nameId}
+                  className="w-8 h-8 sm:w-9 sm:h-9 rounded-full object-cover border-2 border-sky-400 shadow-md ring-2 ring-sky-500/30 group-hover:ring-sky-400 transition"
+                />
+                <span className="absolute -bottom-1 -right-1 px-1 rounded-full bg-sky-600 text-[9px] font-black text-white border border-stone-900 leading-none py-0.5">
+                  P2
+                </span>
+              </button>
+            ) : (
+              <div
+                className={`w-8 h-8 sm:w-9 sm:h-9 rounded-full flex items-center justify-center border-2 shadow transition-all shrink-0 ${
+                  gameMode === 'ai' && aiDifficulty === 'master'
+                    ? 'bg-gradient-to-br from-amber-500 via-yellow-600 to-amber-700 border-amber-300 ring-2 ring-amber-500/40 shadow-amber-950/50'
+                    : 'bg-gradient-to-br from-sky-500 to-blue-700 border-sky-300'
+                }`}
+              >
+                <span className="font-bold text-[11px] text-white flex items-center">
+                  {gameMode === 'ai' ? (
+                    aiDifficulty === 'master' ? (
+                      <Crown size={15} className="text-stone-950 fill-amber-300" />
+                    ) : (
+                      'AI'
+                    )
                   ) : (
-                    'AI'
-                  )
-                ) : (
-                  'P2'
-                )}
-              </span>
-            </div>
+                    'P2'
+                  )}
+                </span>
+              </div>
+            )}
 
             <div>
               <div className="flex items-center gap-1.5">
@@ -775,9 +859,20 @@ export default function App() {
         >
           {/* Player 1 Info */}
           <div className="flex items-center gap-2.5">
-            <div className="w-8 h-8 rounded-full bg-gradient-to-br from-orange-500 to-amber-700 flex items-center justify-center border-2 border-orange-300 shadow shrink-0">
-              <span className="font-bold text-[11px] text-white">P1</span>
-            </div>
+            <button
+              onClick={() => setShowNameModal(true)}
+              className="relative group transition-transform active:scale-95 shrink-0"
+              title={lang === 'en' ? 'Edit player profile & hero' : 'Ubah profil & hero pemain'}
+            >
+              <img
+                src={getHeroById(playerAvatar).image}
+                alt={getHeroById(playerAvatar).nameId}
+                className="w-8 h-8 sm:w-9 sm:h-9 rounded-full object-cover border-2 border-orange-400 shadow-md ring-2 ring-orange-500/30 group-hover:ring-orange-400 transition"
+              />
+              <span className="absolute -bottom-1 -right-1 px-1 rounded-full bg-orange-600 text-[9px] font-black text-white border border-stone-900 leading-none py-0.5">
+                P1
+              </span>
+            </button>
 
             <div>
               <div className="flex items-center gap-1.5">
@@ -790,13 +885,17 @@ export default function App() {
                 </span>
                 <button
                   onClick={() => setShowNameModal(true)}
-                  className="p-0.5 text-stone-400 hover:text-amber-300 rounded transition"
-                  title={lang === 'en' ? 'Edit player name' : 'Ubah nama pemain'}
+                  className="p-1 text-stone-400 hover:text-amber-300 rounded-lg hover:bg-stone-800/60 transition"
+                  title={lang === 'en' ? 'Edit player profile & hero' : 'Ubah profil & hero pemain'}
                 >
-                  <User size={11} />
+                  <User size={12} />
                 </button>
               </div>
               <div className="flex items-center gap-1.5 mt-0.5">
+                <span className="text-[10px] text-amber-300/90 font-medium">
+                  {lang === 'en' ? getHeroById(playerAvatar).nameEn : getHeroById(playerAvatar).nameId}
+                </span>
+                <span className="text-[10px] text-stone-600">•</span>
                 <span className="text-[10px] text-stone-400 font-medium">
                   {p1Count} {t.pieces}
                 </span>
@@ -989,10 +1088,13 @@ export default function App() {
       />
       <ModalPlayerName
         isOpen={showNameModal}
-        onSaveName={handleSaveName}
+        onClose={() => setShowNameModal(false)}
+        onSaveProfile={handleSaveProfile}
         gameMode={gameMode}
         currentP1Name={playerName}
+        currentP1Avatar={playerAvatar}
         currentP2Name={p2CustomName}
+        currentP2Avatar={p2Avatar}
         lang={lang}
         onChangeLang={setLang}
       />
@@ -1033,6 +1135,15 @@ export default function App() {
             ? `AI (${t[aiDifficulty]})`
             : (p2CustomName || t.player2)
         }
+        earnedPoints={lastEarnedPoints}
+        onOpenLeaderboard={() => setShowLeaderboard(true)}
+      />
+      <ModalLeaderboard
+        isOpen={showLeaderboard}
+        onClose={() => setShowLeaderboard(false)}
+        playerName={playerName || (lang === 'en' ? 'Player 1' : 'Pemain 1')}
+        playerAvatar={playerAvatar}
+        lang={lang}
       />
       <ModalOnlineLobby
         isOpen={showOnlineLobby}

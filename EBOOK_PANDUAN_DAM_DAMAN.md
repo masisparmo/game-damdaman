@@ -411,6 +411,54 @@ Bidak tidak hanya dibedakan berdasarkan warna oranye dan biru, melainkan diperku
   * Seluruh aset gambar termuat dengan status HTTP 200 tanpa galat.
   * Tampilan *header*, modal panduan, dan favicon peramban terlihat tajam, proporsional, dan sangat profesional di semua ukuran layar.
 
+### 📅 Tahap 7 — Fitur Kustomisasi Profil Pemain & Galeri 16 Hero Karakter Nusantara *(Selesai & Terverifikasi)*
+* **Latar Belakang & Permintaan Pengguna:**
+  * Pemain menginginkan fitur untuk mengubah nama serta memilih ikon karakter pahlawan (*hero icon*) dari galeri 16 karakter budaya nusantara yang autentik.
+* **Aset Hero Karakter yang Diintegrasikan (`public/heroes/`):**
+  * `anak-laki-laki.png`, `anak-perempuan.png`, `anak-pria.png`, `anak-wanita.png`
+  * `bu-haji.png`, `pak-haji.png`
+  * `petani-pria-muda.png`, `petani-pria.png`, `petani-wanita-muda.png`, `petani-wanita.png`
+  * `preman-pria-marah.png`, `preman-wanita-marah.png` (Pendekar)
+  * `pria-batik.png`, `pria-dewasa.png`, `wanita-dewasa.png`, `wanita-kebaya.png`
+* **Implementasi Arsitektur & Antarmuka:**
+  * **Modul Hero (`src/game/heroes.ts`):** Mengatur metadata dwibahasa (ID & EN) untuk ke-16 karakter beserta gambar dan fungsi pencarian avatar.
+  * **Jendela Kustomisasi Profil (`src/components/ModalPlayerName.tsx`):**
+    - Pratinjau avatar hero berukuran besar dengan cincin aksen keemasan menyala.
+    - Input nama pemain yang responsif dengan pembatas 20 karakter.
+    - Galeri grid 16 karakter dengan efek sorot sentuh, centang aktif, dan label nama.
+    - Pengaturan mandiri untuk Pemain 1 dan Pemain 2 pada mode 2 Pemain (PvP).
+    - Tombol silang (`X`) untuk menutup jendela kapan saja saat bermain.
+  * **Bilah Pemain 1 & Bilah Lawan (`src/App.tsx`):**
+    - Mengganti lingkaran polos "P1" dengan foto avatar hero pilihan pemain lengkap dengan lencana nomor dan nama hero.
+    - Mengklik avatar pada bilah pemain atau tombol profil di bilah atas akan langsung memunculkan jendela profil secara instan.
+* **Hasil Pengujian Komprehensif:**
+  * Uji kompilasi TypeScript dan bundel Vite lulus dengan status sukses.
+  * Uji browser aktual membuktikan perubahan nama dan pemilihan avatar (seperti *Pak Haji*, *Pria Batik*, dll.) langsung tersimpan ke memori perangkat dan langsung merefleksikan perubahan pada seluruh bilah permainan tanpa perlu memuat ulang peramban.
+
+### 📅 Tahap 8 — Sistem Statistik & Papan Peringkat Global (Database Supabase & Sinkronisasi IndexedDB) *(Selesai & Terverifikasi)*
+* **Latar Belakang & Permintaan Pengguna:**
+  * Diperlukan sistem akumulasi nilai dan perangkingan pemain secara global yang tersimpan di cloud database (Supabase) dan tersinkronisasi offline di memori lokal peramban (IndexedDB).
+* **Ketentuan Resmi Perhitungan Nilai (Scoring Rules):**
+  * **Menang vs AI Tingkat Mudah (Easy):** Mendapatkan **+1 Poin**.
+  * **Menang vs AI Tingkat Sedang (Medium):** Mendapatkan **+2 Poin**.
+  * **Menang vs AI Tingkat Sulit (Hard):** Mendapatkan **+3 Poin**.
+  * **Menang vs AI Tingkat Dewa (Master 👑):** Mendapatkan **+5 Poin**.
+  * **Menang vs Pemain Lain (Offline PvP maupun Duel Online):** Mendapatkan **+2 Poin**.
+  * Nilai kemenangan ini diakumulasikan secara kumulatif untuk menentukan peringkat pemain global.
+* **Implementasi Arsitektur Database & Sinkronisasi:**
+  * **Skema Supabase Cloud (`supabase_schema.sql`):** Tabel `public.player_rankings` dengan kolom `player_id`, `player_name`, `player_avatar`, `total_points`, rincian kemenangan tiap tingkat, `win_rate`, dan indeks performa tinggi `idx_player_rankings_points`.
+  * **Mesin Sinkronisasi Lokal & Cloud (`src/game/leaderboard.ts`):** 
+    - Mendukung skema IndexedDB Versi 2 (`DamDamanDB` -> store `player_stats` dan `leaderboard_cache`).
+    - Menyimpan skor secara offline-first seketika saat laga selesai, lalu mengunggahnya (*upsert*) ke database Supabase secara otomatis saat koneksi aktif.
+* **Antarmuka Pengguna (`src/components/ModalLeaderboard.tsx`):**
+  * **Tab Peringkat Global:** Menampilkan podium Top 3 (Emas 🥇, Perak 🥈, Perunggu 🥉), tabel seluruh pemain, lencana pahlawan, poin, rasio menang, dan kartu lengket *"Peringkat Saya"*.
+  * **Tab Statistik Pribadi:** Menampilkan ringkasan metrik (Total Poin, Pertandingan, Menang, Rasio Menang %) serta matriks rincian poin per tingkat kesulitan.
+  * **Tab Ketentuan Nilai:** Panduan transparan sistem poin ramah pengguna tanpa istilah teknis.
+  * **Integrasi Modal Selesai Laga (`ModalGameOver.tsx`):** Menampilkan animasi perolehan poin berkilau (contoh: `+5 Poin Peringkat Global!`) dan tombol langsung menuju papan peringkat.
+* **Hasil Pengujian Komprehensif:**
+  * Pengujian build & lint sukses 100%.
+  * Pengujian browser subagent memastikan podium juara, tabel peringkat, matriks statistik, dan ketentuan poin termuat cepat dan responsif di desktop maupun mobile.
+
 ---
 
 ## BAB 9: PANDUAN DEPLOYMENT & PENUTUP

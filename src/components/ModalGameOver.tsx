@@ -8,7 +8,7 @@
 
 import React, { useEffect } from 'react';
 import confetti from 'canvas-confetti';
-import { Trophy, RefreshCw, Eye, Award } from 'lucide-react';
+import { Trophy, RefreshCw, Eye, Award, Sparkles } from 'lucide-react';
 import { GameState } from '../game/rulesEngine';
 import { Language, translations } from '../i18n';
 
@@ -21,6 +21,8 @@ interface ModalGameOverProps {
   lang?: Language;
   playerName?: string;
   opponentName?: string;
+  earnedPoints?: number;
+  onOpenLeaderboard?: () => void;
 }
 
 export const ModalGameOver: React.FC<ModalGameOverProps> = ({
@@ -32,6 +34,8 @@ export const ModalGameOver: React.FC<ModalGameOverProps> = ({
   lang = 'id',
   playerName,
   opponentName,
+  earnedPoints,
+  onOpenLeaderboard,
 }) => {
   useEffect(() => {
     if (isOpen && gameState.gameStatus === 'won') {
@@ -109,6 +113,14 @@ export const ModalGameOver: React.FC<ModalGameOverProps> = ({
           <p className="text-xs text-stone-400 max-w-sm mx-auto leading-relaxed">
             {reason}
           </p>
+          {earnedPoints !== undefined && earnedPoints > 0 && (
+            <div className="pt-1">
+              <div className="py-1 px-3 mx-auto w-fit rounded-full bg-gradient-to-r from-yellow-500/20 via-amber-500/30 to-yellow-500/20 border border-yellow-500/50 flex items-center gap-1.5 text-yellow-300 text-xs font-black shadow-lg shadow-amber-950/40 animate-pulse">
+                <Sparkles size={14} className="text-yellow-400" />
+                <span>{t.ptsEarnedBadge(earnedPoints)}</span>
+              </div>
+            </div>
+          )}
         </div>
 
         {/* Stats Summary */}
@@ -138,22 +150,34 @@ export const ModalGameOver: React.FC<ModalGameOverProps> = ({
         </div>
 
         {/* Action Buttons */}
-        <div className="flex flex-col sm:flex-row gap-2 pt-2">
-          <button
-            onClick={onPlayAgain}
-            className="flex-1 flex items-center justify-center gap-2 px-5 py-3 rounded-xl bg-amber-600 hover:bg-amber-500 active:scale-95 text-white font-bold text-sm shadow-lg shadow-amber-900/30 transition"
-          >
-            <RefreshCw size={16} />
-            {t.playAgain}
-          </button>
-          
-          <button
-            onClick={onClose}
-            className="flex items-center justify-center gap-2 px-4 py-3 rounded-xl bg-stone-800 hover:bg-stone-700 active:scale-95 text-stone-300 font-semibold text-xs border border-stone-700 transition"
-          >
-            <Eye size={15} />
-            {lang === 'en' ? 'Inspect Board' : 'Lihat Papan'}
-          </button>
+        <div className="space-y-2 pt-2">
+          {onOpenLeaderboard && (
+            <button
+              onClick={onOpenLeaderboard}
+              className="w-full flex items-center justify-center gap-2 py-2.5 px-4 rounded-xl bg-gradient-to-r from-amber-900/40 via-yellow-950/50 to-amber-900/40 hover:bg-stone-800 active:scale-95 text-amber-300 font-bold text-xs border border-amber-600/40 shadow transition"
+            >
+              <Trophy size={14} className="text-yellow-400" />
+              <span>{t.leaderboardTitle}</span>
+            </button>
+          )}
+
+          <div className="flex flex-col sm:flex-row gap-2">
+            <button
+              onClick={onPlayAgain}
+              className="flex-1 flex items-center justify-center gap-2 px-5 py-3 rounded-xl bg-amber-600 hover:bg-amber-500 active:scale-95 text-white font-bold text-sm shadow-lg shadow-amber-900/30 transition"
+            >
+              <RefreshCw size={16} />
+              {t.playAgain}
+            </button>
+            
+            <button
+              onClick={onClose}
+              className="flex items-center justify-center gap-2 px-4 py-3 rounded-xl bg-stone-800 hover:bg-stone-700 active:scale-95 text-stone-300 font-semibold text-xs border border-stone-700 transition"
+            >
+              <Eye size={15} />
+              {lang === 'en' ? 'Inspect Board' : 'Lihat Papan'}
+            </button>
+          </div>
         </div>
       </div>
     </div>
