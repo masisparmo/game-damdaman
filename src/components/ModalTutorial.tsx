@@ -8,7 +8,7 @@
  */
 
 import React, { useState, useEffect } from 'react';
-import { X, Check, ChevronLeft, ChevronRight, BookOpen, ShieldAlert, Trophy, Compass, Flame } from 'lucide-react';
+import { X, Check, ChevronLeft, ChevronRight } from 'lucide-react';
 import { Language, translations, getTutorialSlides } from '../i18n';
 
 interface ModalTutorialProps {
@@ -27,14 +27,6 @@ export const ModalTutorial: React.FC<ModalTutorialProps> = ({
   const [activeTab, setActiveTab] = useState<number>(0);
   const t = translations[lang];
   const slidesData = getTutorialSlides(lang);
-
-  const icons = [
-    <Compass key="1" className="w-5 h-5 text-amber-400" />,
-    <BookOpen key="2" className="w-5 h-5 text-emerald-400" />,
-    <Flame key="3" className="w-5 h-5 text-orange-400" />,
-    <ShieldAlert key="4" className="w-5 h-5 text-rose-400" />,
-    <Trophy key="5" className="w-5 h-5 text-yellow-400" />,
-  ];
 
   useEffect(() => {
     if (!isOpen) return;
@@ -67,9 +59,11 @@ export const ModalTutorial: React.FC<ModalTutorialProps> = ({
         {/* Header with Title, Language Switcher, and Close Button */}
         <div className="flex items-center justify-between px-4 sm:px-5 py-3 border-b border-stone-800 bg-stone-950/70 gap-2">
           <div className="flex items-center gap-2 min-w-0">
-            <div className="p-1.5 rounded-xl bg-stone-800/80 text-amber-400 shrink-0">
-              {icons[activeTab] || <Compass className="w-5 h-5 text-amber-400" />}
-            </div>
+            <img
+              src="/logo.png"
+              alt="Dam-Daman Logo"
+              className="w-7 h-7 sm:w-8 sm:h-8 rounded-xl shadow-md shrink-0 object-contain ring-1 ring-amber-500/30"
+            />
             <div className="min-w-0">
               <h3 className="font-bold text-stone-100 text-sm sm:text-base leading-tight truncate">
                 {t.howToPlay}

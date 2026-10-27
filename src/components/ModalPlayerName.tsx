@@ -56,9 +56,11 @@ export const ModalPlayerName: React.FC<ModalPlayerNameProps> = ({
         {/* Header with Icon and Language Switcher */}
         <div className="flex items-center justify-between border-b border-stone-800 pb-4">
           <div className="flex items-center gap-3">
-            <div className="w-11 h-11 rounded-2xl bg-gradient-to-br from-amber-500 to-amber-700 flex items-center justify-center text-white shadow-lg shadow-amber-950/40 shrink-0">
-              <Gamepad2 className="w-6 h-6" />
-            </div>
+            <img
+              src="/logo.png"
+              alt="Dam-Daman Logo"
+              className="w-11 h-11 rounded-2xl shadow-lg shrink-0 object-contain ring-2 ring-amber-500/40"
+            />
             <div>
               <h3 className="text-base sm:text-lg font-extrabold text-stone-100 font-serif leading-tight">
                 {lang === 'en' ? 'Welcome to Dam-Daman!' : 'Selamat Datang di Dam-Daman!'}

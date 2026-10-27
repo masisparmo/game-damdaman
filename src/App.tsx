@@ -506,9 +506,11 @@ export default function App() {
         <div className="max-w-2xl mx-auto flex items-center justify-between gap-2">
           {/* Logo & Mode Pill */}
           <div className="flex items-center gap-2">
-            <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-xl bg-gradient-to-br from-amber-500 to-orange-600 flex items-center justify-center font-bold text-white shadow-md shadow-orange-950/40 shrink-0">
-              <span className="font-serif text-sm sm:text-base">D</span>
-            </div>
+            <img
+              src="/logo.png"
+              alt="Maen Dam-Daman Logo"
+              className="w-7 h-7 sm:w-8 sm:h-8 rounded-xl shadow-md shrink-0 object-contain ring-1 ring-amber-500/30"
+            />
             <div className="flex items-center gap-1.5">
               <h1 className="text-xs sm:text-sm font-extrabold tracking-tight font-serif text-stone-100 hidden min-[380px]:inline">
                 {t.title}

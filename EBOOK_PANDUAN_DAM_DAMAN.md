@@ -395,6 +395,22 @@ Bidak tidak hanya dibedakan berdasarkan warna oranye dan biru, melainkan diperku
 * **Hasil Pengujian Browser:**
   * Terverifikasi lulus pengujian visual mobile portrait (390 × 844) dengan tombol yang pas di dalam jendela dan alih bahasa instan.
 
+### 📅 Tahap 6 — Integrasi Identitas Visual Resmi: Logo, Favicon & Touch Icon *(Selesai & Terverifikasi)*
+* **Latar Belakang:**
+  * Aplikasi sebelumnya masih menggunakan placeholder huruf "D" pada bilah navigasi dan belum memiliki favicon resmi untuk tab peramban maupun ikon instalasi PWA/layar beranda smartphone.
+* **Aset Grafis yang Diintegrasikan:**
+  * `logo.png` (512 × 512 px) — Logo resolusi tinggi dengan latar belakang *squircle* hijau zamrud khas alas kain dam-daman, menampilkan pola papan autentik dengan bidak biru dan oranye.
+  * `icon-192.png` & `icon-512.png` — Ikon standar Progressive Web App (PWA) dan Android Launcher.
+  * `apple-touch-icon.png` (180 × 180 px) — Ikon layar utama iOS/Safari.
+  * `favicon.ico`, `favicon.png`, dan `favicon-16x16.png` — Favicon peramban web modern dan retro.
+* **Titik Integrasi Kode:**
+  * **`index.html`:** Ditambahkan metadata lengkap untuk `<link rel="icon">`, `<link rel="apple-touch-icon">`, serta Open Graph & Twitter Card image (`og:image` / `twitter:image`).
+  * **`src/App.tsx`:** Mengganti placeholder kotak "D" pada bilah navigasi atas dengan `<img src="/logo.png" />` berhiaskan cincin aksen keemasan.
+  * **`ModalTutorial.tsx` & `ModalPlayerName.tsx`:** Menampilkan logo resmi pada tajuk jendela panduan dan jendela registrasi nama pemain untuk memperkuat *branding* permainan nusantara yang prestisius.
+* **Hasil Pengujian:**
+  * Seluruh aset gambar termuat dengan status HTTP 200 tanpa galat.
+  * Tampilan *header*, modal panduan, dan favicon peramban terlihat tajam, proporsional, dan sangat profesional di semua ukuran layar.
+
 ---
 
 ## BAB 9: PANDUAN DEPLOYMENT & PENUTUP
