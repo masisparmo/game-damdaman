@@ -383,16 +383,18 @@ export function learnFromFinishedMatch(
     }
 
     if (cloudRecords.length > 0) {
-      supabase
-        .from('global_brain_moves')
-        .insert(cloudRecords)
-        .then(({ error }) => {
-          if (error) console.warn('Supabase background contribution log:', error.message);
-          else {
-            cloudRecordsCount += cloudRecords.length;
-          }
-        })
-        .catch(() => {});
+        Promise.resolve(
+          supabase
+            .from('global_brain_moves')
+            .insert(cloudRecords)
+        )
+          .then(({ error }: any) => {
+            if (error) console.warn('Supabase background contribution log:', error.message);
+            else {
+              cloudRecordsCount += cloudRecords.length;
+            }
+          })
+          .catch(() => {});
     }
   } catch (err) {
     // Non-blocking failover

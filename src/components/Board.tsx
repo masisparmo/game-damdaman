@@ -47,7 +47,7 @@ interface BoardProps {
   onToggleNodeLabels: () => void;
   disabled?: boolean;
   lang?: Language;
-  gameMode?: 'ai' | 'pvp';
+  gameMode?: 'ai' | 'pvp' | 'online';
 }
 
 export const Board: React.FC<BoardProps> = ({
@@ -212,109 +212,126 @@ export const Board: React.FC<BoardProps> = ({
     }
   };
 
+  const [showControls, setShowControls] = useState(false);
+
   return (
-    <div className="flex flex-col items-center w-full select-none">
-      {/* Modern Compact Board Toolbar */}
-      <div className="flex flex-wrap items-center justify-between gap-2 w-full max-w-xl px-3 py-2 mb-2 bg-stone-900/90 border border-stone-800 rounded-2xl backdrop-blur-md shadow-lg text-xs text-stone-300">
-        {/* Orientation Toggle */}
-        <div className="flex items-center gap-1">
-          <button
-            onClick={onToggleOrientation}
-            className={`flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl font-semibold transition ${
-              isPortrait
-                ? 'bg-amber-600 text-white shadow-sm'
-                : 'bg-stone-800 hover:bg-stone-700 text-stone-300'
-            }`}
-            title={lang === 'en' ? 'Toggle Portrait / Landscape' : 'Ubah orientasi ke Portrait (Tegak) atau Landscape (Mendatar)'}
-          >
-            {isPortrait ? <Smartphone size={14} /> : <Monitor size={14} />}
-            <span className="font-medium text-[11px]">
-              {isPortrait ? (lang === 'en' ? 'Portrait' : 'Tegak (HP)') : (lang === 'en' ? 'Landscape' : 'Mendatar')}
+    <div className="flex flex-col items-center justify-center w-full h-full flex-1 min-h-0 relative select-none">
+      {/* Floating Board Quick Controls Button */}
+      <div className="absolute top-1 right-1 sm:top-2 sm:right-2 z-30 flex items-center gap-1.5">
+        <button
+          onClick={onToggleFlip}
+          className="p-1.5 sm:p-2 rounded-xl bg-stone-900/85 hover:bg-stone-800 border border-stone-800/80 text-stone-300 hover:text-white backdrop-blur-md shadow-md transition active:scale-95"
+          title={lang === 'en' ? 'Flip board 180°' : 'Putar papan 180°'}
+          aria-label="Flip board"
+        >
+          <RotateCcw size={14} />
+        </button>
+        <button
+          onClick={onToggleNodeLabels}
+          className={`p-1.5 sm:p-2 rounded-xl border backdrop-blur-md shadow-md transition active:scale-95 ${
+            showNodeLabels
+              ? 'bg-amber-600/80 border-amber-500 text-white shadow-amber-950/40'
+              : 'bg-stone-900/85 border-stone-800/80 text-stone-400 hover:text-white'
+          }`}
+          title={lang === 'en' ? 'Toggle Node Labels (A..Z)' : 'Tampilkan Simpul Graf (A..Z)'}
+          aria-label="Toggle node labels"
+        >
+          <Tag size={14} />
+        </button>
+        <button
+          onClick={() => setShowControls(!showControls)}
+          className={`p-1.5 sm:p-2 rounded-xl border backdrop-blur-md shadow-md transition active:scale-95 ${
+            showControls
+              ? 'bg-stone-800 border-amber-500/80 text-amber-300'
+              : 'bg-stone-900/85 border-stone-800/80 text-stone-400 hover:text-white'
+          }`}
+          title={lang === 'en' ? 'Display & Zoom Settings' : 'Pengaturan Tampilan & Zoom'}
+          aria-label="Display settings"
+        >
+          <Maximize2 size={14} />
+        </button>
+      </div>
+
+      {/* Floating Expandable Zoom & Orientation Panel */}
+      {showControls && (
+        <div className="absolute top-10 sm:top-12 right-1 sm:right-2 z-30 p-2.5 bg-stone-900/95 border border-stone-700/80 rounded-2xl backdrop-blur-md shadow-2xl text-xs text-stone-200 animate-in fade-in slide-in-from-top-2 duration-150 flex flex-col gap-2 min-w-[220px]">
+          <div className="flex items-center justify-between border-b border-stone-800 pb-1.5">
+            <span className="font-bold text-[11px] text-amber-400">
+              {lang === 'en' ? 'Board Controls' : 'Kontrol Papan'}
             </span>
-          </button>
+            <button
+              onClick={() => setShowControls(false)}
+              className="text-stone-500 hover:text-stone-300 text-xs px-1"
+            >
+              ✕
+            </button>
+          </div>
 
-          <button
-            onClick={onToggleFlip}
-            className="p-1.5 rounded-xl bg-stone-800 hover:bg-stone-700 active:scale-95 text-stone-300 transition"
-            title={lang === 'en' ? 'Flip board 180°' : 'Putar papan 180° (Untuk main berhadapan)'}
-            aria-label="Flip board"
-          >
-            <RotateCcw size={14} />
-          </button>
-        </div>
+          {/* Orientation Toggle */}
+          <div className="flex items-center justify-between gap-2">
+            <span className="text-[11px] text-stone-400">
+              {lang === 'en' ? 'Orientation:' : 'Orientasi:'}
+            </span>
+            <button
+              onClick={onToggleOrientation}
+              className={`flex items-center gap-1 px-2 py-1 rounded-lg font-semibold transition text-[11px] ${
+                isPortrait
+                  ? 'bg-amber-600 text-white shadow-sm'
+                  : 'bg-stone-800 hover:bg-stone-700 text-stone-300'
+              }`}
+            >
+              {isPortrait ? <Smartphone size={12} /> : <Monitor size={12} />}
+              <span>{isPortrait ? 'Portrait' : 'Landscape'}</span>
+            </button>
+          </div>
 
-        {/* Zoom & Resizing Controls */}
-        <div className="flex items-center gap-1.5">
-          <button
-            onClick={() => onScaleChange(Math.max(0.65, boardScale - 0.1))}
-            className="p-1 rounded-lg hover:bg-stone-800 text-stone-300 hover:text-white transition active:scale-90"
-            title="Perkecil"
-            aria-label="Perkecil papan"
-          >
-            <ZoomOut size={15} />
-          </button>
+          {/* Zoom Slider */}
+          <div className="flex items-center justify-between gap-1.5">
+            <button
+              onClick={() => onScaleChange(Math.max(0.65, boardScale - 0.1))}
+              className="p-1 rounded hover:bg-stone-800 text-stone-300 transition"
+              title="Perkecil"
+            >
+              <ZoomOut size={13} />
+            </button>
+            <input
+              type="range"
+              min="0.65"
+              max="1.35"
+              step="0.05"
+              value={boardScale}
+              onChange={(e) => onScaleChange(parseFloat(e.target.value))}
+              className="w-24 accent-amber-500 cursor-pointer h-1.5 bg-stone-700 rounded-lg"
+            />
+            <button
+              onClick={() => onScaleChange(Math.min(1.35, boardScale + 0.1))}
+              className="p-1 rounded hover:bg-stone-800 text-stone-300 transition"
+              title="Perbesar"
+            >
+              <ZoomIn size={13} />
+            </button>
+            <span className="font-mono text-[10px] text-amber-400 min-w-6 text-right">
+              {Math.round(boardScale * 100)}%
+            </span>
+          </div>
 
-          <input
-            type="range"
-            min="0.65"
-            max="1.35"
-            step="0.05"
-            value={boardScale}
-            onChange={(e) => onScaleChange(parseFloat(e.target.value))}
-            className="w-16 sm:w-24 accent-amber-500 cursor-pointer h-1.5 bg-stone-700 rounded-lg"
-            title="Ukuran papan"
-          />
-
-          <button
-            onClick={() => onScaleChange(Math.min(1.35, boardScale + 0.1))}
-            className="p-1 rounded-lg hover:bg-stone-800 text-stone-300 hover:text-white transition active:scale-90"
-            title="Perbesar"
-            aria-label="Perbesar papan"
-          >
-            <ZoomIn size={15} />
-          </button>
-
-          <span className="font-mono text-[11px] text-amber-400 min-w-8 text-center font-bold">
-            {Math.round(boardScale * 100)}%
-          </span>
-        </div>
-
-        {/* Quick Scale Presets & Labels Toggle */}
-        <div className="flex items-center gap-1">
+          {/* Fit Preset */}
           <button
             onClick={() => onScaleChange(1.0)}
-            className={`px-2 py-1 rounded-lg text-[11px] font-medium transition ${
-              Math.abs(boardScale - 1.0) < 0.04
-                ? 'bg-amber-600/40 text-amber-300 border border-amber-500/40'
-                : 'bg-stone-800/80 text-stone-400 hover:text-stone-200'
-            }`}
+            className="w-full py-1 text-center rounded-lg bg-stone-800 hover:bg-stone-700 text-[11px] font-medium text-stone-300 transition"
           >
-            {lang === 'en' ? 'Fit' : 'Pas'}
-          </button>
-
-          <button
-            onClick={onToggleNodeLabels}
-            className={`p-1.5 rounded-lg text-[11px] transition ${
-              showNodeLabels
-                ? 'bg-amber-600/30 text-amber-300 border border-amber-500/40'
-                : 'bg-stone-800/80 text-stone-400 hover:text-stone-200'
-            }`}
-            title={lang === 'en' ? 'Show Graph Vertices (A..Z)' : 'Tampilkan Simpul Graf Matematis (A..Z)'}
-            aria-label="Toggle node labels"
-          >
-            <Tag size={14} />
+            {lang === 'en' ? 'Reset to 100% Fit' : 'Reset ke 100% Pas'}
           </button>
         </div>
-      </div>
+      )}
 
       {/* Main Board Viewport with Smooth Dynamic Scaling */}
       <div
         ref={containerRef}
-        className="w-full flex items-center justify-center p-1 sm:p-2 overflow-visible transition-all"
-        style={{ minHeight: isPortrait ? '520px' : '400px' }}
+        className="w-full h-full flex-1 flex items-center justify-center p-1 sm:p-2 min-h-0 overflow-visible transition-all"
       >
         <div
-          className="relative transition-transform duration-200 ease-out origin-center"
+          className="relative transition-transform duration-200 ease-out origin-center flex items-center justify-center max-h-full max-w-full"
           style={{
             transform: `scale(${boardScale})`,
             width: '100%',
@@ -323,12 +340,10 @@ export const Board: React.FC<BoardProps> = ({
         >
           <svg
             viewBox={`0 0 ${SVG_WIDTH} ${SVG_HEIGHT}`}
-            className={`w-full h-auto drop-shadow-2xl rounded-3xl touch-manipulation transition-opacity duration-200 ${
+            preserveAspectRatio="xMidYMid meet"
+            className={`w-full max-h-[66dvh] sm:max-h-[72vh] h-auto drop-shadow-2xl rounded-3xl touch-manipulation transition-opacity duration-200 ${
               disabled ? 'pointer-events-none opacity-95 cursor-wait' : ''
             }`}
-            style={{
-              maxHeight: isPortrait ? '78vh' : '65vh',
-            }}
           >
             <defs>
               {/* Shadows & 3D Depth Filters */}

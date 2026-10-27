@@ -21,7 +21,7 @@ export interface GameHistoryRecord {
   id?: number;
   playerName: string;
   opponentName: string;
-  gameMode: 'ai' | 'pvp';
+  gameMode: 'ai' | 'pvp' | 'online';
   date: string; // DDMMYYYY format, e.g. "26102026"
   dateFormatted: string; // Display friendly format, e.g. "26/10/2026"
   time: string; // e.g. "14:15:30"

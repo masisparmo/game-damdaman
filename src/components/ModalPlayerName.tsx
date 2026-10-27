@@ -4,6 +4,7 @@
  * 
  * Player Name Registration Modal for Maen Dam-Daman.
  * Prompts user for name after the rules guide is closed.
+ * Fully user-friendly with zero technical jargon.
  */
 
 import React, { useState, useEffect } from 'react';
@@ -13,10 +14,11 @@ import { Language, translations } from '../i18n';
 interface ModalPlayerNameProps {
   isOpen: boolean;
   onSaveName: (p1Name: string, p2Name?: string) => void;
-  gameMode: 'ai' | 'pvp';
+  gameMode: 'ai' | 'pvp' | 'online';
   currentP1Name: string;
   currentP2Name: string;
   lang?: Language;
+  onChangeLang?: (newLang: Language) => void;
 }
 
 export const ModalPlayerName: React.FC<ModalPlayerNameProps> = ({
@@ -26,6 +28,7 @@ export const ModalPlayerName: React.FC<ModalPlayerNameProps> = ({
   currentP1Name,
   currentP2Name,
   lang = 'id',
+  onChangeLang,
 }) => {
   const [name, setName] = useState(currentP1Name || '');
   const [p2Name, setP2Name] = useState(currentP2Name || '');
@@ -50,19 +53,51 @@ export const ModalPlayerName: React.FC<ModalPlayerNameProps> = ({
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-md animate-in fade-in duration-200">
       <div className="relative w-full max-w-md bg-stone-900 border border-amber-600/50 rounded-3xl shadow-2xl overflow-hidden p-6 text-stone-200 space-y-5">
-        {/* Header Icon */}
-        <div className="flex items-center gap-3 border-b border-stone-800 pb-4">
-          <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-amber-500 to-amber-700 flex items-center justify-center text-white shadow-lg shadow-amber-950/40">
-            <Gamepad2 className="w-6 h-6" />
+        {/* Header with Icon and Language Switcher */}
+        <div className="flex items-center justify-between border-b border-stone-800 pb-4">
+          <div className="flex items-center gap-3">
+            <div className="w-11 h-11 rounded-2xl bg-gradient-to-br from-amber-500 to-amber-700 flex items-center justify-center text-white shadow-lg shadow-amber-950/40 shrink-0">
+              <Gamepad2 className="w-6 h-6" />
+            </div>
+            <div>
+              <h3 className="text-base sm:text-lg font-extrabold text-stone-100 font-serif leading-tight">
+                {lang === 'en' ? 'Welcome to Dam-Daman!' : 'Selamat Datang di Dam-Daman!'}
+              </h3>
+              <p className="text-xs text-amber-400/90 font-medium mt-0.5">
+                {lang === 'en' ? 'Enter your name to start playing' : 'Masukkan nama Anda untuk mulai bermain'}
+              </p>
+            </div>
           </div>
-          <div>
-            <h3 className="text-lg font-extrabold text-stone-100 font-serif">
-              {lang === 'en' ? 'Welcome to Dam-Daman!' : 'Selamat Datang di Dam-Daman!'}
-            </h3>
-            <p className="text-xs text-amber-400/90 font-medium">
-              {lang === 'en' ? 'Enter your name to start recording your game history' : 'Masukkan nama Anda untuk mencatat riwayat permainan'}
-            </p>
-          </div>
+
+          {/* Language Toggle in Welcome Modal */}
+          {onChangeLang && (
+            <div className="flex bg-stone-800/90 border border-stone-700/70 rounded-xl p-0.5 text-xs shadow-inner shrink-0 ml-2">
+              <button
+                type="button"
+                onClick={() => onChangeLang('id')}
+                className={`px-2 py-1 rounded-lg text-[11px] font-bold transition flex items-center gap-1 ${
+                  lang === 'id'
+                    ? 'bg-amber-600 text-white shadow-xs'
+                    : 'text-stone-400 hover:text-stone-200'
+                }`}
+                title="Bahasa Indonesia"
+              >
+                <span>🇮🇩 ID</span>
+              </button>
+              <button
+                type="button"
+                onClick={() => onChangeLang('en')}
+                className={`px-2 py-1 rounded-lg text-[11px] font-bold transition flex items-center gap-1 ${
+                  lang === 'en'
+                    ? 'bg-amber-600 text-white shadow-xs'
+                    : 'text-stone-400 hover:text-stone-200'
+                }`}
+                title="English"
+              >
+                <span>🇬🇧 EN</span>
+              </button>
+            </div>
+          )}
         </div>
 
         {/* Input Form */}
@@ -100,15 +135,16 @@ export const ModalPlayerName: React.FC<ModalPlayerNameProps> = ({
             </div>
           )}
 
+          {/* User-friendly info box with zero technical jargon */}
           <div className="p-3 bg-stone-950/60 rounded-xl border border-stone-800 text-[11px] text-stone-400 space-y-1">
             <div className="flex items-center gap-1 text-amber-300 font-semibold">
               <Sparkles size={13} />
-              <span>{lang === 'en' ? 'Automatic Record Keeping' : 'Pencatatan Otomatis IndexedDB'}</span>
+              <span>{lang === 'en' ? 'Automatic Match Tracking' : 'Pencatatan Otomatis Riwayat'}</span>
             </div>
             <p>
               {lang === 'en'
-                ? 'Your match result, duration, date (DDMMYYYY), and moves will be securely stored in your browser’s IndexedDB.'
-                : 'Hasil pertandingan, lama waktu bermain, tanggal (DDMMYYYY), dan langkah akan otomatis tercatat di IndexedDB perangkat Anda.'}
+                ? 'Your scores, duration, date, and moves are automatically saved on your device without needing an account.'
+                : 'Hasil skor, lama bermain, tanggal, dan riwayat langkah akan otomatis tersimpan rapi di memori perangkat Anda tanpa perlu mendaftar.'}
             </p>
           </div>
 

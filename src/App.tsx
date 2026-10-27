@@ -44,11 +44,16 @@ import {
   VolumeX,
   Crown,
   Globe,
+  ChevronDown,
+  Gamepad2,
+  RefreshCw,
+  Sparkles,
 } from 'lucide-react';
 import { Language, translations, formatMoveDescription } from './i18n';
 import { ModalPlayerName } from './components/ModalPlayerName';
 import { ModalGameHistory } from './components/ModalGameHistory';
 import { ModalOnlineLobby } from './components/ModalOnlineLobby';
+import { ModalGameMode } from './components/ModalGameMode';
 import {
   saveGameHistory,
   formatDDMMYYYY,
@@ -89,6 +94,7 @@ export default function App() {
   const [showSettings, setShowSettings] = useState<boolean>(false);
   const [showGameOver, setShowGameOver] = useState<boolean>(false);
   const [showHistoryDrawer, setShowHistoryDrawer] = useState<boolean>(false);
+  const [showGameModeModal, setShowGameModeModal] = useState<boolean>(false);
 
   // Player Name State
   const [playerName, setPlayerName] = useState<string>(() => {
@@ -495,378 +501,208 @@ export default function App() {
 
   return (
     <div className="min-h-screen bg-stone-950 text-stone-100 flex flex-col font-sans selection:bg-amber-500 selection:text-black">
-      {/* Top Navigation Bar */}
-      <header className="border-b border-stone-800/80 bg-stone-900/90 backdrop-blur-md sticky top-0 z-40 px-3 sm:px-6 py-2.5">
-        <div className="max-w-6xl mx-auto flex flex-wrap items-center justify-between gap-2.5">
-          {/* Logo & Subtitle */}
-          <div className="flex items-center gap-2.5">
-            <div className="w-8 h-8 sm:w-9 sm:h-9 rounded-xl bg-gradient-to-br from-amber-500 to-orange-600 flex items-center justify-center font-bold text-white shadow-md shadow-orange-950/40">
-              <span className="font-serif text-base sm:text-lg">D</span>
+      {/* ZONA 1 — COMPACT TOP NAVBAR */}
+      <header className="border-b border-stone-800/80 bg-stone-900/95 backdrop-blur-md sticky top-0 z-40 px-2 sm:px-4 py-1.5 sm:py-2">
+        <div className="max-w-2xl mx-auto flex items-center justify-between gap-2">
+          {/* Logo & Mode Pill */}
+          <div className="flex items-center gap-2">
+            <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-xl bg-gradient-to-br from-amber-500 to-orange-600 flex items-center justify-center font-bold text-white shadow-md shadow-orange-950/40 shrink-0">
+              <span className="font-serif text-sm sm:text-base">D</span>
             </div>
-            <div>
-              <h1 className="text-sm sm:text-base font-extrabold tracking-tight font-serif text-stone-100">
+            <div className="flex items-center gap-1.5">
+              <h1 className="text-xs sm:text-sm font-extrabold tracking-tight font-serif text-stone-100 hidden min-[380px]:inline">
                 {t.title}
               </h1>
-              <p className="text-[10px] sm:text-xs text-amber-400 font-medium">
-                {t.subtitle}
-              </p>
+
+              {/* Match Mode Pill (Clickable -> Opens Game Mode Modal) */}
+              <button
+                onClick={() => setShowGameModeModal(true)}
+                className="flex items-center gap-1 px-2 py-1 rounded-xl bg-stone-800/90 hover:bg-stone-700/90 active:scale-95 border border-stone-700/60 text-xs font-semibold text-amber-300 transition"
+                title={lang === 'en' ? 'Change Game Mode / Difficulty' : 'Ganti Mode Permainan / Tingkat AI'}
+              >
+                {gameMode === 'ai' ? (
+                  <>
+                    <Bot size={13} className="text-amber-400" />
+                    <span>vs {t[aiDifficulty]}</span>
+                    {aiDifficulty === 'master' && <Crown size={11} className="text-yellow-400" />}
+                  </>
+                ) : gameMode === 'pvp' ? (
+                  <>
+                    <Users size={13} className="text-amber-400" />
+                    <span>{t.pvp}</span>
+                  </>
+                ) : (
+                  <>
+                    <Globe size={13} className="text-emerald-400" />
+                    <span className="font-mono text-emerald-300">{onlineConfig?.roomId || 'Online'}</span>
+                  </>
+                )}
+                <ChevronDown size={12} className="text-stone-400" />
+              </button>
             </div>
           </div>
 
-          {/* Quick Action Navigation & Language Switcher */}
-          <div className="flex items-center gap-1.5 sm:gap-2">
-            {/* Language Selector Pill */}
-            <div className="flex bg-stone-900 border border-stone-700/80 rounded-xl p-0.5 text-xs shadow-inner">
-              <button
-                onClick={() => setLang('id')}
-                className={`px-2 py-1 rounded-lg text-xs font-bold transition flex items-center gap-1 ${
-                  lang === 'id'
-                    ? 'bg-amber-600 text-white shadow-xs'
-                    : 'text-stone-400 hover:text-stone-200'
-                }`}
-                title="Bahasa Indonesia (Default)"
-              >
-                <span>🇮🇩</span>
-                <span>ID</span>
-              </button>
-              <button
-                onClick={() => setLang('en')}
-                className={`px-2 py-1 rounded-lg text-xs font-bold transition flex items-center gap-1 ${
-                  lang === 'en'
-                    ? 'bg-amber-600 text-white shadow-xs'
-                    : 'text-stone-400 hover:text-stone-200'
-                }`}
-                title="English (International)"
-              >
-                <span>🇬🇧</span>
-                <span>EN</span>
-              </button>
-            </div>
-
+          {/* Quick Action Utilities */}
+          <div className="flex items-center gap-1 sm:gap-1.5">
+            {/* Language Switcher */}
             <button
-              onClick={() => setShowTutorial(true)}
-              className="flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-xs font-semibold bg-stone-800/90 hover:bg-stone-700 active:scale-95 text-stone-200 transition border border-stone-700/60"
-              title={t.howToPlay}
+              onClick={() => setLang(lang === 'id' ? 'en' : 'id')}
+              className="px-2 py-1 rounded-xl bg-stone-800/80 hover:bg-stone-700 active:scale-95 text-[11px] font-bold text-stone-300 border border-stone-700/60 flex items-center gap-1 transition"
+              title="Ganti Bahasa / Switch Language"
             >
-              <HelpCircle size={14} className="text-amber-400" />
-              <span className="hidden sm:inline">{t.howToPlay}</span>
+              <span>{lang === 'id' ? '🇮🇩 ID' : '🇬🇧 EN'}</span>
             </button>
 
-            <button
-              onClick={() => setShowGameHistory(true)}
-              className="flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-xs font-semibold bg-stone-800/90 hover:bg-stone-700 active:scale-95 text-stone-200 transition border border-stone-700/60"
-              title={t.gameHistory}
-            >
-              <History size={14} className="text-emerald-400" />
-              <span className="hidden sm:inline">{t.gameHistory}</span>
-            </button>
-
-            <button
-              onClick={() => setShowEtnomatematika(true)}
-              className="flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-xs font-semibold bg-stone-800/90 hover:bg-stone-700 active:scale-95 text-stone-200 transition border border-stone-700/60"
-              title={t.ethnomathematics}
-            >
-              <GraduationCap size={14} className="text-sky-400" />
-              <span className="hidden sm:inline">{t.ethnomathematics}</span>
-            </button>
-
-            <button
-              onClick={() => setShowSettings(true)}
-              className="p-1.5 sm:px-2.5 sm:py-1.5 rounded-lg text-xs font-semibold bg-stone-800/90 hover:bg-stone-700 active:scale-95 text-stone-200 transition border border-stone-700/60 flex items-center gap-1"
-              title={t.settings}
-            >
-              <Settings size={14} className="text-stone-400" />
-              <span className="hidden sm:inline">{t.settings}</span>
-            </button>
-
+            {/* Sound Toggle */}
             <button
               onClick={() => setSoundEnabled(!soundEnabled)}
-              className="p-1.5 rounded-lg text-xs font-semibold bg-stone-800/90 hover:bg-stone-700 active:scale-95 text-stone-300 transition border border-stone-700/60"
+              className="p-1.5 rounded-xl bg-stone-800/80 hover:bg-stone-700 active:scale-95 text-stone-300 transition border border-stone-700/60"
               title={soundEnabled ? t.soundOn : t.soundOff}
               aria-label="Toggle Sound"
             >
-              {soundEnabled ? <Volume2 size={15} className="text-emerald-400" /> : <VolumeX size={15} className="text-stone-500" />}
+              {soundEnabled ? (
+                <Volume2 size={15} className="text-emerald-400" />
+              ) : (
+                <VolumeX size={15} className="text-stone-500" />
+              )}
+            </button>
+
+            {/* Help / Tutorial */}
+            <button
+              onClick={() => setShowTutorial(true)}
+              className="p-1.5 rounded-xl bg-stone-800/80 hover:bg-stone-700 active:scale-95 text-amber-400 transition border border-stone-700/60"
+              title={t.howToPlay}
+              aria-label="Tutorial"
+            >
+              <HelpCircle size={15} />
+            </button>
+
+            {/* Match History (IndexedDB) */}
+            <button
+              onClick={() => setShowGameHistory(true)}
+              className="p-1.5 rounded-xl bg-stone-800/80 hover:bg-stone-700 active:scale-95 text-emerald-400 transition border border-stone-700/60 hidden min-[440px]:flex"
+              title={t.gameHistory}
+              aria-label="History"
+            >
+              <History size={15} />
+            </button>
+
+            {/* Ethnomathematics */}
+            <button
+              onClick={() => setShowEtnomatematika(true)}
+              className="p-1.5 rounded-xl bg-stone-800/80 hover:bg-stone-700 active:scale-95 text-sky-400 transition border border-stone-700/60 hidden min-[440px]:flex"
+              title={t.ethnomathematics}
+              aria-label="Ethnomathematics"
+            >
+              <GraduationCap size={15} />
+            </button>
+
+            {/* Settings */}
+            <button
+              onClick={() => setShowSettings(true)}
+              className="p-1.5 rounded-xl bg-stone-800/80 hover:bg-stone-700 active:scale-95 text-stone-300 transition border border-stone-700/60"
+              title={t.settings}
+              aria-label="Settings"
+            >
+              <Settings size={15} />
             </button>
           </div>
         </div>
       </header>
 
-      {/* Main Container */}
-      <main className="flex-1 max-w-4xl w-full mx-auto p-2 sm:p-3 flex flex-col gap-2">
-        {/* Game Mode & Action Bar */}
-        <div className="flex flex-wrap items-center justify-between gap-2">
-          {/* Mode Switcher */}
-          <div className="flex items-center gap-1.5">
-            <div className="flex bg-stone-900 border border-stone-800 rounded-xl p-0.5 text-xs shadow-inner">
-              <button
-                onClick={() => {
-                  setGameMode('ai');
-                  onlineMatch.cleanup();
-                  setOnlineConfig(null);
-                  handleRestart();
-                }}
-                className={`flex items-center gap-1 px-2.5 py-1 rounded-lg font-semibold transition text-xs ${
-                  gameMode === 'ai'
-                    ? 'bg-amber-600 text-white shadow-sm'
-                    : 'text-stone-400 hover:text-stone-200'
-                }`}
-              >
-                <Bot size={13} />
-                {t.vsAi}
-              </button>
-              <button
-                onClick={() => {
-                  setGameMode('pvp');
-                  onlineMatch.cleanup();
-                  setOnlineConfig(null);
-                  handleRestart();
-                }}
-                className={`flex items-center gap-1 px-2.5 py-1 rounded-lg font-semibold transition text-xs ${
-                  gameMode === 'pvp'
-                    ? 'bg-amber-600 text-white shadow-sm'
-                    : 'text-stone-400 hover:text-stone-200'
-                }`}
-              >
-                <Users size={13} />
-                {t.pvp}
-              </button>
-              <button
-                onClick={() => {
-                  setShowOnlineLobby(true);
-                }}
-                className={`flex items-center gap-1 px-2.5 py-1 rounded-lg font-semibold transition text-xs ${
-                  gameMode === 'online'
-                    ? 'bg-emerald-600 text-white shadow-sm font-bold'
-                    : 'text-stone-400 hover:text-stone-200'
-                }`}
-              >
-                <Globe size={13} />
-                {t.online}
-              </button>
-            </div>
-
-            {/* Online Room Info & Reaction Emojis */}
-            {gameMode === 'online' && onlineConfig && (
-              <div className="flex items-center gap-2">
-                <div className="flex items-center gap-1.5 bg-stone-900 border border-stone-800 rounded-xl px-2.5 py-1 text-xs">
-                  <span className="font-mono text-amber-400 font-bold">{onlineConfig.roomId}</span>
-                  <span className="text-stone-600">•</span>
-                  <span className="flex items-center gap-1 font-mono text-[11px]">
-                    <span className={`w-2 h-2 rounded-full ${isOpponentConnected ? 'bg-emerald-400 animate-pulse' : 'bg-rose-400'}`} />
-                    <span className={isOpponentConnected ? 'text-emerald-300 font-medium' : 'text-rose-300'}>
-                      {isOpponentConnected
-                        ? (lang === 'en' ? 'Online' : 'Terhubung')
-                        : (lang === 'en' ? 'Offline' : 'Terputus')}
-                    </span>
-                  </span>
-                </div>
-
-                <div className="hidden sm:flex items-center gap-1 bg-stone-900 border border-stone-800 rounded-xl px-1.5 py-0.5">
-                  {['👋', '😂', '👏', '👑', '🔥', '☕'].map((emoji) => (
-                    <button
-                      key={emoji}
-                      onClick={() => {
-                        onlineMatch.broadcastReaction(emoji);
-                        setReactionToast({ emoji, sender: playerName || 'Saya' });
-                        setTimeout(() => setReactionToast(null), 2500);
-                      }}
-                      className="hover:scale-125 active:scale-95 transition text-xs p-1"
-                      title={`Kirim ${emoji}`}
-                    >
-                      {emoji}
-                    </button>
-                  ))}
-                </div>
-              </div>
-            )}
-
-            {gameMode === 'ai' && (
-              <div className="flex items-center gap-0.5 bg-stone-900 border border-stone-800 rounded-xl px-1.5 py-0.5 text-xs">
-                {(['easy', 'medium', 'hard', 'master'] as AIDifficulty[]).map((level) => {
-                  const isSelected = aiDifficulty === level;
-                  const isMaster = level === 'master';
-                  return (
-                    <button
-                      key={level}
-                      onClick={() => setAiDifficulty(level)}
-                      className={`px-1.5 py-0.5 rounded text-[11px] font-medium transition flex items-center gap-0.5 ${
-                        isSelected
-                          ? isMaster
-                            ? 'bg-gradient-to-r from-amber-500 to-yellow-600 text-stone-950 font-black shadow-xs'
-                            : 'bg-stone-700 text-amber-300 font-bold'
-                          : isMaster
-                          ? 'text-amber-400/80 hover:text-amber-300'
-                          : 'text-stone-400 hover:text-stone-200'
-                      }`}
-                      title={isMaster ? 'Level Dewa: Grandmaster AI + Continuous Learning' : undefined}
-                    >
-                      {isMaster && <Crown size={11} className={isSelected ? 'text-stone-950' : 'text-amber-400'} />}
-                      <span>{t[level]}</span>
-                    </button>
-                  );
-                })}
-              </div>
-            )}
-          </div>
-
-          {/* Controls: Undo & Reset */}
-          <div className="flex items-center gap-1.5 text-xs">
-            {historyStack.length > 0 && (
-              <button
-                onClick={handleUndo}
-                disabled={isAiThinking}
-                className="flex items-center gap-1 px-2.5 py-1 rounded-lg bg-stone-900 hover:bg-stone-800 border border-stone-800 text-stone-300 hover:text-white transition active:scale-95 disabled:opacity-40"
-              >
-                <RotateCcw size={13} />
-                <span>{t.undo}</span>
-              </button>
-            )}
-
-            <button
-              onClick={() => setShowHistoryDrawer(!showHistoryDrawer)}
-              className="flex items-center gap-1 px-2.5 py-1 rounded-lg bg-stone-900 hover:bg-stone-800 border border-stone-800 text-stone-300 hover:text-white transition active:scale-95"
+      {/* Main Container — Chess.com Mobile Sandwich Layout */}
+      <main className="flex-1 max-w-xl w-full mx-auto px-2 py-1 sm:py-2 flex flex-col justify-between min-h-0 select-none overflow-hidden relative">
+        {/* ZONA 2 — OPPONENT PLAYER BAR (At Top of Board) */}
+        <div
+          className={`px-3 py-2 rounded-2xl border transition-all flex items-center justify-between ${
+            gameState.currentPlayer === 'P2'
+              ? 'bg-gradient-to-r from-sky-950/70 via-stone-900 to-sky-950/50 border-sky-500 shadow-md shadow-sky-950/30'
+              : 'bg-stone-900/60 border-stone-800/80 opacity-80'
+          }`}
+        >
+          {/* Opponent Info */}
+          <div className="flex items-center gap-2.5">
+            <div
+              className={`w-8 h-8 rounded-full flex items-center justify-center border-2 shadow transition-all shrink-0 ${
+                gameMode === 'ai' && aiDifficulty === 'master'
+                  ? 'bg-gradient-to-br from-amber-500 via-yellow-600 to-amber-700 border-amber-300 ring-2 ring-amber-500/40 shadow-amber-950/50'
+                  : 'bg-gradient-to-br from-sky-500 to-blue-700 border-sky-300'
+              }`}
             >
-              <History size={13} />
-              <span>{t.moves} ({gameState.moveHistory.length})</span>
-            </button>
-
-            <button
-              onClick={() => {
-                if (window.confirm(t.resetConfirm)) {
-                  handleRestart();
-                }
-              }}
-              className="px-2.5 py-1 rounded-lg bg-stone-900 hover:bg-stone-800 border border-stone-800 text-rose-400 hover:text-rose-300 transition active:scale-95 font-medium"
-            >
-              {t.reset}
-            </button>
-          </div>
-        </div>
-
-        {/* Player Turn Cards */}
-        <div className="grid grid-cols-2 gap-2 items-stretch">
-          {/* Player 1 Card (At bottom on board) */}
-          <div
-            className={`p-2.5 rounded-2xl border transition-all flex items-center justify-between ${
-              gameState.currentPlayer === 'P1'
-                ? 'bg-gradient-to-r from-orange-950/60 to-stone-900 border-orange-500/80 shadow-md shadow-orange-950/20'
-                : 'bg-stone-900/50 border-stone-800/80 opacity-70'
-            }`}
-          >
-            <div className="flex items-center gap-2">
-              <div className="w-8 h-8 rounded-full bg-gradient-to-br from-orange-500 to-amber-700 flex items-center justify-center border-2 border-orange-300 shadow">
-                <span className="font-bold text-[11px] text-white">P1</span>
-              </div>
-              <div>
-                <div className="flex items-center gap-1.5">
-                  <span className="font-bold text-xs text-stone-100">
-                    {gameMode === 'online' && onlineConfig
-                      ? onlineConfig.myRole === 'P1'
-                        ? `${playerName || t.player1} (${lang === 'en' ? 'You' : 'Anda'})`
-                        : onlineConfig.myName
-                      : (playerName || t.player1)}
-                  </span>
-                  <button
-                    onClick={() => setShowNameModal(true)}
-                    className="p-0.5 text-stone-400 hover:text-amber-300 rounded transition"
-                    title={lang === 'en' ? 'Edit player name' : 'Ubah nama pemain'}
-                  >
-                    <User size={11} />
-                  </button>
-                  {gameState.currentPlayer === 'P1' && (
-                    <span className="px-1.5 py-0.2 rounded text-[9px] bg-orange-500/30 text-orange-300 font-bold">
-                      {t.turn}
-                    </span>
-                  )}
-                </div>
-                <div className="flex items-center gap-1.5 mt-0.5">
-                  <span className="text-[10px] text-stone-400">
-                    {p1Count} {t.pieces} • {p1Captured} {t.captured}
-                  </span>
-                  {p1Captured > 0 && (
-                    <div className="flex items-center gap-0.5">
-                      {Array.from({ length: Math.min(6, p1Captured) }).map((_, i) => (
-                        <div key={i} className="w-1.5 h-1.5 rounded-full bg-sky-400/80 shadow-xs" />
-                      ))}
-                      {p1Captured > 6 && <span className="text-[8px] text-stone-500 font-mono">+{p1Captured - 6}</span>}
-                    </div>
-                  )}
-                </div>
-              </div>
-            </div>
-          </div>
-
-          {/* Player 2 Card (At top on board) */}
-          <div
-            className={`p-2.5 rounded-2xl border transition-all flex items-center justify-between ${
-              gameState.currentPlayer === 'P2'
-                ? 'bg-gradient-to-l from-sky-950/60 to-stone-900 border-sky-500/80 shadow-md shadow-sky-950/20'
-                : 'bg-stone-900/50 border-stone-800/80 opacity-70'
-            }`}
-          >
-            <div className="flex items-center gap-2 flex-row-reverse text-right w-full justify-between">
-              <div
-                className={`w-8 h-8 rounded-full flex items-center justify-center border-2 shadow transition-all ${
-                  gameMode === 'ai' && aiDifficulty === 'master'
-                    ? 'bg-gradient-to-br from-amber-500 via-yellow-600 to-amber-700 border-amber-300 ring-2 ring-amber-500/40 shadow-amber-950/50'
-                    : 'bg-gradient-to-br from-sky-500 to-blue-700 border-sky-300'
-                }`}
-              >
-                <span className="font-bold text-[11px] text-white flex items-center">
-                  {gameMode === 'ai' ? (
-                    aiDifficulty === 'master' ? (
-                      <Crown size={15} className="text-stone-950 fill-amber-300" />
-                    ) : (
-                      'AI'
-                    )
+              <span className="font-bold text-[11px] text-white flex items-center">
+                {gameMode === 'ai' ? (
+                  aiDifficulty === 'master' ? (
+                    <Crown size={15} className="text-stone-950 fill-amber-300" />
                   ) : (
-                    'P2'
-                  )}
+                    'AI'
+                  )
+                ) : (
+                  'P2'
+                )}
+              </span>
+            </div>
+
+            <div>
+              <div className="flex items-center gap-1.5">
+                <span className="font-bold text-xs sm:text-sm text-stone-100 flex items-center gap-1">
+                  {gameMode === 'online' && onlineConfig
+                    ? onlineConfig.myRole === 'P2'
+                      ? `${playerName || t.player2} (${lang === 'en' ? 'You' : 'Anda'})`
+                      : onlineConfig.opponentName
+                    : gameMode === 'ai'
+                    ? `AI (${t[aiDifficulty]})`
+                    : (p2CustomName || t.player2)}
                 </span>
+                {gameMode === 'online' && (
+                  <span className={`w-2 h-2 rounded-full ${isOpponentConnected ? 'bg-emerald-400' : 'bg-rose-400'}`} />
+                )}
               </div>
-              <div>
-                <div className="flex items-center gap-1 justify-end">
-                  {gameState.currentPlayer === 'P2' && (
-                    <span className="px-1.5 py-0.2 rounded text-[9px] bg-sky-500/30 text-sky-300 font-bold">
-                      {isAiThinking ? t.thinking : t.turn}
-                    </span>
-                  )}
-                  <span className="font-bold text-xs text-stone-100 flex items-center gap-1">
-                    {gameMode === 'online' && onlineConfig
-                      ? onlineConfig.myRole === 'P2'
-                        ? `${playerName || t.player2} (${lang === 'en' ? 'You' : 'Anda'})`
-                        : onlineConfig.opponentName
-                      : gameMode === 'ai'
-                      ? `AI (${t[aiDifficulty]})`
-                      : (p2CustomName || t.player2)}
-                  </span>
-                </div>
-                <div className="flex items-center gap-1.5 justify-end mt-0.5">
-                  {p2Captured > 0 && (
-                    <div className="flex items-center gap-0.5">
-                      {Array.from({ length: Math.min(6, p2Captured) }).map((_, i) => (
-                        <div key={i} className="w-1.5 h-1.5 rounded-full bg-orange-400/80 shadow-xs" />
-                      ))}
-                      {p2Captured > 6 && <span className="text-[8px] text-stone-500 font-mono">+{p2Captured - 6}</span>}
-                    </div>
-                  )}
-                  <span className="text-[10px] text-stone-400">
-                    {p2Count} {t.pieces} • {p2Captured} {t.captured}
-                  </span>
-                </div>
+              <div className="flex items-center gap-1.5 mt-0.5">
+                <span className="text-[10px] text-stone-400 font-medium">
+                  {p2Count} {t.pieces}
+                </span>
+                {p2Captured > 0 && (
+                  <div className="flex items-center gap-0.5">
+                    {Array.from({ length: Math.min(6, p2Captured) }).map((_, i) => (
+                      <div key={i} className="w-1.5 h-1.5 rounded-full bg-orange-400/90 shadow-xs" />
+                    ))}
+                    {p2Captured > 6 && <span className="text-[8px] text-stone-500 font-mono">+{p2Captured - 6}</span>}
+                  </div>
+                )}
               </div>
             </div>
           </div>
+
+          {/* Turn Badge / Thinking Indicator */}
+          <div>
+            {gameState.currentPlayer === 'P2' ? (
+              <span className="px-2.5 py-1 rounded-full text-[10px] bg-sky-500/25 border border-sky-500/50 text-sky-300 font-bold flex items-center gap-1 animate-pulse">
+                {isAiThinking ? (
+                  <>
+                    <span className="w-1.5 h-1.5 rounded-full bg-sky-400 animate-ping" />
+                    <span>{t.thinking}</span>
+                  </>
+                ) : (
+                  t.turn
+                )}
+              </span>
+            ) : (
+              <span className="text-[10px] text-stone-500 font-mono">
+                {t.movePrefix}{gameState.moveHistory.length}
+              </span>
+            )}
+          </div>
         </div>
 
-        {/* Live Step & Capture Notification Banner */}
+        {/* Live Step Mini-Ticker (Non-displacing) */}
         {gameState.moveHistory.length > 0 && (() => {
           const lastMove = gameState.moveHistory[gameState.moveHistory.length - 1];
-          const actor = lastMove.player === 'P1'
-            ? (playerName || t.player1)
-            : gameMode === 'ai'
-            ? t.playerAi
-            : (p2CustomName || t.player2);
+          const actor =
+            lastMove.player === 'P1'
+              ? (playerName || t.player1)
+              : gameMode === 'ai'
+              ? t.playerAi
+              : (p2CustomName || t.player2);
           const formatted = formatMoveDescription(
             actor,
             lastMove.fromNodeId,
@@ -876,65 +712,34 @@ export default function App() {
             lang
           );
           return (
-            <div
-              className={`px-3 py-1.5 rounded-xl text-xs flex items-center justify-between border transition-all ${
-                lastMove.isCapture
-                  ? 'bg-rose-950/40 border-rose-600/40 text-rose-200'
-                  : 'bg-stone-900/60 border-stone-800 text-stone-300'
-              }`}
-            >
-              <span className="flex items-center gap-1.5">
-                <span className="text-sm">
-                  {lastMove.isCapture ? '⚔️' : '👣'}
-                </span>
-                <span>
-                  <strong>{actor}</strong>: {formatted}
-                </span>
+            <div className="flex items-center justify-between px-2.5 py-0.5 text-[10px] text-stone-400 font-medium">
+              <span className="truncate">
+                {lastMove.isCapture ? '⚔️' : '👣'} <strong>{actor}</strong>: {formatted}
               </span>
-              <span className="text-[10px] text-stone-500 font-mono">
-                {t.movePrefix}{gameState.moveHistory.length}
-              </span>
+              {gameMode === 'online' && onlineConfig && (
+                <div className="flex items-center gap-1 shrink-0 ml-2">
+                  {['👋', '😂', '👏', '🔥'].map((emoji) => (
+                    <button
+                      key={emoji}
+                      onClick={() => {
+                        onlineMatch.broadcastReaction(emoji);
+                        setReactionToast({ emoji, sender: playerName || 'Saya' });
+                        setTimeout(() => setReactionToast(null), 2500);
+                      }}
+                      className="hover:scale-125 active:scale-95 transition text-[11px]"
+                      title={`Kirim ${emoji}`}
+                    >
+                      {emoji}
+                    </button>
+                  ))}
+                </div>
+              )}
             </div>
           );
         })()}
 
-        {/* Special Action Alert: DAM Penalty Claim (Only if enabled in settings) */}
-        {gameState.opponentMissedCapture && rulesConfig.damPenaltyClaim && !gameState.damClaimedThisTurn && (
-          <div className="bg-gradient-to-r from-rose-950/70 via-amber-950/60 to-stone-900 border border-amber-500/70 p-2.5 rounded-2xl flex flex-wrap items-center justify-between gap-2 animate-pulse">
-            <div className="flex items-center gap-2">
-              <AlertTriangle className="text-amber-400 shrink-0" size={16} />
-              <div className="text-xs">
-                <strong className="text-amber-300">{t.damPenaltyTitle}</strong>{' '}
-                <span className="text-stone-300">{t.damPenaltyDesc}</span>
-              </div>
-            </div>
-            <button
-              onClick={handleClaimDam}
-              className="px-3 py-1.5 rounded-xl text-xs font-extrabold bg-gradient-to-r from-amber-600 to-rose-600 hover:from-amber-500 text-white shadow transition active:scale-95"
-            >
-              {t.claimDamButton}
-            </button>
-          </div>
-        )}
-
-        {/* Multi-jump Notice */}
-        {gameState.consecutivePieceId && (
-          <div className="bg-sky-950/90 border border-sky-500/80 p-3 rounded-2xl flex flex-wrap items-center justify-between gap-3 shadow-xl">
-            <div className="text-xs text-sky-200">
-              <strong className="text-amber-300 block text-sm">{t.multiJumpTitle}</strong>
-              <span className="text-stone-300">{t.multiJumpDesc}</span>
-            </div>
-            <button
-              onClick={handlePassJump}
-              className="px-4 py-2 rounded-xl text-xs font-extrabold bg-gradient-to-r from-amber-600 to-emerald-600 hover:from-amber-500 text-white shadow-md transition active:scale-95 shrink-0"
-            >
-              {t.finishJumpButton}
-            </button>
-          </div>
-        )}
-
-        {/* Dynamic Scalable Board with Portrait Default */}
-        <div className="flex-1 flex flex-col items-center justify-center w-full">
+        {/* ZONA 3 — RESPONSIVE GAME BOARD (Centered & Auto-Fit) */}
+        <div className="flex-1 flex items-center justify-center min-h-0 w-full relative overflow-hidden my-0.5">
           <Board
             gameState={gameState}
             selectedPieceId={selectedPieceId}
@@ -958,22 +763,167 @@ export default function App() {
           />
         </div>
 
-        {/* Collapsible Move History Log */}
+        {/* ZONA 4 — PLAYER 1 BAR (At Bottom of Board) */}
+        <div
+          className={`px-3 py-2 rounded-2xl border transition-all flex items-center justify-between ${
+            gameState.currentPlayer === 'P1'
+              ? 'bg-gradient-to-r from-orange-950/70 via-stone-900 to-orange-950/50 border-orange-500 shadow-md shadow-orange-950/30'
+              : 'bg-stone-900/60 border-stone-800/80 opacity-80'
+          }`}
+        >
+          {/* Player 1 Info */}
+          <div className="flex items-center gap-2.5">
+            <div className="w-8 h-8 rounded-full bg-gradient-to-br from-orange-500 to-amber-700 flex items-center justify-center border-2 border-orange-300 shadow shrink-0">
+              <span className="font-bold text-[11px] text-white">P1</span>
+            </div>
+
+            <div>
+              <div className="flex items-center gap-1.5">
+                <span className="font-bold text-xs sm:text-sm text-stone-100">
+                  {gameMode === 'online' && onlineConfig
+                    ? onlineConfig.myRole === 'P1'
+                      ? `${playerName || t.player1} (${lang === 'en' ? 'You' : 'Anda'})`
+                      : onlineConfig.myName
+                    : (playerName || t.player1)}
+                </span>
+                <button
+                  onClick={() => setShowNameModal(true)}
+                  className="p-0.5 text-stone-400 hover:text-amber-300 rounded transition"
+                  title={lang === 'en' ? 'Edit player name' : 'Ubah nama pemain'}
+                >
+                  <User size={11} />
+                </button>
+              </div>
+              <div className="flex items-center gap-1.5 mt-0.5">
+                <span className="text-[10px] text-stone-400 font-medium">
+                  {p1Count} {t.pieces}
+                </span>
+                {p1Captured > 0 && (
+                  <div className="flex items-center gap-0.5">
+                    {Array.from({ length: Math.min(6, p1Captured) }).map((_, i) => (
+                      <div key={i} className="w-1.5 h-1.5 rounded-full bg-sky-400/90 shadow-xs" />
+                    ))}
+                    {p1Captured > 6 && <span className="text-[8px] text-stone-500 font-mono">+{p1Captured - 6}</span>}
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
+
+          {/* Action Slot: DAM Penalty Claim / Multi-jump Finish / Turn Status */}
+          <div className="flex items-center gap-2">
+            {/* Special Action: Claim DAM Penalty */}
+            {gameState.opponentMissedCapture && rulesConfig.damPenaltyClaim && !gameState.damClaimedThisTurn && (
+              <button
+                onClick={handleClaimDam}
+                className="px-3 py-1.5 rounded-xl bg-gradient-to-r from-amber-500 via-rose-600 to-orange-600 hover:from-amber-400 hover:to-rose-500 text-white font-black text-xs shadow-lg animate-pulse flex items-center gap-1 transition active:scale-95"
+                title={t.damPenaltyDesc}
+              >
+                <AlertTriangle size={14} />
+                <span>{t.claimDamButton} (+3)</span>
+              </button>
+            )}
+
+            {/* Special Action: Multi-jump Pass */}
+            {gameState.consecutivePieceId && (
+              <button
+                onClick={handlePassJump}
+                className="px-3 py-1.5 rounded-xl bg-gradient-to-r from-amber-600 to-emerald-600 hover:from-amber-500 text-white font-extrabold text-xs shadow-md transition active:scale-95 flex items-center gap-1"
+              >
+                <span>⚡ {t.finishJumpButton}</span>
+              </button>
+            )}
+
+            {/* Standard Turn Indicator */}
+            {gameState.currentPlayer === 'P1' && !gameState.opponentMissedCapture && !gameState.consecutivePieceId && (
+              <span className="px-2.5 py-1 rounded-full text-[10px] bg-orange-500/25 border border-orange-500/50 text-orange-300 font-bold">
+                {t.turn}
+              </span>
+            )}
+          </div>
+        </div>
+
+        {/* ZONA 5 — BOTTOM ACTION BAR (Thumb Zone Ergonomics) */}
+        <div className="grid grid-cols-4 gap-1 sm:gap-2 p-1 sm:p-1.5 bg-stone-900/95 border border-stone-800 rounded-2xl backdrop-blur-md shadow-lg text-xs mt-1">
+          {/* Slot 1: Mode / Match Setup */}
+          <button
+            onClick={() => setShowGameModeModal(true)}
+            className="flex flex-col items-center justify-center py-1.5 px-1 rounded-xl text-stone-300 hover:text-white hover:bg-stone-800/80 active:scale-95 transition"
+            title="Pilih Mode Permainan"
+          >
+            <Gamepad2 size={16} className="text-amber-400" />
+            <span className="text-[10px] font-bold mt-0.5">Mode</span>
+          </button>
+
+          {/* Slot 2: Undo */}
+          <button
+            onClick={handleUndo}
+            disabled={historyStack.length === 0 || isAiThinking}
+            className="flex flex-col items-center justify-center py-1.5 px-1 rounded-xl text-stone-300 hover:text-white hover:bg-stone-800/80 active:scale-95 transition disabled:opacity-30 disabled:pointer-events-none"
+            title={t.undo}
+          >
+            <RotateCcw size={16} className="text-stone-300" />
+            <span className="text-[10px] font-bold mt-0.5">{t.undo}</span>
+          </button>
+
+          {/* Slot 3: Moves Drawer Toggle */}
+          <button
+            onClick={() => setShowHistoryDrawer(!showHistoryDrawer)}
+            className={`flex flex-col items-center justify-center py-1.5 px-1 rounded-xl transition active:scale-95 ${
+              showHistoryDrawer
+                ? 'bg-amber-600/30 text-amber-300'
+                : 'text-stone-300 hover:text-white hover:bg-stone-800/80'
+            }`}
+            title={t.moveHistoryTitle}
+          >
+            <History size={16} className="text-emerald-400" />
+            <span className="text-[10px] font-bold mt-0.5">
+              {t.moves} ({gameState.moveHistory.length})
+            </span>
+          </button>
+
+          {/* Slot 4: Reset Match */}
+          <button
+            onClick={() => {
+              if (window.confirm(t.resetConfirm)) {
+                handleRestart();
+              }
+            }}
+            className="flex flex-col items-center justify-center py-1.5 px-1 rounded-xl text-rose-400 hover:text-rose-300 hover:bg-rose-950/30 active:scale-95 transition"
+            title={t.reset}
+          >
+            <RefreshCw size={16} />
+            <span className="text-[10px] font-bold mt-0.5">{t.reset}</span>
+          </button>
+        </div>
+
+        {/* Collapsible Move History Log (Floating Drawer) */}
         {showHistoryDrawer && (
-          <div className="bg-stone-900 border border-stone-800 rounded-2xl p-3 shadow-xl max-h-40 overflow-y-auto space-y-1.5 text-xs">
-            <div className="flex items-center justify-between font-bold text-stone-400 border-b border-stone-800 pb-1">
-              <span>{t.moveHistoryTitle}</span>
-              <span>{gameState.moveHistory.length} {t.moves}</span>
+          <div className="absolute bottom-16 left-2 right-2 z-40 bg-stone-900/98 border border-stone-700 rounded-2xl p-3 shadow-2xl max-h-48 overflow-y-auto space-y-1.5 text-xs backdrop-blur-md animate-in slide-in-from-bottom-2 duration-150">
+            <div className="flex items-center justify-between font-bold text-stone-300 border-b border-stone-800 pb-1.5">
+              <span className="text-amber-400">{t.moveHistoryTitle}</span>
+              <div className="flex items-center gap-2">
+                <span className="text-[10px] text-stone-500 font-mono">
+                  {gameState.moveHistory.length} {t.moves}
+                </span>
+                <button
+                  onClick={() => setShowHistoryDrawer(false)}
+                  className="text-stone-400 hover:text-stone-200 px-1 text-xs"
+                >
+                  ✕
+                </button>
+              </div>
             </div>
             {gameState.moveHistory.length === 0 ? (
-              <p className="text-stone-500 italic py-1">{t.noMovesYet}</p>
+              <p className="text-stone-500 italic py-2 text-center">{t.noMovesYet}</p>
             ) : (
               gameState.moveHistory.map((m, idx) => {
-                const actor = m.player === 'P1'
-                  ? (playerName || t.player1)
-                  : gameMode === 'ai'
-                  ? t.playerAi
-                  : (p2CustomName || t.player2);
+                const actor =
+                  m.player === 'P1'
+                    ? (playerName || t.player1)
+                    : gameMode === 'ai'
+                    ? t.playerAi
+                    : (p2CustomName || t.player2);
                 const formatted = formatMoveDescription(
                   actor,
                   m.fromNodeId,
@@ -985,11 +935,11 @@ export default function App() {
                 return (
                   <div
                     key={idx}
-                    className="flex items-center gap-2 p-1 rounded bg-stone-950/50 text-stone-300"
+                    className="flex items-center gap-2 p-1.5 rounded-lg bg-stone-950/60 text-stone-300 border border-stone-800/60"
                   >
-                    <span className="font-mono text-stone-500 text-[10px]">#{idx + 1}</span>
+                    <span className="font-mono text-stone-500 text-[10px] min-w-5">#{idx + 1}</span>
                     <span
-                      className={`font-bold ${
+                      className={`font-bold text-[11px] ${
                         m.player === 'P1' ? 'text-orange-400' : 'text-sky-400'
                       }`}
                     >
@@ -1005,7 +955,36 @@ export default function App() {
       </main>
 
       {/* Modals */}
-      <ModalTutorial isOpen={showTutorial} onClose={handleCloseTutorial} lang={lang} />
+      <ModalGameMode
+        isOpen={showGameModeModal}
+        onClose={() => setShowGameModeModal(false)}
+        gameMode={gameMode}
+        onSelectMode={(mode) => {
+          if (mode === 'ai') {
+            setGameMode('ai');
+            onlineMatch.cleanup();
+            setOnlineConfig(null);
+            handleRestart();
+          } else if (mode === 'pvp') {
+            setGameMode('pvp');
+            onlineMatch.cleanup();
+            setOnlineConfig(null);
+            handleRestart();
+          }
+        }}
+        aiDifficulty={aiDifficulty}
+        onSelectDifficulty={(diff) => {
+          setAiDifficulty(diff);
+        }}
+        lang={lang}
+        onOpenOnlineLobby={() => setShowOnlineLobby(true)}
+      />
+      <ModalTutorial
+        isOpen={showTutorial}
+        onClose={handleCloseTutorial}
+        lang={lang}
+        onChangeLang={setLang}
+      />
       <ModalPlayerName
         isOpen={showNameModal}
         onSaveName={handleSaveName}
@@ -1013,6 +992,7 @@ export default function App() {
         currentP1Name={playerName}
         currentP2Name={p2CustomName}
         lang={lang}
+        onChangeLang={setLang}
       />
       <ModalGameHistory
         isOpen={showGameHistory}

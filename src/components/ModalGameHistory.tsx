@@ -72,8 +72,8 @@ export const ModalGameHistory: React.FC<ModalGameHistoryProps> = ({
   const handleClearAll = async () => {
     const confirmMsg =
       lang === 'en'
-        ? 'Are you sure you want to clear all game history from IndexedDB?'
-        : 'Apakah Anda yakin ingin menghapus seluruh riwayat permainan dari IndexedDB?';
+        ? 'Are you sure you want to clear all game history?'
+        : 'Apakah Anda yakin ingin menghapus seluruh riwayat permainan?';
     if (window.confirm(confirmMsg)) {
       await clearAllGameHistory();
       setHistory([]);
@@ -113,8 +113,8 @@ export const ModalGameHistory: React.FC<ModalGameHistoryProps> = ({
               </h3>
               <p className="text-[11px] text-stone-400">
                 {lang === 'en'
-                  ? 'All matches recorded locally in browser IndexedDB'
-                  : 'Tersimpan otomatis di IndexedDB browser Anda'}
+                  ? 'All matches recorded locally on your device'
+                  : 'Tersimpan otomatis di memori perangkat Anda'}
               </p>
             </div>
           </div>
@@ -163,7 +163,7 @@ export const ModalGameHistory: React.FC<ModalGameHistoryProps> = ({
           {isLoading ? (
             <div className="py-12 flex flex-col items-center justify-center text-stone-400 space-y-2">
               <RefreshCw className="animate-spin text-amber-400" size={24} />
-              <p className="text-xs">{lang === 'en' ? 'Loading IndexedDB...' : 'Memuat data IndexedDB...'}</p>
+              <p className="text-xs">{lang === 'en' ? 'Loading game history...' : 'Memuat riwayat permainan...'}</p>
             </div>
           ) : history.length === 0 ? (
             <div className="py-12 flex flex-col items-center justify-center text-center space-y-3 text-stone-400">

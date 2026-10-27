@@ -316,7 +316,7 @@ export const getTutorialSlides = (lang: Language) => {
     return [
       {
         title: '1. Origins & The Dam-Daman Board',
-        subtitle: 'Authentic Graph Structure & Setup',
+        subtitle: 'Authentic Board Layout & Setup',
         text: (
           <div className="space-y-3 text-stone-300 text-sm leading-relaxed">
             <p>
@@ -326,10 +326,10 @@ export const getTutorialSlides = (lang: Language) => {
             </p>
             <div className="bg-stone-900/80 p-3 rounded-xl border border-stone-800">
               <h4 className="font-semibold text-stone-200 mb-1 flex items-center gap-1.5">
-                <span>Authentic Board Graph Structure</span>
+                <span>Authentic Board Layout</span>
               </h4>
               <ul className="list-disc list-inside space-y-1 text-stone-400 text-xs">
-                <li>Consists of <strong>37 line intersections (vertices)</strong> and <strong>76 connecting lines (edges)</strong>.</li>
+                <li>Consists of <strong>37 intersection points</strong> and <strong>76 connecting lines</strong>.</li>
                 <li>The center board is a 5x5 square grid with diagonal lines across each quadrant.</li>
                 <li>Both opposing ends feature triangular wings (known as <em>Dapur</em>, <em>Gunungan</em>, or <em>Tail</em>).</li>
                 <li>Each player commands <strong>16 pieces</strong>. The middle vertical row (5 points) begins empty.</li>
@@ -438,7 +438,7 @@ export const getTutorialSlides = (lang: Language) => {
   return [
     {
       title: '1. Asal Usul & Papan Dam-Daman',
-      subtitle: 'Struktur Graf Autentik & Penataan Awal',
+      subtitle: 'Bentuk Papan & Penataan Awal',
       text: (
         <div className="space-y-3 text-stone-300 text-sm leading-relaxed">
           <p>
@@ -449,10 +449,10 @@ export const getTutorialSlides = (lang: Language) => {
           </p>
           <div className="bg-stone-900/80 p-3 rounded-xl border border-stone-800">
             <h4 className="font-semibold text-stone-200 mb-1 flex items-center gap-1.5">
-              <span>Struktur Graf Papan Autentik</span>
+              <span>Bentuk Papan Permainan</span>
             </h4>
             <ul className="list-disc list-inside space-y-1 text-stone-400 text-xs">
-              <li>Terdiri dari <strong>37 titik temu garis (simpul/vertex)</strong> dan <strong>76 garis penghubung (sisi/edge)</strong>.</li>
+              <li>Terdiri dari <strong>37 titik temu garis</strong> dan <strong>76 garis lintasan</strong>.</li>
               <li>Papan tengah berbentuk bujur sangkar 5x5 dengan garis diagonal di setiap kuadran.</li>
               <li>Kedua ujung memiliki sayap segitiga (dikenal sebagai <em>Dapur</em>, <em>Gunungan</em>, atau <em>Ekor</em>).</li>
               <li>Masing-masing pemain dibekali <strong>16 bidak</strong>. Kolom tengah (5 titik) dikosongkan saat mulai.</li>

@@ -15,7 +15,7 @@ import { Language, translations } from '../i18n';
 interface ModalGameOverProps {
   isOpen: boolean;
   gameState: GameState;
-  gameMode: 'ai' | 'pvp';
+  gameMode: 'ai' | 'pvp' | 'online';
   onPlayAgain: () => void;
   onClose: () => void;
   lang?: Language;
