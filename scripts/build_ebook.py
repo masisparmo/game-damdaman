@@ -44,9 +44,8 @@ def parse_markdown_to_html(md_text):
     code_lang = ""
     code_lines = []
     
-    in_list = False
-    list_type = None # 'ul' or 'ol'
-    
+    list_stack = [] # stack of {'type': 'ol' or 'ul', 'indent': int}
+        
     in_blockquote = False
     blockquote_lines = []
     
@@ -102,12 +101,36 @@ def parse_markdown_to_html(md_text):
 
         return text
 
-    def close_list():
-        nonlocal in_list, list_type
-        if in_list:
-            html_out.append(f'</{list_type}>')
-            in_list = False
-            list_type = None
+    def close_all_lists():
+        while list_stack:
+            top = list_stack.pop()
+            html_out.append(f"</{top['type']}>")
+
+    def adjust_list_stack(target_type, indent, item_num=None):
+        if not list_stack:
+            cls = "content-ordered-list" if target_type == "ol" else "content-list"
+            start_attr = f' start="{item_num}"' if target_type == "ol" and item_num and item_num != "1" else ""
+            html_out.append(f"<{target_type} class=\"{cls}\"{start_attr}>")
+            list_stack.append({'type': target_type, 'indent': indent})
+            return
+
+        if indent > list_stack[-1]['indent']:
+            cls = "content-sublist"
+            html_out.append(f"<{target_type} class=\"{cls}\">")
+            list_stack.append({'type': target_type, 'indent': indent})
+            return
+
+        while len(list_stack) > 1 and indent < list_stack[-1]['indent']:
+            top = list_stack.pop()
+            html_out.append(f"</{top['type']}>")
+
+        if list_stack[-1]['type'] != target_type:
+            top = list_stack.pop()
+            html_out.append(f"</{top['type']}>")
+            cls = "content-ordered-list" if target_type == "ol" else "content-list"
+            start_attr = f' start="{item_num}"' if target_type == "ol" and item_num and item_num != "1" else ""
+            html_out.append(f"<{target_type} class=\"{cls}\"{start_attr}>")
+            list_stack.append({'type': target_type, 'indent': indent})
 
     def close_blockquote():
         nonlocal in_blockquote, blockquote_lines
@@ -162,7 +185,7 @@ def parse_markdown_to_html(md_text):
                 code_lines.append(line)
             continue
         elif code_start_match:
-            close_list()
+            close_all_lists()
             close_blockquote()
             in_code_block = True
             code_fence = code_start_match.group(1)
@@ -191,7 +214,7 @@ def parse_markdown_to_html(md_text):
 
         # Horizontal Rule
         if stripped in ['---', '***', '___']:
-            close_list()
+            close_all_lists()
             close_blockquote()
             html_out.append('<hr class="divider" />')
             continue
@@ -199,7 +222,7 @@ def parse_markdown_to_html(md_text):
         # Headings
         h_match = re.match(r'^(#{1,4})\s+(.+)$', line)
         if h_match:
-            close_list()
+            close_all_lists()
             close_blockquote()
             level = len(h_match.group(1))
             heading_text = h_match.group(2).strip()
@@ -224,7 +247,7 @@ def parse_markdown_to_html(md_text):
 
         # Blockquote (> text)
         if stripped.startswith('>'):
-            close_list()
+            close_all_lists()
             in_blockquote = True
             bq_text = re.sub(r'^>\s?', '', line).strip()
             blockquote_lines.append(bq_text)
@@ -234,34 +257,29 @@ def parse_markdown_to_html(md_text):
 
         # Unordered or Ordered Lists
         ul_match = re.match(r'^(\s*)[*-]\s+(.+)$', line)
-        ol_match = re.match(r'^(\s*)\d+\.\s+(.+)$', line)
+        ol_match = re.match(r'^(\s*)(\d+)\.\s+(.+)$', line)
 
-        if ul_match:
-            content = format_inline(ul_match.group(2))
-            if not in_list or list_type != 'ul':
-                close_list()
-                in_list = True
-                list_type = 'ul'
-                html_out.append('<ul class="content-list">')
-            html_out.append(f'  <li class="list-item">{content}</li>')
+        if ol_match:
+            indent = len(ol_match.group(1))
+            num = ol_match.group(2)
+            content = format_inline(ol_match.group(3))
+            adjust_list_stack('ol', indent, num)
+            html_out.append(f'  <li class="list-item" value="{num}">{content}</li>')
             continue
-        elif ol_match:
-            content = format_inline(ol_match.group(2))
-            if not in_list or list_type != 'ol':
-                close_list()
-                in_list = True
-                list_type = 'ol'
-                html_out.append('<ol class="content-ordered-list">')
+        elif ul_match:
+            indent = len(ul_match.group(1))
+            content = format_inline(ul_match.group(2))
+            adjust_list_stack('ul', indent)
             html_out.append(f'  <li class="list-item">{content}</li>')
             continue
         else:
-            close_list()
+            close_all_lists()
 
         # Regular Paragraph
         if stripped:
             html_out.append(f'<p class="paragraph">{format_inline(line)}</p>')
 
-    close_list()
+    close_all_lists()
     close_blockquote()
 
     return '\n'.join(html_out), toc_items
@@ -818,6 +836,19 @@ def generate_full_html():
     .content-list, .content-ordered-list {{
       margin: 1rem 0 1.5rem 1.5rem;
       color: var(--text-primary);
+    }}
+
+    .content-sublist {{
+      margin: 0.5rem 0 1rem 1.75rem;
+      padding-left: 0.5rem;
+    }}
+
+    ol .content-sublist {{
+      list-style-type: disc;
+    }}
+
+    ul .content-sublist {{
+      list-style-type: circle;
     }}
 
     .list-item {{
