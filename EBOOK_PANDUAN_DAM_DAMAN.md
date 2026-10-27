@@ -389,7 +389,7 @@ Bidak tidak hanya dibedakan berdasarkan warna oranye dan biru, melainkan diperku
   * Pada layar smartphone sempit, tombol aksi di jendela cara bermain (*ModalTutorial*) mengalami *overflow* (terpotong ke luar bingkai).
   * Antarmuka masih memuat istilah teknis IT seperti *IndexedDB*, *simpul/vertex*, dan *sisi/edge* yang membingungkan bagi masyarakat umum.
 * **Solusi & Perbaikan:**
-  * **Pilihan Bahasa di Jendela Awal:** Menambahkan tombol toggle bahasa instan (`🇮🇩 ID` / `🇬🇧 EN`) di pojok kanan atas `ModalTutorial` dan `ModalPlayerName` sehingga pemain internasional dapat beralih bahasa seketika dari layar pertama.
+  * **Pilihan Bahasa di Jendela Awal:** Menambahkan tombol toggle bahasa instan (`ID` / `EN`) di pojok kanan atas `ModalTutorial`, `ModalPlayerName`, dan bilah atas sehingga pemain internasional dapat beralih bahasa seketika tanpa masalah rendering emoji bendera di perangkat mobile.
   * **Navigasi Mobile-Safe:** Merombak bilah navigasi bawah `ModalTutorial` menjadi responsif: tombol *Sebelumnya* di kiri, indikator titik di tengah, dan tombol *Selanjutnya* / *Mulai Bermain* di kanan. Menghilangkan tombol berlebih sehingga **100% bebas dari overflow**.
   * **Penyucian Bahasa dari Jargon IT:** Mengganti istilah *IndexedDB* menjadi bahasa awam yang ramah (*"Pencatatan Otomatis Riwayat"*), serta menyederhanakan penjelasan geometri papan menjadi *"37 titik temu garis dan 76 garis lintasan"* tanpa jargon asing.
 * **Hasil Pengujian Browser:**

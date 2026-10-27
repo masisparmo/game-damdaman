@@ -92,7 +92,7 @@ export const ModalSettings: React.FC<ModalSettingsProps> = ({
                       : 'border-stone-800 bg-stone-900 text-stone-400 hover:text-stone-200'
                   }`}
                 >
-                  <span className="text-base">🇮🇩</span>
+                  <span className="px-1.5 py-0.5 rounded bg-stone-800 text-[11px] font-bold">ID</span>
                   <span>Bahasa Indonesia (Default)</span>
                 </button>
                 <button
@@ -103,7 +103,7 @@ export const ModalSettings: React.FC<ModalSettingsProps> = ({
                       : 'border-stone-800 bg-stone-900 text-stone-400 hover:text-stone-200'
                   }`}
                 >
-                  <span className="text-base">🇬🇧</span>
+                  <span className="px-1.5 py-0.5 rounded bg-stone-800 text-[11px] font-bold">EN</span>
                   <span>English (International)</span>
                 </button>
               </div>

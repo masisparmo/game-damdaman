@@ -606,10 +606,10 @@ export default function App() {
             {/* Language Switcher */}
             <button
               onClick={() => setLang(lang === 'id' ? 'en' : 'id')}
-              className="px-2 py-1 rounded-xl bg-stone-800/80 hover:bg-stone-700 active:scale-95 text-[11px] font-bold text-stone-300 border border-stone-700/60 flex items-center gap-1 transition"
+              className="px-2 py-1 rounded-xl bg-stone-800/80 hover:bg-stone-700 active:scale-95 text-[11px] font-bold text-stone-300 border border-stone-700/60 transition"
               title="Ganti Bahasa / Switch Language"
             >
-              <span>{lang === 'id' ? '🇮🇩 ID' : '🇬🇧 EN'}</span>
+              <span>{lang === 'id' ? 'ID' : 'EN'}</span>
             </button>
 
             {/* Sound Toggle */}

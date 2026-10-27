@@ -103,7 +103,7 @@ export const ModalPlayerName: React.FC<ModalPlayerNameProps> = ({
                     lang === 'id' ? 'bg-amber-600 text-white' : 'text-stone-400 hover:text-stone-200'
                   }`}
                 >
-                  🇮🇩 ID
+                  ID
                 </button>
                 <button
                   type="button"
@@ -112,7 +112,7 @@ export const ModalPlayerName: React.FC<ModalPlayerNameProps> = ({
                     lang === 'en' ? 'bg-amber-600 text-white' : 'text-stone-400 hover:text-stone-200'
                   }`}
                 >
-                  🇬🇧 EN
+                  EN
                 </button>
               </div>
             )}

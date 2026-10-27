@@ -81,28 +81,26 @@ export const ModalTutorial: React.FC<ModalTutorialProps> = ({
                 <button
                   type="button"
                   onClick={() => onChangeLang('id')}
-                  className={`px-2 py-0.5 rounded-lg text-[11px] font-bold transition flex items-center gap-1 ${
+                  className={`px-2 py-0.5 rounded-lg text-[11px] font-bold transition ${
                     lang === 'id'
                       ? 'bg-amber-600 text-white shadow-xs'
                       : 'text-stone-400 hover:text-stone-200'
                   }`}
                   title="Bahasa Indonesia"
                 >
-                  <span>🇮🇩</span>
-                  <span>ID</span>
+                  ID
                 </button>
                 <button
                   type="button"
                   onClick={() => onChangeLang('en')}
-                  className={`px-2 py-0.5 rounded-lg text-[11px] font-bold transition flex items-center gap-1 ${
+                  className={`px-2 py-0.5 rounded-lg text-[11px] font-bold transition ${
                     lang === 'en'
                       ? 'bg-amber-600 text-white shadow-xs'
                       : 'text-stone-400 hover:text-stone-200'
                   }`}
                   title="English"
                 >
-                  <span>🇬🇧</span>
-                  <span>EN</span>
+                  EN
                 </button>
               </div>
             )}
