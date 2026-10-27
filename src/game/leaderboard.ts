@@ -298,17 +298,6 @@ export async function getGlobalLeaderboard(currentPlayerStats: PlayerStats): Pro
   let entries: LeaderboardEntry[] = [];
   let isLiveCloud = false;
 
-  // 1. Proactively push current player's profile & accumulated score to Supabase Cloud
-  // so any offline or previously earned points (like points earned before the table existed)
-  // are immediately registered in the global cloud database!
-  if (currentPlayerStats && currentPlayerStats.playerId && currentPlayerStats.playerName) {
-    try {
-      await syncPlayerStatsToCloud(currentPlayerStats);
-    } catch (err) {
-      console.warn('Proactive cloud sync notification:', err);
-    }
-  }
-
   try {
     const { data, error } = await supabase
       .from('player_rankings')
@@ -330,6 +319,32 @@ export async function getGlobalLeaderboard(currentPlayerStats: PlayerStats): Pro
         totalMatches: Number(row.total_matches) || 0,
         winRate: Number(row.win_rate) || 0,
       }));
+
+      // RECONCILIATION: Check if current player already exists in Supabase Cloud
+      const cloudPlayer = data.find((row: any) => row.player_id === currentPlayerStats.playerId);
+      if (cloudPlayer) {
+        // Cloud is authoritative! If superuser edited score in Supabase, update local IndexedDB!
+        const cloudPoints = Number(cloudPlayer.total_points) || 0;
+        const cloudWins = Number(cloudPlayer.wins) || 0;
+        const cloudMatches = Number(cloudPlayer.total_matches) || 0;
+
+        if (
+          currentPlayerStats.totalPoints !== cloudPoints ||
+          currentPlayerStats.wins !== cloudWins ||
+          currentPlayerStats.totalMatches !== cloudMatches
+        ) {
+          currentPlayerStats.totalPoints = cloudPoints;
+          currentPlayerStats.wins = cloudWins;
+          currentPlayerStats.totalMatches = cloudMatches;
+          currentPlayerStats.losses = Number(cloudPlayer.losses) || 0;
+          currentPlayerStats.draws = Number(cloudPlayer.draws) || 0;
+          currentPlayerStats.winRate = Number(cloudPlayer.win_rate) || 0;
+          saveLocalPlayerStats(currentPlayerStats).catch(() => {});
+        }
+      } else if (currentPlayerStats && currentPlayerStats.playerId && currentPlayerStats.playerName) {
+        // Player is new and not in Cloud yet: register them in Supabase Cloud now
+        syncPlayerStatsToCloud(currentPlayerStats).catch(() => {});
+      }
     }
   } catch (err) {
     console.warn('Using local leaderboard fallback:', err);
@@ -342,23 +357,21 @@ export async function getGlobalLeaderboard(currentPlayerStats: PlayerStats): Pro
 
   // Ensure current player is included in ranking list
   const existingIndex = entries.findIndex((e) => e.playerId === currentPlayerStats.playerId);
-  const currentEntry: LeaderboardEntry = {
-    playerId: currentPlayerStats.playerId,
-    playerName: currentPlayerStats.playerName,
-    playerAvatar: currentPlayerStats.playerAvatar,
-    totalPoints: currentPlayerStats.totalPoints,
-    wins: currentPlayerStats.wins,
-    losses: currentPlayerStats.losses,
-    draws: currentPlayerStats.draws,
-    totalMatches: currentPlayerStats.totalMatches,
-    winRate: currentPlayerStats.winRate,
-    isCurrentPlayer: true,
-  };
-
   if (existingIndex >= 0) {
-    entries[existingIndex] = currentEntry;
+    entries[existingIndex].isCurrentPlayer = true;
   } else {
-    entries.push(currentEntry);
+    entries.push({
+      playerId: currentPlayerStats.playerId,
+      playerName: currentPlayerStats.playerName,
+      playerAvatar: currentPlayerStats.playerAvatar,
+      totalPoints: currentPlayerStats.totalPoints,
+      wins: currentPlayerStats.wins,
+      losses: currentPlayerStats.losses,
+      draws: currentPlayerStats.draws,
+      totalMatches: currentPlayerStats.totalMatches,
+      winRate: currentPlayerStats.winRate,
+      isCurrentPlayer: true,
+    });
   }
 
   // Sort descending by points, then by wins

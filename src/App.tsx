@@ -163,14 +163,7 @@ export default function App() {
     initMasterBrain();
   }, []);
 
-  // Proactively sync existing player stats to Supabase Cloud on startup
-  useEffect(() => {
-    if (playerName) {
-      getLocalPlayerStats(playerName, playerAvatar).then((st) => {
-        syncPlayerStatsToCloud(st).catch(() => {});
-      });
-    }
-  }, [playerName, playerAvatar]);
+
 
   // Check for room invite code in URL query params (?room=DAM-XXXX)
   useEffect(() => {
