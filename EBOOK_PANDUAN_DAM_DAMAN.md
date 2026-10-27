@@ -139,8 +139,19 @@ Inilah aturan paling unik dan menegangkan dalam Dam-Daman yang membedakannya dar
 * Mekanisme ini menanamkan etos ketelitian dan konsentrasi tinggi.
 
 ### 2.6. Promosi Bidak Raja (Puncak Gunungan)
-* Fitur opsional yang dapat diaktifkan: Jika sebuah bidak berhasil menembus pertahanan lawan hingga mencapai **puncak segitiga belakang lawan (*Puncak Gunungan / Apex Node*)**, bidak tersebut dipromosikan menjadi **Raja (King)** bermahkota emas.
-* Raja memiliki keleluasaan manuver yang lebih lincah dan berwibawa di atas papan.
+Posisi paling belakang pada area segitiga wilayah lawan disebut sebagai **Puncak Gunungan** atau **Pucuk Dapur Lawan (*Triangle Apex Node*)**. Menembus seluruh barisan pertahanan 16 bidak musuh hingga berhasil mendarat di titik puncak ini merupakan pencapaian taktis tertinggi dalam tradisi Dam-Daman / Catur Jawa.
+
+Aturan promosi ini kini **aktif secara default** dan memberikan keistimewaan serta keuntungan nyata bagi pemain:
+
+1. **Kehormatan Visual & Mahkota Emas (*Golden Crown Insignia*):**
+   * Bidak yang mencapai puncak segitiga lawan langsung dipromosikan dan disematkan **Mahkota Emas Berkilau** di atas kepalanya.
+   * Dilengkapi cincin aura keemasan ganda serta label status **`RAJA`** (atau **`KING`**), menjadikannya figur paling disegani dan berwibawa di atas papan.
+2. **Peningkatan Bobot Strategis AI Drastis (2.5× Lipat):**
+   * Di dalam mesin kecerdasan buatan (*AI Engine Minimax & Quiescence Search*), Bidak Raja memiliki bobot nilai evaluasi **25 poin** (berbanding 10 poin pada bidak biasa).
+   * **Dampak Taktis:** AI memandang Bidak Raja sebagai ancaman mematikan yang sangat berbahaya. AI akan berpikir keras menyusun formasi bertahan, memprioritaskan keselamatan rajanya sendiri, atau rela mengorbankan bidak biasa demi membendung pergerakan Bidak Raja Anda.
+3. **Penguasaan Titik Kunci & Tekanan Kebuntuan (*Stalemate Pressure*):**
+   * Puncak segitiga (*Apex*) memiliki keterhubungan khusus yang mengontrol jalur keluar-masuk area belakang lawan.
+   * Keberadaan Bidak Raja di zona ini mempersempit mobilitas sisa-sisa bidak lawan, mempercepat tercapainya kondisi kemenangan kebuntuan (*stalemate*) di mana seluruh bidak lawan terkunci total.
 
 ### 2.7. Kondisi Kemenangan, Kekalahan, dan Remis (Draw)
 * **Menang Mutlak:** Pemain berhasil menghabisi ke-16 bidak lawan hingga habis.
