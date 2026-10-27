@@ -136,40 +136,40 @@ export const ModalLeaderboard: React.FC<ModalLeaderboardProps> = ({
           </div>
         </div>
 
-        {/* Tab Switcher */}
-        <div className="px-4 sm:px-6 pt-2.5 pb-1 flex gap-1.5 border-b border-stone-800/80 bg-stone-900/40 shrink-0">
+        {/* Tab Switcher - Responsive 3-Column Grid without Clipping */}
+        <div className="px-2.5 sm:px-6 pt-2.5 pb-1 grid grid-cols-3 gap-1 sm:gap-2 border-b border-stone-800/80 bg-stone-900/40 shrink-0">
           <button
             onClick={() => setActiveTab('leaderboard')}
-            className={`flex-1 py-1.5 px-2 rounded-xl text-xs font-bold transition flex items-center justify-center gap-1.5 border ${
+            className={`py-1.5 px-1 sm:px-2 rounded-xl text-[11px] sm:text-xs font-bold transition flex items-center justify-center gap-1 sm:gap-1.5 border min-w-0 ${
               activeTab === 'leaderboard'
                 ? 'bg-amber-600/30 border-amber-500 text-amber-300 shadow-xs'
                 : 'bg-stone-800/50 border-stone-700/50 text-stone-400 hover:text-stone-200'
             }`}
           >
-            <Trophy size={13} className="text-amber-400" />
-            <span className="truncate">{t.leaderboardTab}</span>
+            <Trophy size={13} className="text-amber-400 shrink-0" />
+            <span className="truncate">{lang === 'en' ? 'Ranking' : 'Peringkat'}</span>
           </button>
           <button
             onClick={() => setActiveTab('stats')}
-            className={`flex-1 py-1.5 px-2 rounded-xl text-xs font-bold transition flex items-center justify-center gap-1.5 border ${
+            className={`py-1.5 px-1 sm:px-2 rounded-xl text-[11px] sm:text-xs font-bold transition flex items-center justify-center gap-1 sm:gap-1.5 border min-w-0 ${
               activeTab === 'stats'
                 ? 'bg-amber-600/30 border-amber-500 text-amber-300 shadow-xs'
                 : 'bg-stone-800/50 border-stone-700/50 text-stone-400 hover:text-stone-200'
             }`}
           >
-            <BarChart3 size={13} className="text-sky-400" />
-            <span className="truncate">{t.statsTab}</span>
+            <BarChart3 size={13} className="text-sky-400 shrink-0" />
+            <span className="truncate">{lang === 'en' ? 'Stats' : 'Statistik'}</span>
           </button>
           <button
             onClick={() => setActiveTab('rules')}
-            className={`flex-1 py-1.5 px-2 rounded-xl text-xs font-bold transition flex items-center justify-center gap-1.5 border ${
+            className={`py-1.5 px-1 sm:px-2 rounded-xl text-[11px] sm:text-xs font-bold transition flex items-center justify-center gap-1 sm:gap-1.5 border min-w-0 ${
               activeTab === 'rules'
                 ? 'bg-amber-600/30 border-amber-500 text-amber-300 shadow-xs'
                 : 'bg-stone-800/50 border-stone-700/50 text-stone-400 hover:text-stone-200'
             }`}
           >
-            <Flame size={13} className="text-orange-400" />
-            <span className="truncate">{t.rulesTab}</span>
+            <Flame size={13} className="text-orange-400 shrink-0" />
+            <span className="truncate">{lang === 'en' ? 'Rules' : 'Aturan'}</span>
           </button>
         </div>
 
@@ -246,13 +246,13 @@ export const ModalLeaderboard: React.FC<ModalLeaderboardProps> = ({
               {/* Leaderboard Table */}
               <div className="bg-stone-950/70 rounded-2xl border border-stone-800/90 overflow-hidden shadow-inner">
                 <div className="px-3 py-2 bg-stone-900/80 border-b border-stone-800 flex items-center justify-between text-[11px] font-semibold text-stone-400">
-                  <div className="flex items-center gap-2">
-                    <span className="w-6 text-center">{t.rankHeader}</span>
+                  <div className="flex items-center gap-2.5">
+                    <span className="w-7 text-center font-bold text-stone-500 shrink-0">#</span>
                     <span>{t.playerHeader}</span>
                   </div>
-                  <div className="flex items-center gap-4 text-right">
+                  <div className="flex items-center gap-3 text-right">
                     <span className="w-16 hidden sm:inline">{t.statsHeader}</span>
-                    <span className="w-16">{t.scoreHeader}</span>
+                    <span className="w-20 text-right">{t.scoreHeader}</span>
                   </div>
                 </div>
 
@@ -270,7 +270,7 @@ export const ModalLeaderboard: React.FC<ModalLeaderboardProps> = ({
                       >
                         <div className="flex items-center gap-2.5 min-w-0">
                           <span
-                            className={`w-6 text-center font-bold text-xs font-mono shrink-0 ${
+                            className={`w-7 text-center font-bold text-xs font-mono shrink-0 ${
                               entry.rank === 1
                                 ? 'text-yellow-400'
                                 : entry.rank === 2
@@ -542,10 +542,12 @@ export const ModalLeaderboard: React.FC<ModalLeaderboardProps> = ({
               <div className="p-3 rounded-xl bg-stone-950/60 border border-stone-800 text-[11px] text-stone-400 space-y-1">
                 <div className="flex items-center gap-1.5 text-amber-300 font-semibold">
                   <CheckCircle2 size={13} />
-                  <span>Sinkronisasi Otomatis Database & Memori Lokal</span>
+                  <span>{lang === 'en' ? 'Automatic Online & Offline Recording' : 'Pencatatan Otomatis Online & Offline'}</span>
                 </div>
                 <p>
-                  Seluruh perolehan nilai dan peringkat secara langsung tersinkronisasi ke database cloud (Supabase) dan disimpan di IndexedDB perangkat Anda untuk kehandalan bermain saat offline.
+                  {lang === 'en'
+                    ? 'All score points and rankings are automatically synced when connected online and securely saved on your device for offline play.'
+                    : 'Seluruh perolehan nilai dan peringkat secara otomatis tersambung online dan tersimpan aman di memori perangkat Anda agar tetap dapat dimainkan saat offline.'}
                 </p>
               </div>
             </div>

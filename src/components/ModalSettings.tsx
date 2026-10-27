@@ -256,7 +256,7 @@ export const ModalSettings: React.FC<ModalSettingsProps> = ({
               <div className="flex items-center gap-1.5">
                 <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
                 <span className="text-stone-300 font-medium">
-                  {lang === 'en' ? 'Supabase Global Hive Mind' : 'Otak Global Supabase'}
+                  {lang === 'en' ? 'Global Collective Intelligence' : 'Kecerdasan Kolektif Global'}
                 </span>
               </div>
               <span className="text-emerald-400 font-mono text-[10px]">

@@ -237,8 +237,8 @@ export const ModalOnlineLobby: React.FC<ModalOnlineLobbyProps> = ({
               </h3>
               <p className="text-[11px] text-stone-400">
                 {lang === 'en'
-                  ? 'Real-time WebSocket over Supabase'
-                  : 'Real-time WebSocket via Supabase'}
+                  ? 'Play with friends or online players'
+                  : 'Bermain bersama teman atau lawan online'}
               </p>
             </div>
           </div>
